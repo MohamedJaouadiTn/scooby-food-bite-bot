@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu - Scooby Food</title>
+    <meta name="description" content="Explore our delicious menu at Scooby Food" />
+    <meta name="author" content="Scooby Food" />
+    <link rel="icon" href="/public/favicon.ico" />
+    
+    <!-- Meta tags for social media -->
+    <meta property="og:title" content="Menu - Scooby Food" />
+    <meta property="og:description" content="Explore our delicious menu at Scooby Food" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@scoobyfood" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/src/index.css" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lobster&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="root">
+      <!-- Header with Navigation -->
+      <header class="header">
+        <div class="container">
+          <div class="header-content">
+            <div class="logo">
+              <h1>Scooby Food</h1>
+            </div>
+            <nav class="nav">
+              <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="menu.html" class="nav-link active">Menu</a></li>
+                <li class="nav-item"><a href="index.html#about" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="index.html#contact" class="nav-link">Contact</a></li>
+              </ul>
+            </nav>
+            <div class="mobile-menu-btn">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="cart-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <span class="cart-count">0</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Menu Hero Section -->
+      <section class="menu-hero">
+        <div class="container">
+          <div class="menu-hero-content">
+            <h2>Our Menu</h2>
+            <p>Explore our delicious selection of freshly prepared food</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Filter Section -->
+      <section class="menu-filter">
+        <div class="container">
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="breakfast">Breakfast</button>
+            <button class="filter-btn" data-filter="main-course">Main Course</button>
+            <button class="filter-btn" data-filter="sides">Sides</button>
+            <button class="filter-btn" data-filter="drinks">Drinks</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Items Section -->
+      <section class="menu-items">
+        <div class="container">
+          <div class="menu-grid">
+            <!-- Breakfast Items -->
+            <div class="menu-item" data-category="breakfast" data-id="1">
+              <div class="menu-image">
+                <img src="https://images.unsplash.com/photo-1500673922987-e212871fec22" alt="Breakfast Platter">
+              </div>
+              <div class="menu-info">
+                <h3>Breakfast Platter</h3>
+                <p>Eggs, sausage, toast, and hash browns</p>
+                <div class="menu-price-actions">
+                  <span class="menu-price">$15.99</span>
+                  <div class="menu-actions">
+                    <button class="btn btn-sm btn-add-cart" data-id="1" data-name="Breakfast Platter" data-price="15.99">Add to Cart</button>
+                    <button class="btn btn-sm btn-primary btn-buy-now" data-id="1" data-name="Breakfast Platter" data-price="15.99">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Malawi -->
+            <div class="menu-item" data-category="main-course" data-id="2">
+              <div class="menu-image">
+                <img src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9" alt="Malawi">
+              </div>
+              <div class="menu-info">
+                <h3>Malawi</h3>
+                <p>Our signature Malawi made with authentic spices</p>
+                <div class="menu-price-actions">
+                  <span class="menu-price">$8.99</span>
+                  <div class="menu-actions">
+                    <button class="btn btn-sm btn-add-cart" data-id="2" data-name="Malawi" data-price="8.99">Add to Cart</button>
+                    <button class="btn btn-sm btn-primary btn-buy-now" data-id="2" data-name="Malawi" data-price="8.99">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chapaty -->
+            <div class="menu-item" data-category="sides" data-id="3">
+              <div class="menu-image">
+                <img src="https://images.unsplash.com/photo-1500673922987-e212871fec22" alt="Chapaty">
+              </div>
+              <div class="menu-info">
+                <h3>Chapaty</h3>
+                <p>Freshly made Chapaty, perfect with any meal</p>
+                <div class="menu-price-actions">
+                  <span class="menu-price">$5.49</span>
+                  <div class="menu-actions">
+                    <button class="btn btn-sm btn-add-cart" data-id="3" data-name="Chapaty" data-price="5.49">Add to Cart</button>
+                    <button class="btn btn-sm btn-primary btn-buy-now" data-id="3" data-name="Chapaty" data-price="5.49">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tacos -->
+            <div class="menu-item" data-category="main-course" data-id="4">
+              <div class="menu-image">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="Tacos">
+              </div>
+              <div class="menu-info">
+                <h3>Tacos</h3>
+                <p>Spicy and flavorful tacos with your choice of filling</p>
+                <div class="menu-price-actions">
+                  <span class="menu-price">$9.99</span>
+                  <div class="menu-actions">
+                    <button class="btn btn-sm btn-add-cart" data-id="4" data-name="Tacos" data-price="9.99">Add to Cart</button>
+                    <button class="btn btn-sm btn-primary btn-buy-now" data-id="4" data-name="Tacos" data-price="9.99">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Burger -->
+            <div class="menu-item" data-category="main-course" data-id="5">
+              <div class="menu-image">
+                <img src="https://images.unsplash.com/photo-1582562124811-c09040d0a901" alt="Burger">
+              </div>
+              <div class="menu-info">
+                <h3>Burger</h3>
+                <p>Juicy burger with all the fixings you love</p>
+                <div class="menu-price-actions">
+                  <span class="menu-price">$12.99</span>
+                  <div class="menu-actions">
+                    <button class="btn btn-sm btn-add-cart" data-id="5" data-name="Burger" data-price="12.99">Add to Cart</button>
+                    <button class="btn btn-sm btn-primary btn-buy-now" data-id="5" data-name="Burger" data-price="12.99">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Soda -->
+            <div class="menu-item" data-category="drinks" data-id="6">
+              <div class="menu-image">
+                <img src="https://images.unsplash.com/photo-1582562124811-c09040d0a901" alt="Soda">
+              </div>
+              <div class="menu-info">
+                <h3>Soda</h3>
+                <p>Refreshing soda in various flavors</p>
+                <div class="menu-price-actions">
+                  <span class="menu-price">$2.99</span>
+                  <div class="menu-actions">
+                    <button class="btn btn-sm btn-add-cart" data-id="6" data-name="Soda" data-price="2.99">Add to Cart</button>
+                    <button class="btn btn-sm btn-primary btn-buy-now" data-id="6" data-name="Soda" data-price="2.99">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cart Modal -->
+      <div class="modal" id="cartModal">
+        <div class="modal-content">
+          <span class="close-modal">&times;</span>
+          <h2>Your Cart</h2>
+          <div class="cart-items">
+            <!-- Cart items will be inserted here via JavaScript -->
+          </div>
+          <div class="cart-total">
+            <h3>Total: <span id="cartTotal">$0.00</span></h3>
+          </div>
+          <div class="cart-actions">
+            <button class="btn btn-secondary" id="clearCart">Clear Cart</button>
+            <button class="btn btn-primary" id="checkoutBtn">Checkout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Modal -->
+      <div class="modal" id="orderModal">
+        <div class="modal-content">
+          <span class="close-modal">&times;</span>
+          <h2>Complete Your Order</h2>
+          <form id="orderForm">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="address">Delivery Address</label>
+              <input type="text" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="order-summary">
+              <h3>Order Summary</h3>
+              <div id="orderSummary"></div>
+              <div class="order-total">
+                <h4>Total: <span id="orderTotal">$0.00</span></h4>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Place Order</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Order Confirmation Modal -->
+      <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+          <span class="close-modal">&times;</span>
+          <div class="confirmation-content">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+              <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+              <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+            <h2>Order Placed Successfully!</h2>
+            <p>Thank you for your order. We'll prepare your food and deliver it to you as soon as possible.</p>
+            <button class="btn btn-primary btn-block" id="backToMenuBtn">Back to Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Section -->
+      <footer id="contact" class="footer">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-logo">
+              <h2>Scooby Food</h2>
+              <p>Delicious food, delivered fast</p>
+            </div>
+            <div class="footer-contact">
+              <h3>Contact Us</h3>
+              <p><strong>Address:</strong> 123 Food Street, Tasty Town</p>
+              <p><strong>Phone:</strong> (123) 456-7890</p>
+              <p><strong>Email:</strong> info@scoobyfood.com</p>
+            </div>
+            <div class="footer-hours">
+              <h3>Opening Hours</h3>
+              <p><strong>Monday - Friday:</strong> 10:00 AM - 10:00 PM</p>
+              <p><strong>Saturday - Sunday:</strong> 11:00 AM - 11:00 PM</p>
+            </div>
+            <div class="footer-social">
+              <h3>Follow Us</h3>
+              <div class="social-icons">
+                <a href="#" class="social-icon facebook" aria-label="Facebook">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                </a>
+                <a href="#" class="social-icon instagram" aria-label="Instagram">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </a>
+                <a href="#" class="social-icon twitter" aria-label="Twitter">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p>&copy; 2025 Scooby Food. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/src/main.js"></script>
+    <script src="/src/menu.js"></script>
+  </body>
+</html>
