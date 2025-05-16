@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -32,14 +33,14 @@ const MenuPage = () => {
 
   // Menu items data
   const menuItems = [
-    { id: "1", name: "Burger", price: 8.99, category: "main", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "2", name: "Chapaty", price: 5.99, category: "main", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "3", name: "Malawi", price: 7.99, category: "main", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "4", name: "Tacos", price: 6.99, category: "main", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
-    { id: "5", name: "Soda", price: 2.50, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "6", name: "Coffee", price: 3.50, category: "drinks", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "7", name: "Breakfast", price: 12.99, category: "breakfast", image: "https://images.unsplash.com/photo-1533920379810-6bedac961c2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWtmYXN0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "8", name: "Salad", price: 9.99, category: "healthy", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "1", name: "Burger", frenchName: "Hamburger", price: 8.99, category: "main", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "2", name: "Chapaty", frenchName: "Chapati", price: 5.99, category: "main", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "3", name: "Malawi", frenchName: "Malawi", price: 7.99, category: "main", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "4", name: "Tacos", frenchName: "Tacos", price: 6.99, category: "main", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "5", name: "Soda", frenchName: "Soda", price: 2.50, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "6", name: "Coffee", frenchName: "Café", price: 3.50, category: "drinks", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "7", name: "Breakfast", frenchName: "Petit-déjeuner", price: 12.99, category: "breakfast", image: "https://images.unsplash.com/photo-1533920379810-6bedac961c2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWtmYXN0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "8", name: "Salad", frenchName: "Salade", price: 9.99, category: "healthy", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
   ];
 
   // Translation data
@@ -75,6 +76,12 @@ const MenuPage = () => {
       thankYou: "Thank you for your order. We'll prepare it right away!",
       continueShopping: "Continue Shopping",
       viewIngredients: "View Ingredients",
+      ingredients: "Ingredients:",
+      quickLinks: "Quick Links",
+      followUs: "Follow Us",
+      contactUs: "Contact Us",
+      copyright: "2023 Scooby Food. All rights reserved.",
+      deliciousFood: "Delicious food for every mood",
     },
     fr: {
       home: "Accueil",
@@ -107,19 +114,49 @@ const MenuPage = () => {
       thankYou: "Merci pour votre commande. Nous la préparerons immédiatement!",
       continueShopping: "Continuer vos Achats",
       viewIngredients: "Voir les Ingrédients",
+      ingredients: "Ingrédients:",
+      quickLinks: "Liens Rapides",
+      followUs: "Suivez-nous",
+      contactUs: "Contactez-nous",
+      copyright: "2023 Scooby Food. Tous droits réservés.",
+      deliciousFood: "Des plats délicieux pour chaque humeur",
     }
   };
 
-  // Ingredients data
+  // Ingredients data with French translations
   const ingredients = {
-    "1": ["Beef patty", "Lettuce", "Tomato", "Cheese", "Onions", "Special sauce", "Sesame bun"],
-    "2": ["Flour", "Water", "Salt", "Oil"],
-    "3": ["Flour", "Water", "Salt", "Oil", "Traditional spices"],
-    "4": ["Tortilla", "Beef/Chicken", "Lettuce", "Tomato", "Cheese", "Sour cream", "Salsa"],
-    "5": ["Carbonated water", "High fructose corn syrup", "Caramel color", "Phosphoric acid", "Natural flavors", "Caffeine"],
-    "6": ["Coffee beans", "Hot water", "Optional: milk, sugar"],
-    "7": ["Eggs", "Bread", "Butter", "Bacon", "Hash browns", "Orange juice"],
-    "8": ["Fresh greens", "Tomatoes", "Cucumbers", "Bell peppers", "Olive oil", "Vinegar", "Salt", "Pepper"],
+    "1": {
+      en: ["Beef patty", "Lettuce", "Tomato", "Cheese", "Onions", "Special sauce", "Sesame bun"],
+      fr: ["Steak de bœuf", "Laitue", "Tomate", "Fromage", "Oignons", "Sauce spéciale", "Pain au sésame"]
+    },
+    "2": {
+      en: ["Flour", "Water", "Salt", "Oil"],
+      fr: ["Farine", "Eau", "Sel", "Huile"]
+    },
+    "3": {
+      en: ["Flour", "Water", "Salt", "Oil", "Traditional spices"],
+      fr: ["Farine", "Eau", "Sel", "Huile", "Épices traditionnelles"]
+    },
+    "4": {
+      en: ["Tortilla", "Beef/Chicken", "Lettuce", "Tomato", "Cheese", "Sour cream", "Salsa"],
+      fr: ["Tortilla", "Bœuf/Poulet", "Laitue", "Tomate", "Fromage", "Crème sure", "Salsa"]
+    },
+    "5": {
+      en: ["Carbonated water", "High fructose corn syrup", "Caramel color", "Phosphoric acid", "Natural flavors", "Caffeine"],
+      fr: ["Eau gazéifiée", "Sirop de maïs à haute teneur en fructose", "Colorant caramel", "Acide phosphorique", "Arômes naturels", "Caféine"]
+    },
+    "6": {
+      en: ["Coffee beans", "Hot water", "Optional: milk, sugar"],
+      fr: ["Grains de café", "Eau chaude", "Optionnel: lait, sucre"]
+    },
+    "7": {
+      en: ["Eggs", "Bread", "Butter", "Bacon", "Hash browns", "Orange juice"],
+      fr: ["Œufs", "Pain", "Beurre", "Bacon", "Galettes de pommes de terre", "Jus d'orange"]
+    },
+    "8": {
+      en: ["Fresh greens", "Tomatoes", "Cucumbers", "Bell peppers", "Olive oil", "Vinegar", "Salt", "Pepper"],
+      fr: ["Verdures fraîches", "Tomates", "Concombres", "Poivrons", "Huile d'olive", "Vinaigre", "Sel", "Poivre"]
+    },
   };
 
   // Get translation function
@@ -390,8 +427,8 @@ const MenuPage = () => {
         <div className="menu-items">
           {filteredItems.map((item) => (
             <div key={item.id} className="menu-item" data-category={item.category}>
-              <img src={item.image} alt={item.name} className="menu-item-img" />
-              <h3>{item.name}</h3>
+              <img src={item.image} alt={currentLanguage === 'en' ? item.name : item.frenchName} className="menu-item-img" />
+              <h3>{currentLanguage === 'en' ? item.name : item.frenchName}</h3>
               <div className="menu-item-price">${item.price.toFixed(2)}</div>
               
               {/* Ingredients button */}
@@ -405,9 +442,9 @@ const MenuPage = () => {
               {/* Ingredients popup */}
               {showIngredients === item.id && (
                 <div className="ingredients-popup">
-                  <h4>Ingredients:</h4>
+                  <h4>{t('ingredients')}</h4>
                   <ul>
-                    {ingredients[item.id as keyof typeof ingredients]?.map((ingredient, index) => (
+                    {ingredients[item.id as keyof typeof ingredients][currentLanguage as 'en' | 'fr'].map((ingredient, index) => (
                       <li key={index}>{ingredient}</li>
                     ))}
                   </ul>
@@ -426,13 +463,13 @@ const MenuPage = () => {
               <div className="menu-item-actions">
                 <button 
                   className="btn-add-cart" 
-                  onClick={() => addToCart(item)}
+                  onClick={() => addToCart({...item, name: currentLanguage === 'en' ? item.name : item.frenchName})}
                 >
                   {t('addToCart')}
                 </button>
                 <button 
                   className="btn-buy-now"
-                  onClick={() => buyNow(item)}
+                  onClick={() => buyNow({...item, name: currentLanguage === 'en' ? item.name : item.frenchName})}
                 >
                   {t('buyNow')}
                 </button>
@@ -633,11 +670,11 @@ const MenuPage = () => {
         <div className="footer-content">
           <div className="footer-logo">
             <h2>Scooby<span>Food</span></h2>
-            <p>Delicious food for every mood</p>
+            <p>{t('deliciousFood')}</p>
           </div>
           
           <div className="footer-links">
-            <h3>Quick Links</h3>
+            <h3>{t('quickLinks')}</h3>
             <ul>
               <li><Link to="/">{t('home')}</Link></li>
               <li><Link to="/menu">{t('menu')}</Link></li>
@@ -647,14 +684,14 @@ const MenuPage = () => {
           </div>
           
           <div className="footer-contact">
-            <h3>Contact Us</h3>
+            <h3>{t('contactUs')}</h3>
             <p><i className="fa fa-map-marker"></i> 123 Food Street, Foodville</p>
             <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
             <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
           </div>
           
           <div className="footer-social">
-            <h3>Follow Us</h3>
+            <h3>{t('followUs')}</h3>
             <div className="social-icons">
               <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>
               <a href="#" className="social-icon"><i className="fa fa-instagram"></i></a>
@@ -664,7 +701,7 @@ const MenuPage = () => {
         </div>
         
         <div className="footer-bottom">
-          <p>&copy; 2023 Scooby Food. All rights reserved.</p>
+          <p>&copy; {t('copyright')}</p>
         </div>
       </footer>
     </div>

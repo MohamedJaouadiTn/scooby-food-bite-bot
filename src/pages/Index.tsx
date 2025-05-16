@@ -27,7 +27,19 @@ const Index = () => {
       viewMenu: "View Our Menu",
       quickLinks: "Quick Links",
       followUs: "Follow Us",
-      copyright: "2023 Scooby Food. All rights reserved."
+      copyright: "2023 Scooby Food. All rights reserved.",
+      // Featured items descriptions
+      chapatyDesc: "Soft, fluffy chapati bread perfect for any meal",
+      malawiDesc: "Traditional Malawi with authentic flavors",
+      sodaDesc: "Ice-cold sodas to complement your meal",
+      // Testimonials
+      testimonial1: "The best chapaty I've ever had! Scooby Food never disappoints with their quality and taste.",
+      testimonial2: "Quick service, friendly staff and delicious food. What more could you ask for? Highly recommend!",
+      testimonial3: "Their burgers are juicy and flavorful. My go-to place when I'm craving fast food that's actually good.",
+      // Ingredients
+      chapatyIngredients: "Made with premium flour, water, salt, and a touch of oil",
+      malawiIngredients: "Prepared with fine flour, water, salt, oil and traditional spices",
+      sodaIngredients: "Various refreshing flavors with natural ingredients"
     },
     fr: {
       home: "Accueil",
@@ -48,7 +60,19 @@ const Index = () => {
       viewMenu: "Voir Notre Menu",
       quickLinks: "Liens Rapides",
       followUs: "Suivez-nous",
-      copyright: "2023 Scooby Food. Tous droits réservés."
+      copyright: "2023 Scooby Food. Tous droits réservés.",
+      // Featured items descriptions in French
+      chapatyDesc: "Pain chapati moelleux et léger, parfait pour tous les repas",
+      malawiDesc: "Malawi traditionnel avec des saveurs authentiques",
+      sodaDesc: "Sodas glacés pour accompagner votre repas",
+      // Testimonials in French
+      testimonial1: "Le meilleur chapati que j'ai jamais mangé ! Scooby Food ne déçoit jamais avec sa qualité et son goût.",
+      testimonial2: "Service rapide, personnel sympathique et nourriture délicieuse. Que demander de plus ? Je recommande vivement !",
+      testimonial3: "Leurs hamburgers sont juteux et savoureux. Mon endroit préféré quand j'ai envie de fast-food qui est vraiment bon.",
+      // Ingredients in French
+      chapatyIngredients: "Préparé avec de la farine premium, de l'eau, du sel et un peu d'huile",
+      malawiIngredients: "Préparé avec de la farine fine, de l'eau, du sel, de l'huile et des épices traditionnelles",
+      sodaIngredients: "Diverses saveurs rafraîchissantes avec des ingrédients naturels"
     }
   };
 
@@ -150,7 +174,8 @@ const Index = () => {
               <img src="/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" alt="Chapaty" />
             </div>
             <h3>Chapaty</h3>
-            <p>Soft, fluffy chapati bread perfect for any meal</p>
+            <p>{t('chapatyDesc')}</p>
+            <p className="ingredients-text"><small>{t('chapatyIngredients')}</small></p>
             <div className="featured-price">$5.99</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
@@ -160,7 +185,8 @@ const Index = () => {
               <img src="/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" alt="Malawi" />
             </div>
             <h3>Malawi</h3>
-            <p>Traditional Malawi with authentic flavors</p>
+            <p>{t('malawiDesc')}</p>
+            <p className="ingredients-text"><small>{t('malawiIngredients')}</small></p>
             <div className="featured-price">$7.99</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
@@ -170,7 +196,8 @@ const Index = () => {
               <img src="/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" alt="Sodas" />
             </div>
             <h3>Refreshing Sodas</h3>
-            <p>Ice-cold sodas to complement your meal</p>
+            <p>{t('sodaDesc')}</p>
+            <p className="ingredients-text"><small>{t('sodaIngredients')}</small></p>
             <div className="featured-price">$2.50</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
@@ -186,7 +213,7 @@ const Index = () => {
         <div className="testimonial-slider">
           <div className={`testimonial-slide ${activeSlide === 0 ? 'active' : ''}`}>
             <div className="testimonial-content">
-              <p>"The best chapaty I've ever had! Scooby Food never disappoints with their quality and taste."</p>
+              <p>"{t('testimonial1')}"</p>
               <div className="customer-info">
                 <h4>Sarah Johnson</h4>
                 <span className="customer-rating">★★★★★</span>
@@ -196,7 +223,7 @@ const Index = () => {
           
           <div className={`testimonial-slide ${activeSlide === 1 ? 'active' : ''}`}>
             <div className="testimonial-content">
-              <p>"Quick service, friendly staff and delicious food. What more could you ask for? Highly recommend!"</p>
+              <p>"{t('testimonial2')}"</p>
               <div className="customer-info">
                 <h4>Michael Brown</h4>
                 <span className="customer-rating">★★★★★</span>
@@ -206,7 +233,7 @@ const Index = () => {
           
           <div className={`testimonial-slide ${activeSlide === 2 ? 'active' : ''}`}>
             <div className="testimonial-content">
-              <p>"Their burgers are juicy and flavorful. My go-to place when I'm craving fast food that's actually good."</p>
+              <p>"{t('testimonial3')}"</p>
               <div className="customer-info">
                 <h4>Emily Davis</h4>
                 <span className="customer-rating">★★★★☆</span>
