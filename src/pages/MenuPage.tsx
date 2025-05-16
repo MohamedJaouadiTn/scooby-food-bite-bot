@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Info } from "lucide-react";
 
 const MenuPage = () => {
   const { toast } = useToast();
@@ -15,7 +15,10 @@ const MenuPage = () => {
     name: "",
     address: "",
     phone: "",
+    allergies: "", // Added allergies field
   });
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [showIngredients, setShowIngredients] = useState<string | null>(null);
 
   // Telegram Bot Configuration
   const token = "8170617850:AAFJWVcrDKSCaRknRSs_XTj_6epWef8qnjQ";
@@ -28,17 +31,90 @@ const MenuPage = () => {
     quantity: number;
   };
 
-  // Menu items data
-  const menuItems = [
-    { id: "1", name: "Burger", price: 8.99, category: "main", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "2", name: "Chapaty", price: 5.99, category: "main", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "3", name: "Malawi", price: 7.99, category: "main", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "4", name: "Tacos", price: 6.99, category: "main", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
-    { id: "5", name: "Soda", price: 2.50, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "6", name: "Coffee", price: 3.50, category: "drinks", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "7", name: "Breakfast", price: 12.99, category: "breakfast", image: "https://images.unsplash.com/photo-1533920379810-6bedac961c2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWtmYXN0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "8", name: "Salad", price: 9.99, category: "healthy", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
-  ];
+  // Translation data
+  const translations = {
+    en: {
+      home: "Home",
+      menu: "Menu",
+      about: "About",
+      contact: "Contact",
+      ourMenu: "Our Menu",
+      discoverDishes: "Discover your favorite dishes",
+      all: "All",
+      mainDishes: "Main Dishes",
+      breakfast: "Breakfast",
+      drinks: "Drinks",
+      healthyOptions: "Healthy Options",
+      addToCart: "Add to Cart",
+      buyNow: "Buy Now",
+      yourCart: "Your Cart",
+      emptyCart: "Your cart is empty",
+      total: "Total:",
+      clearCart: "Clear Cart",
+      checkout: "Checkout",
+      completeOrder: "Complete Your Order",
+      orderSummary: "Order Summary",
+      name: "Name",
+      deliveryAddress: "Delivery Address",
+      phoneNumber: "Phone Number",
+      allergies: "Allergies or preferences (optional)",
+      allergiesInfo: "Use this field to let us know about any allergies or preferences. It's optional!",
+      placeOrder: "Place Order",
+      orderConfirmed: "Order Confirmed!",
+      thankYou: "Thank you for your order. We'll prepare it right away!",
+      continueShopping: "Continue Shopping",
+      viewIngredients: "View Ingredients",
+    },
+    fr: {
+      home: "Accueil",
+      menu: "Menu",
+      about: "À Propos",
+      contact: "Contact",
+      ourMenu: "Notre Menu",
+      discoverDishes: "Découvrez vos plats préférés",
+      all: "Tous",
+      mainDishes: "Plats Principaux",
+      breakfast: "Petit-déjeuner",
+      drinks: "Boissons",
+      healthyOptions: "Options Santé",
+      addToCart: "Ajouter au Panier",
+      buyNow: "Acheter",
+      yourCart: "Votre Panier",
+      emptyCart: "Votre panier est vide",
+      total: "Total:",
+      clearCart: "Vider le Panier",
+      checkout: "Commander",
+      completeOrder: "Compléter Votre Commande",
+      orderSummary: "Résumé de la Commande",
+      name: "Nom",
+      deliveryAddress: "Adresse de Livraison",
+      phoneNumber: "Numéro de Téléphone",
+      allergies: "Allergies ou préférences (optionnel)",
+      allergiesInfo: "Utilisez ce champ pour nous informer de vos allergies ou préférences. C'est optionnel!",
+      placeOrder: "Passer la Commande",
+      orderConfirmed: "Commande Confirmée!",
+      thankYou: "Merci pour votre commande. Nous la préparerons immédiatement!",
+      continueShopping: "Continuer vos Achats",
+      viewIngredients: "Voir les Ingrédients",
+    }
+  };
+
+  // Ingredients data
+  const ingredients = {
+    "1": ["Beef patty", "Lettuce", "Tomato", "Cheese", "Onions", "Special sauce", "Sesame bun"],
+    "2": ["Flour", "Water", "Salt", "Oil"],
+    "3": ["Flour", "Water", "Salt", "Oil", "Traditional spices"],
+    "4": ["Tortilla", "Beef/Chicken", "Lettuce", "Tomato", "Cheese", "Sour cream", "Salsa"],
+    "5": ["Carbonated water", "High fructose corn syrup", "Caramel color", "Phosphoric acid", "Natural flavors", "Caffeine"],
+    "6": ["Coffee beans", "Hot water", "Optional: milk, sugar"],
+    "7": ["Eggs", "Bread", "Butter", "Bacon", "Hash browns", "Orange juice"],
+    "8": ["Fresh greens", "Tomatoes", "Cucumbers", "Bell peppers", "Olive oil", "Vinegar", "Salt", "Pepper"],
+  };
+
+  // Get translation function
+  const t = (key: string) => {
+    return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
+  };
 
   // Load cart from localStorage
   useEffect(() => {
@@ -91,6 +167,15 @@ const MenuPage = () => {
   const buyNow = (item: any) => {
     setCart([{ ...item, quantity: 1 }]);
     setShowOrderModal(true);
+  };
+
+  // Toggle ingredients display
+  const toggleIngredients = (id: string) => {
+    if (showIngredients === id) {
+      setShowIngredients(null);
+    } else {
+      setShowIngredients(id);
+    }
   };
 
   // Decrease quantity
@@ -183,7 +268,12 @@ const MenuPage = () => {
     message += `\nCustomer Information:\n`;
     message += `Name = ${orderForm.name}\n`;
     message += `Address = ${orderForm.address}\n`;
-    message += `Phone = ${orderForm.phone}`;
+    message += `Phone = ${orderForm.phone}\n`;
+    
+    // Add allergies information if provided
+    if (orderForm.allergies) {
+      message += `Allergies/Preferences = ${orderForm.allergies}\n`;
+    }
     
     // Send to Telegram
     sendToTelegram(message)
@@ -206,6 +296,18 @@ const MenuPage = () => {
       });
   };
 
+  // Menu items data
+  const menuItems = [
+    { id: "1", name: "Burger", price: 8.99, category: "main", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "2", name: "Chapaty", price: 5.99, category: "main", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "3", name: "Malawi", price: 7.99, category: "main", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "4", name: "Tacos", price: 6.99, category: "main", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "5", name: "Soda", price: 2.50, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "6", name: "Coffee", price: 3.50, category: "drinks", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "7", name: "Breakfast", price: 12.99, category: "breakfast", image: "https://images.unsplash.com/photo-1533920379810-6bedac961c2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWtmYXN0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "8", name: "Salad", price: 9.99, category: "healthy", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+  ];
+
   return (
     <div className="menu-page">
       <header className="header">
@@ -214,12 +316,25 @@ const MenuPage = () => {
         </div>
         <nav className="nav">
           <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/menu" className="active">Menu</Link></li>
-            <li><a href="/#about">About</a></li>
-            <li><a href="/#contact">Contact</a></li>
+            <li><Link to="/">{t('home')}</Link></li>
+            <li><Link to="/menu" className="active">{t('menu')}</Link></li>
+            <li><a href="/#about">{t('about')}</a></li>
+            <li><a href="/#contact">{t('contact')}</a></li>
           </ul>
         </nav>
+        
+        {/* Language Switcher */}
+        <div className="language-switcher">
+          <select 
+            value={currentLanguage} 
+            onChange={(e) => setCurrentLanguage(e.target.value)}
+            className="language-select"
+          >
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+        </div>
+        
         <div className="cart-icon" onClick={() => setShowCartModal(true)}>
           <ShoppingCart className="w-6 h-6" />
           {totalCartItems > 0 && <span className="cart-count">{totalCartItems}</span>}
@@ -236,8 +351,8 @@ const MenuPage = () => {
 
       <section className="menu-section">
         <div className="section-title">
-          <h2>Our Menu</h2>
-          <p>Discover your favorite dishes</p>
+          <h2>{t('ourMenu')}</h2>
+          <p>{t('discoverDishes')}</p>
         </div>
         
         <div className="filter-buttons">
@@ -245,31 +360,31 @@ const MenuPage = () => {
             className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
             onClick={() => setActiveFilter('all')}
           >
-            All
+            {t('all')}
           </button>
           <button 
             className={`filter-btn ${activeFilter === 'main' ? 'active' : ''}`}
             onClick={() => setActiveFilter('main')}
           >
-            Main Dishes
+            {t('mainDishes')}
           </button>
           <button 
             className={`filter-btn ${activeFilter === 'breakfast' ? 'active' : ''}`}
             onClick={() => setActiveFilter('breakfast')}
           >
-            Breakfast
+            {t('breakfast')}
           </button>
           <button 
             className={`filter-btn ${activeFilter === 'drinks' ? 'active' : ''}`}
             onClick={() => setActiveFilter('drinks')}
           >
-            Drinks
+            {t('drinks')}
           </button>
           <button 
             className={`filter-btn ${activeFilter === 'healthy' ? 'active' : ''}`}
             onClick={() => setActiveFilter('healthy')}
           >
-            Healthy Options
+            {t('healthyOptions')}
           </button>
         </div>
         
@@ -279,18 +394,48 @@ const MenuPage = () => {
               <img src={item.image} alt={item.name} className="menu-item-img" />
               <h3>{item.name}</h3>
               <div className="menu-item-price">${item.price.toFixed(2)}</div>
+              
+              {/* Ingredients button */}
+              <button 
+                className="btn-view-ingredients" 
+                onClick={() => toggleIngredients(item.id)}
+              >
+                {t('viewIngredients')}
+              </button>
+              
+              {/* Ingredients popup */}
+              {showIngredients === item.id && (
+                <div className="ingredients-popup">
+                  <h4>Ingredients:</h4>
+                  <ul>
+                    {ingredients[item.id as keyof typeof ingredients]?.map((ingredient, index) => (
+                      <li key={index}>{ingredient}</li>
+                    ))}
+                  </ul>
+                  <button 
+                    className="close-ingredients"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowIngredients(null);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              
               <div className="menu-item-actions">
                 <button 
                   className="btn-add-cart" 
                   onClick={() => addToCart(item)}
                 >
-                  Add to Cart
+                  {t('addToCart')}
                 </button>
                 <button 
                   className="btn-buy-now"
                   onClick={() => buyNow(item)}
                 >
-                  Buy Now
+                  {t('buyNow')}
                 </button>
               </div>
             </div>
@@ -307,11 +452,11 @@ const MenuPage = () => {
         }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowCartModal(false)}>×</span>
-            <h2>Your Cart</h2>
+            <h2>{t('yourCart')}</h2>
             
             <div className="cart-items">
               {cart.length === 0 ? (
-                <p className="empty-cart">Your cart is empty</p>
+                <p className="empty-cart">{t('emptyCart')}</p>
               ) : (
                 cart.map((item) => (
                   <div key={item.id} className="cart-item">
@@ -347,7 +492,7 @@ const MenuPage = () => {
             
             <div className="cart-footer">
               <div className="cart-total">
-                <span>Total:</span>
+                <span>{t('total')}</span>
                 <span id="cartTotal">${calculateTotal()}</span>
               </div>
               
@@ -358,7 +503,7 @@ const MenuPage = () => {
                   onClick={clearCart}
                   disabled={cart.length === 0}
                 >
-                  Clear Cart
+                  {t('clearCart')}
                 </button>
                 <button 
                   id="checkoutBtn" 
@@ -377,7 +522,7 @@ const MenuPage = () => {
                   }}
                   disabled={cart.length === 0}
                 >
-                  Checkout
+                  {t('checkout')}
                 </button>
               </div>
             </div>
@@ -390,10 +535,10 @@ const MenuPage = () => {
         <div className="modal">
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowOrderModal(false)}>×</span>
-            <h2>Complete Your Order</h2>
+            <h2>{t('completeOrder')}</h2>
             
             <div className="order-summary">
-              <h3>Order Summary</h3>
+              <h3>{t('orderSummary')}</h3>
               <div id="orderSummary">
                 {cart.map((item) => (
                   <div key={item.id} className="order-item">
@@ -403,14 +548,14 @@ const MenuPage = () => {
                 ))}
               </div>
               <div className="order-total">
-                <span>Total:</span>
+                <span>{t('total')}</span>
                 <span id="orderTotal">${calculateTotal()}</span>
               </div>
             </div>
             
             <form id="orderForm" onSubmit={handleSubmitOrder}>
               <div className="form-group">
-                <label htmlFor="name">Name</label>
+                <label htmlFor="name">{t('name')}</label>
                 <input 
                   type="text" 
                   id="name" 
@@ -422,7 +567,7 @@ const MenuPage = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="address">Delivery Address</label>
+                <label htmlFor="address">{t('deliveryAddress')}</label>
                 <textarea 
                   id="address" 
                   name="address" 
@@ -433,7 +578,7 @@ const MenuPage = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="phone">Phone Number</label>
+                <label htmlFor="phone">{t('phoneNumber')}</label>
                 <input 
                   type="tel" 
                   id="phone" 
@@ -444,7 +589,24 @@ const MenuPage = () => {
                 />
               </div>
               
-              <button type="submit" className="btn-primary btn-block">Place Order</button>
+              {/* Added allergies field */}
+              <div className="form-group allergies-group">
+                <div className="allergies-label-container">
+                  <label htmlFor="allergies">{t('allergies')}</label>
+                  <div className="info-tooltip">
+                    <Info size={16} />
+                    <span className="tooltip-text">{t('allergiesInfo')}</span>
+                  </div>
+                </div>
+                <textarea 
+                  id="allergies" 
+                  name="allergies" 
+                  value={orderForm.allergies}
+                  onChange={handleInputChange}
+                ></textarea>
+              </div>
+              
+              <button type="submit" className="btn-primary btn-block">{t('placeOrder')}</button>
             </form>
           </div>
         </div>
@@ -454,15 +616,15 @@ const MenuPage = () => {
       {showConfirmationModal && (
         <div className="modal">
           <div className="modal-content confirmation-modal">
-            <h2>Order Confirmed!</h2>
-            <p>Thank you for your order. We'll prepare it right away!</p>
+            <h2>{t('orderConfirmed')}</h2>
+            <p>{t('thankYou')}</p>
             <div className="confirmation-icon">✓</div>
             <button 
               id="backToMenuBtn" 
               className="btn-primary"
               onClick={() => setShowConfirmationModal(false)}
             >
-              Continue Shopping
+              {t('continueShopping')}
             </button>
           </div>
         </div>
@@ -478,10 +640,10 @@ const MenuPage = () => {
           <div className="footer-links">
             <h3>Quick Links</h3>
             <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/menu">Menu</Link></li>
-              <li><a href="/#about">About</a></li>
-              <li><a href="/#contact">Contact</a></li>
+              <li><Link to="/">{t('home')}</Link></li>
+              <li><Link to="/menu">{t('menu')}</Link></li>
+              <li><a href="/#about">{t('about')}</a></li>
+              <li><a href="/#contact">{t('contact')}</a></li>
             </ul>
           </div>
           

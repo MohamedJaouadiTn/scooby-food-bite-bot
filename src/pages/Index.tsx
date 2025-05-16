@@ -4,6 +4,58 @@ import { Link } from "react-router-dom";
 
 const Index = () => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+  
+  // Translation data
+  const translations = {
+    en: {
+      home: "Home",
+      menu: "Menu",
+      about: "About",
+      contact: "Contact",
+      heroTitle: "Delicious Food for Every Mood",
+      heroSubtitle: "Experience the taste that makes you come back for more",
+      exploreMenu: "Explore Menu",
+      featuredItems: "Featured Items",
+      popularItems: "Our most popular and delicious offerings",
+      orderNow: "Order Now",
+      testimonials: "What Our Customers Say",
+      testimonialSubtitle: "Hear from people who love our food",
+      aboutTitle: "About Scooby Food",
+      aboutText1: "Since 2010, Scooby Food has been serving delicious, high-quality fast food with a twist of homemade goodness. We believe in using fresh ingredients to create meals that not only satisfy hunger but also delight the taste buds.",
+      aboutText2: "Our passionate team works hard to ensure every customer leaves with a smile, making us one of the most beloved food spots in town.",
+      viewMenu: "View Our Menu",
+      quickLinks: "Quick Links",
+      followUs: "Follow Us",
+      copyright: "2023 Scooby Food. All rights reserved."
+    },
+    fr: {
+      home: "Accueil",
+      menu: "Menu",
+      about: "À Propos",
+      contact: "Contact",
+      heroTitle: "Des Plats Délicieux pour Chaque Humeur",
+      heroSubtitle: "Découvrez le goût qui vous fera revenir pour plus",
+      exploreMenu: "Explorer le Menu",
+      featuredItems: "Articles Vedettes",
+      popularItems: "Nos offres les plus populaires et délicieuses",
+      orderNow: "Commander",
+      testimonials: "Ce Que Disent Nos Clients",
+      testimonialSubtitle: "Écoutez les personnes qui adorent notre nourriture",
+      aboutTitle: "À Propos de Scooby Food",
+      aboutText1: "Depuis 2010, Scooby Food sert de la restauration rapide délicieuse et de qualité avec une touche de bonté maison. Nous croyons en l'utilisation d'ingrédients frais pour créer des repas qui non seulement satisfont la faim mais ravissent aussi les papilles.",
+      aboutText2: "Notre équipe passionnée travaille dur pour s'assurer que chaque client repart avec le sourire, faisant de nous l'un des endroits les plus aimés en ville.",
+      viewMenu: "Voir Notre Menu",
+      quickLinks: "Liens Rapides",
+      followUs: "Suivez-nous",
+      copyright: "2023 Scooby Food. Tous droits réservés."
+    }
+  };
+
+  // Get translation function
+  const t = (key: string) => {
+    return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
+  };
   
   useEffect(() => {
     // Testimonial slider effect
@@ -52,12 +104,25 @@ const Index = () => {
         </div>
         <nav className="nav">
           <ul>
-            <li><Link to="/" className="active">Home</Link></li>
-            <li><Link to="/menu">Menu</Link></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><Link to="/" className="active">{t('home')}</Link></li>
+            <li><Link to="/menu">{t('menu')}</Link></li>
+            <li><a href="#about">{t('about')}</a></li>
+            <li><a href="#contact">{t('contact')}</a></li>
           </ul>
         </nav>
+        
+        {/* Language Switcher */}
+        <div className="language-switcher">
+          <select 
+            value={currentLanguage} 
+            onChange={(e) => setCurrentLanguage(e.target.value)}
+            className="language-select"
+          >
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+        </div>
+        
         <div className="mobile-menu-btn">
           <span></span>
           <span></span>
@@ -67,16 +132,16 @@ const Index = () => {
       
       <section className="hero">
         <div className="hero-content">
-          <h2>Delicious Food for Every Mood</h2>
-          <p>Experience the taste that makes you come back for more</p>
-          <Link to="/menu" className="btn-primary">Explore Menu</Link>
+          <h2>{t('heroTitle')}</h2>
+          <p>{t('heroSubtitle')}</p>
+          <Link to="/menu" className="btn-primary">{t('exploreMenu')}</Link>
         </div>
       </section>
       
       <section className="featured">
         <div className="section-title">
-          <h2>Featured Items</h2>
-          <p>Our most popular and delicious offerings</p>
+          <h2>{t('featuredItems')}</h2>
+          <p>{t('popularItems')}</p>
         </div>
         
         <div className="featured-items">
@@ -87,7 +152,7 @@ const Index = () => {
             <h3>Chapaty</h3>
             <p>Soft, fluffy chapati bread perfect for any meal</p>
             <div className="featured-price">$5.99</div>
-            <Link to="/menu" className="btn-secondary">Order Now</Link>
+            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
           
           <div className="featured-item">
@@ -97,7 +162,7 @@ const Index = () => {
             <h3>Malawi</h3>
             <p>Traditional Malawi with authentic flavors</p>
             <div className="featured-price">$7.99</div>
-            <Link to="/menu" className="btn-secondary">Order Now</Link>
+            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
           
           <div className="featured-item">
@@ -107,15 +172,15 @@ const Index = () => {
             <h3>Refreshing Sodas</h3>
             <p>Ice-cold sodas to complement your meal</p>
             <div className="featured-price">$2.50</div>
-            <Link to="/menu" className="btn-secondary">Order Now</Link>
+            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
         </div>
       </section>
       
       <section className="testimonials" id="testimonials">
         <div className="section-title">
-          <h2>What Our Customers Say</h2>
-          <p>Hear from people who love our food</p>
+          <h2>{t('testimonials')}</h2>
+          <p>{t('testimonialSubtitle')}</p>
         </div>
         
         <div className="testimonial-slider">
@@ -160,10 +225,10 @@ const Index = () => {
       <section className="about" id="about">
         <div className="about-content">
           <div className="about-text">
-            <h2>About Scooby Food</h2>
-            <p>Since 2010, Scooby Food has been serving delicious, high-quality fast food with a twist of homemade goodness. We believe in using fresh ingredients to create meals that not only satisfy hunger but also delight the taste buds.</p>
-            <p>Our passionate team works hard to ensure every customer leaves with a smile, making us one of the most beloved food spots in town.</p>
-            <Link to="/menu" className="btn-secondary">View Our Menu</Link>
+            <h2>{t('aboutTitle')}</h2>
+            <p>{t('aboutText1')}</p>
+            <p>{t('aboutText2')}</p>
+            <Link to="/menu" className="btn-secondary">{t('viewMenu')}</Link>
           </div>
           <div className="about-image">
             <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="Restaurant Interior" />
@@ -179,24 +244,24 @@ const Index = () => {
           </div>
           
           <div className="footer-links">
-            <h3>Quick Links</h3>
+            <h3>{t('quickLinks')}</h3>
             <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/menu">Menu</Link></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><Link to="/">{t('home')}</Link></li>
+              <li><Link to="/menu">{t('menu')}</Link></li>
+              <li><a href="#about">{t('about')}</a></li>
+              <li><a href="#contact">{t('contact')}</a></li>
             </ul>
           </div>
           
           <div className="footer-contact">
-            <h3>Contact Us</h3>
+            <h3>{t('contact')}</h3>
             <p><i className="fa fa-map-marker"></i> 123 Food Street, Foodville</p>
             <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
             <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
           </div>
           
           <div className="footer-social">
-            <h3>Follow Us</h3>
+            <h3>{t('followUs')}</h3>
             <div className="social-icons">
               <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>
               <a href="#" className="social-icon"><i className="fa fa-instagram"></i></a>
@@ -206,7 +271,7 @@ const Index = () => {
         </div>
         
         <div className="footer-bottom">
-          <p>&copy; 2023 Scooby Food. All rights reserved.</p>
+          <p>&copy; {t('copyright')}</p>
         </div>
       </footer>
     </div>
