@@ -31,6 +31,18 @@ const MenuPage = () => {
     quantity: number;
   };
 
+  // Menu items data - MOVED UP to fix the declaration order issue
+  const menuItems = [
+    { id: "1", name: "Burger", price: 8.99, category: "main", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "2", name: "Chapaty", price: 5.99, category: "main", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "3", name: "Malawi", price: 7.99, category: "main", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "4", name: "Tacos", price: 6.99, category: "main", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "5", name: "Soda", price: 2.50, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "6", name: "Coffee", price: 3.50, category: "drinks", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "7", name: "Breakfast", price: 12.99, category: "breakfast", image: "https://images.unsplash.com/photo-1533920379810-6bedac961c2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWtmYXN0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
+    { id: "8", name: "Salad", price: 9.99, category: "healthy", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+  ];
+
   // Translation data
   const translations = {
     en: {
