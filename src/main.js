@@ -1,4 +1,3 @@
-
 // Mobile menu toggle
 document.addEventListener('DOMContentLoaded', () => {
   const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
@@ -76,27 +75,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Animate elements on scroll
+  // Fixed animation on scroll function
   const animateOnScroll = () => {
     const elements = document.querySelectorAll('.featured-item, .about-content, .footer-content');
+    const windowHeight = window.innerHeight;
     
     elements.forEach(element => {
       const elementPosition = element.getBoundingClientRect().top;
-      const windowHeight = window.innerHeight;
+      const elementVisible = 150; // Adjust this value as needed
       
-      if (elementPosition < windowHeight - 100) {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
+      if (elementPosition < windowHeight - elementVisible) {
+        element.classList.add('animate-active');
       }
     });
   };
   
-  // Set initial opacity and transform for animation elements
+  // Set initial opacity and transform for animation elements with CSS classes
   const elementsToAnimate = document.querySelectorAll('.featured-item, .about-content, .footer-content');
   elementsToAnimate.forEach(element => {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(30px)';
-    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    element.classList.add('animate-on-scroll');
   });
   
   // Run animation on scroll
@@ -104,4 +101,18 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Run once on page load
   animateOnScroll();
+  
+  // Remove outline on click (focus) for better visual design
+  document.querySelectorAll('button, a').forEach(element => {
+    element.addEventListener('mousedown', function() {
+      this.style.outline = 'none';
+    });
+    
+    // But still keep outline for keyboard navigation (accessibility)
+    element.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        this.style.outline = '';
+      }
+    });
+  });
 });

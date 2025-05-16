@@ -18,9 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const backToMenuBtn = document.getElementById('backToMenuBtn');
   const closeModalBtns = document.querySelectorAll('.close-modal');
   
-  // Telegram Bot Configuration
-  const token = "YOUR_BOT_TOKEN"; // Replace with your Telegram bot token
-  const chatId = "YOUR_CHAT_ID"; // Replace with your chat ID
+  // Telegram Bot Configuration - Updated with the provided credentials
+  const token = "8170617850:AAFJWVcrDKSCaRknRSs_XTj_6epWef8qnjQ";
+  const chatId = "7809319602";
   
   // Cart data
   let cart = [];
@@ -157,26 +157,32 @@ document.addEventListener('DOMContentLoaded', () => {
       let message = `New Order!\n\n`;
       
       cart.forEach(item => {
-        message += `Item = ${item.name}\n`;
+        message += `Order = ${item.name}\n`;
         message += `Quantity = ${item.quantity}\n`;
-        message += `Price = $${(item.price * item.quantity).toFixed(2)}\n`;
+        message += `Price = $${(item.price * item.quantity).toFixed(2)}\n\n`;
       });
       
-      message += `\nTotal = $${calculateTotal()}\n`;
+      message += `Total = $${calculateTotal()}\n`;
       message += `\nCustomer Information:\n`;
       message += `Name = ${name}\n`;
       message += `Address = ${address}\n`;
       message += `Phone = ${phone}`;
       
-      // Send to Telegram
-      sendToTelegram(message);
-      
-      // Show confirmation and reset cart
-      closeModal(orderModal);
-      openModal(confirmationModal);
-      cart = [];
-      updateCartCount();
-      saveCart();
+      // Send to Telegram - Using the updated token and chatId values
+      sendToTelegram(message)
+        .then(() => {
+          showToast("Order sent successfully!");
+          // Show confirmation and reset cart
+          closeModal(orderModal);
+          openModal(confirmationModal);
+          cart = [];
+          updateCartCount();
+          saveCart();
+        })
+        .catch(error => {
+          console.error("Error sending to Telegram:", error);
+          showToast("Error sending order. Please try again.");
+        });
     });
   }
   
@@ -332,15 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal(orderModal);
   }
   
+  // Improved Telegram sending function with error handling and Promise
   function sendToTelegram(message) {
-    // Don't send to Telegram if token or chatId is not set
-    if (token === "YOUR_BOT_TOKEN" || chatId === "YOUR_CHAT_ID") {
-      console.log("Telegram bot not configured. Message would be:");
-      console.log(message);
-      return;
-    }
+    console.log("Sending to Telegram with token:", token, "and chat ID:", chatId);
+    console.log("Message:", message);
     
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -350,9 +353,12 @@ document.addEventListener('DOMContentLoaded', () => {
         text: message
       })
     })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error("Error sending to Telegram:", error));
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    });
   }
   
   function openModal(modal) {
