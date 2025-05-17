@@ -3,6 +3,25 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+
+type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  category?: string;
+};
+
+type FoodOption = {
+  id: string;
+  name: string;
+  frenchName: string;
+  price: number;
+  category: string;
+};
 
 const MenuPage = () => {
   const { toast } = useToast();
@@ -10,12 +29,16 @@ const MenuPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [showCartModal, setShowCartModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showFoodOptionsModal, setShowFoodOptionsModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<CartItem | null>(null);
+  const [selectedFoodOptions, setSelectedFoodOptions] = useState<string[]>([]);
+  const [totalPrice, setTotalPrice] = useState(0);
   const [orderForm, setOrderForm] = useState({
-    name: "",
-    address: "",
-    phone: "",
-    allergies: "", // Added allergies field
+    name: localStorage.getItem("customerName") || "",
+    address: localStorage.getItem("customerAddress") || "",
+    phone: localStorage.getItem("customerPhone") || "",
+    allergies: localStorage.getItem("customerAllergies") || "",
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
   const [showIngredients, setShowIngredients] = useState<string | null>(null);
@@ -24,23 +47,57 @@ const MenuPage = () => {
   const token = "8170617850:AAFJWVcrDKSCaRknRSs_XTj_6epWef8qnjQ";
   const chatId = "7809319602";
 
-  type CartItem = {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-  };
-
-  // Menu items data
+  // Menu items data - organized by category
   const menuItems = [
-    { id: "1", name: "Burger", frenchName: "Hamburger", price: 8.99, category: "main", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "2", name: "Chapaty", frenchName: "Chapati", price: 5.99, category: "main", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "3", name: "Malawi", frenchName: "Malawi", price: 7.99, category: "main", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "4", name: "Tacos", frenchName: "Tacos", price: 6.99, category: "main", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
-    { id: "5", name: "Soda", frenchName: "Soda", price: 2.50, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "6", name: "Coffee", frenchName: "Café", price: 3.50, category: "drinks", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "7", name: "Breakfast", frenchName: "Petit-déjeuner", price: 12.99, category: "breakfast", image: "https://images.unsplash.com/photo-1533920379810-6bedac961c2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWtmYXN0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" },
-    { id: "8", name: "Salad", frenchName: "Salade", price: 9.99, category: "healthy", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    // Mlawi Category
+    { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi6", name: "Special Mlawi with Ham", frenchName: "Mlawi spécial jambon", price: 5.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi7", name: "Mlawi with Tuna & Salami", frenchName: "Mlawi Thon Salami", price: 4.0, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi8", name: "Mlawi with 4 Cheese & Tuna", frenchName: "Mlawi Thon 4 Fromage", price: 5.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi9", name: "Mlawi with Tuna & Ham", frenchName: "Mlawi thon jambon", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+    { id: "mlawi10", name: "Special Mlawi with Cheese", frenchName: "Mlawi spécial Fromage", price: 8.0, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+
+    // Chapati Category
+    { id: "chapati1", name: "Chapati with Grilled Chicken", frenchName: "Chapati escalope grillée", price: 6.0, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "chapati2", name: "Chapati with Breaded Chicken", frenchName: "Chapati escalope panée", price: 6.5, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "chapati3", name: "Chapati Cordon Bleu", frenchName: "Chapati cordon bleu", price: 6.5, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "chapati4", name: "Chapati with Shawarma", frenchName: "Chapati shawarma", price: 7.0, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+    { id: "chapati5", name: "Chapati with Chicken & Shawarma", frenchName: "Chapati mix escalope-shawarma", price: 10.0, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
+
+    // Tacos Category
+    { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "tacos3", name: "Tacos with Salami", frenchName: "Tacos au salami", price: 3.5, category: "tacos", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+
+    // Sides & Drinks
+    { id: "side1", name: "Cheddar", frenchName: "Cheddar", price: 2.5, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "side2", name: "Mozzarella", frenchName: "Mozzarella", price: 2.5, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "side3", name: "French Fries", frenchName: "Frite", price: 2.0, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+  ];
+
+  // Food options that can be added
+  const foodOptions = [
+    { id: "opt1", name: "Tuna", frenchName: "thon", price: 3.5, category: "addon" },
+    { id: "opt2", name: "Special Tuna", frenchName: "spécial thon", price: 4.5, category: "addon" },
+    { id: "opt3", name: "Salami", frenchName: "salami", price: 3.5, category: "addon" },
+    { id: "opt4", name: "Special Salami", frenchName: "spécial salami", price: 4.5, category: "addon" },
+    { id: "opt5", name: "Ham", frenchName: "jambon", price: 4.0, category: "addon" },
+    { id: "opt6", name: "Special Ham", frenchName: "spécial jambon", price: 5.5, category: "addon" },
+    { id: "opt7", name: "Tuna & Salami", frenchName: "Thon Salami", price: 4.0, category: "addon" },
+    { id: "opt8", name: "4 Cheese & Tuna", frenchName: "Thon 4 Fromage", price: 5.5, category: "addon" },
+    { id: "opt9", name: "Tuna & Ham", frenchName: "thon jambon", price: 4.5, category: "addon" },
+    { id: "opt10", name: "Special Cheese", frenchName: "spécial Fromage", price: 8.0, category: "addon" },
+    { id: "opt11", name: "Cheddar", frenchName: "cheddar", price: 2.5, category: "addon" },
+    { id: "opt12", name: "Mozzarella", frenchName: "mozzarella", price: 2.5, category: "addon" },
+    { id: "opt13", name: "French Fries", frenchName: "frite", price: 2.0, category: "addon" },
+    { id: "opt14", name: "Soda Can", frenchName: "canette", price: 2.0, category: "addon" },
+    { id: "opt15", name: "Water", frenchName: "eau", price: 1.5, category: "addon" },
   ];
 
   // Translation data
@@ -53,10 +110,11 @@ const MenuPage = () => {
       ourMenu: "Our Menu",
       discoverDishes: "Discover your favorite dishes",
       all: "All",
-      mainDishes: "Main Dishes",
-      breakfast: "Breakfast",
+      mlawi: "Mlawi",
+      chapati: "Chapati",
+      tacos: "Tacos",
+      sides: "Sides",
       drinks: "Drinks",
-      healthyOptions: "Healthy Options",
       addToCart: "Add to Cart",
       buyNow: "Buy Now",
       yourCart: "Your Cart",
@@ -66,6 +124,8 @@ const MenuPage = () => {
       checkout: "Checkout",
       completeOrder: "Complete Your Order",
       orderSummary: "Order Summary",
+      basePrice: "Base Price:",
+      foodOptions: "Food Options",
       name: "Name",
       deliveryAddress: "Delivery Address",
       phoneNumber: "Phone Number",
@@ -81,7 +141,10 @@ const MenuPage = () => {
       followUs: "Follow Us",
       contactUs: "Contact Us",
       copyright: "2023 Scooby Food. All rights reserved.",
-      deliciousFood: "Delicious food for every mood",
+      deliciousFood: "Delicious street food for takeaway",
+      aboutText: "We are a street food stand offering delicious takeaway food. We don't offer dine-in service, so customers order and enjoy our food at home.",
+      noIngredients: "Ingredient information not available for this item.",
+      TND: "TND"
     },
     fr: {
       home: "Accueil",
@@ -91,10 +154,11 @@ const MenuPage = () => {
       ourMenu: "Notre Menu",
       discoverDishes: "Découvrez vos plats préférés",
       all: "Tous",
-      mainDishes: "Plats Principaux",
-      breakfast: "Petit-déjeuner",
+      mlawi: "Mlawi",
+      chapati: "Chapati",
+      tacos: "Tacos",
+      sides: "Accompagnements",
       drinks: "Boissons",
-      healthyOptions: "Options Santé",
       addToCart: "Ajouter au Panier",
       buyNow: "Acheter",
       yourCart: "Votre Panier",
@@ -104,6 +168,8 @@ const MenuPage = () => {
       checkout: "Commander",
       completeOrder: "Compléter Votre Commande",
       orderSummary: "Résumé de la Commande",
+      basePrice: "Prix de base:",
+      foodOptions: "Options de Nourriture",
       name: "Nom",
       deliveryAddress: "Adresse de Livraison",
       phoneNumber: "Numéro de Téléphone",
@@ -119,43 +185,30 @@ const MenuPage = () => {
       followUs: "Suivez-nous",
       contactUs: "Contactez-nous",
       copyright: "2023 Scooby Food. Tous droits réservés.",
-      deliciousFood: "Des plats délicieux pour chaque humeur",
+      deliciousFood: "Délicieuse street food à emporter",
+      aboutText: "Nous sommes un stand de street food offrant de délicieux plats à emporter. Nous n'offrons pas de service sur place, donc les clients commandent et profitent de notre nourriture chez eux.",
+      noIngredients: "Les informations sur les ingrédients ne sont pas disponibles pour cet article.",
+      TND: "TND"
     }
   };
 
   // Ingredients data with French translations
   const ingredients = {
-    "1": {
-      en: ["Beef patty", "Lettuce", "Tomato", "Cheese", "Onions", "Special sauce", "Sesame bun"],
-      fr: ["Steak de bœuf", "Laitue", "Tomate", "Fromage", "Oignons", "Sauce spéciale", "Pain au sésame"]
+    "mlawi1": {
+      en: ["Flour", "Water", "Salt", "Oil", "Tuna", "Harissa", "Olives"],
+      fr: ["Farine", "Eau", "Sel", "Huile", "Thon", "Harissa", "Olives"]
     },
-    "2": {
-      en: ["Flour", "Water", "Salt", "Oil"],
-      fr: ["Farine", "Eau", "Sel", "Huile"]
+    "mlawi2": {
+      en: ["Flour", "Water", "Salt", "Oil", "Premium Tuna", "Harissa", "Olives", "Special sauce"],
+      fr: ["Farine", "Eau", "Sel", "Huile", "Thon premium", "Harissa", "Olives", "Sauce spéciale"]
     },
-    "3": {
-      en: ["Flour", "Water", "Salt", "Oil", "Traditional spices"],
-      fr: ["Farine", "Eau", "Sel", "Huile", "Épices traditionnelles"]
+    "chapati1": {
+      en: ["Flour", "Water", "Salt", "Grilled Chicken", "Vegetables", "Sauce"],
+      fr: ["Farine", "Eau", "Sel", "Escalope grillée", "Légumes", "Sauce"]
     },
-    "4": {
-      en: ["Tortilla", "Beef/Chicken", "Lettuce", "Tomato", "Cheese", "Sour cream", "Salsa"],
-      fr: ["Tortilla", "Bœuf/Poulet", "Laitue", "Tomate", "Fromage", "Crème sure", "Salsa"]
-    },
-    "5": {
-      en: ["Carbonated water", "High fructose corn syrup", "Caramel color", "Phosphoric acid", "Natural flavors", "Caffeine"],
-      fr: ["Eau gazéifiée", "Sirop de maïs à haute teneur en fructose", "Colorant caramel", "Acide phosphorique", "Arômes naturels", "Caféine"]
-    },
-    "6": {
-      en: ["Coffee beans", "Hot water", "Optional: milk, sugar"],
-      fr: ["Grains de café", "Eau chaude", "Optionnel: lait, sucre"]
-    },
-    "7": {
-      en: ["Eggs", "Bread", "Butter", "Bacon", "Hash browns", "Orange juice"],
-      fr: ["Œufs", "Pain", "Beurre", "Bacon", "Galettes de pommes de terre", "Jus d'orange"]
-    },
-    "8": {
-      en: ["Fresh greens", "Tomatoes", "Cucumbers", "Bell peppers", "Olive oil", "Vinegar", "Salt", "Pepper"],
-      fr: ["Verdures fraîches", "Tomates", "Concombres", "Poivrons", "Huile d'olive", "Vinaigre", "Sel", "Poivre"]
+    "tacos1": {
+      en: ["Tortilla", "Tuna", "Lettuce", "Tomato", "Cheese", "Sauce"],
+      fr: ["Tortilla", "Thon", "Laitue", "Tomate", "Fromage", "Sauce"]
     },
   };
 
@@ -192,28 +245,68 @@ const MenuPage = () => {
 
   // Add item to cart
   const addToCart = (item: any) => {
-    const existingItem = cart.find(cartItem => cartItem.id === item.id);
-    
-    if (existingItem) {
-      setCart(cart.map(cartItem => 
-        cartItem.id === item.id 
-          ? { ...cartItem, quantity: cartItem.quantity + 1 } 
-          : cartItem
-      ));
-    } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
-    }
-    
-    toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart.`,
-      duration: 2000,
+    setSelectedItem({
+      id: item.id,
+      name: currentLanguage === 'en' ? item.name : item.frenchName,
+      price: item.price,
+      quantity: 1,
+      category: item.category
     });
+    setSelectedFoodOptions([]);
+    setTotalPrice(item.price);
+    setShowFoodOptionsModal(true);
   };
 
   // Buy now function
   const buyNow = (item: any) => {
-    setCart([{ ...item, quantity: 1 }]);
+    setSelectedItem({
+      id: item.id,
+      name: currentLanguage === 'en' ? item.name : item.frenchName,
+      price: item.price,
+      quantity: 1,
+      category: item.category
+    });
+    setSelectedFoodOptions([]);
+    setTotalPrice(item.price);
+    setShowFoodOptionsModal(true);
+  };
+
+  // Handle food option selection
+  const handleFoodOptionChange = (optionId: string, checked: boolean) => {
+    const option = foodOptions.find(opt => opt.id === optionId);
+    
+    if (!option) return;
+    
+    if (checked) {
+      setSelectedFoodOptions([...selectedFoodOptions, optionId]);
+      setTotalPrice(prev => prev + option.price);
+    } else {
+      setSelectedFoodOptions(selectedFoodOptions.filter(id => id !== optionId));
+      setTotalPrice(prev => prev - option.price);
+    }
+  };
+
+  // Continue to checkout after food options
+  const continueToCheckout = () => {
+    // Add item to cart with selected options
+    if (selectedItem) {
+      const itemWithOptions = {
+        ...selectedItem,
+        options: selectedFoodOptions.map(id => {
+          const option = foodOptions.find(o => o.id === id);
+          return {
+            id,
+            name: currentLanguage === 'en' ? option?.name : option?.frenchName,
+            price: option?.price || 0
+          };
+        }),
+        totalPrice: totalPrice
+      };
+      
+      setCart([itemWithOptions]);
+    }
+    
+    setShowFoodOptionsModal(false);
     setShowOrderModal(true);
   };
 
@@ -265,6 +358,9 @@ const MenuPage = () => {
       ...orderForm,
       [name]: value,
     });
+    
+    // Store customer info in localStorage
+    localStorage.setItem(`customer${name.charAt(0).toUpperCase() + name.slice(1)}`, value);
   };
 
   // Send order to Telegram
@@ -308,11 +404,18 @@ const MenuPage = () => {
     
     cart.forEach(item => {
       message += `Order = ${item.name}\n`;
+      
+      // Add food options if available
+      if (item.options && item.options.length > 0) {
+        const optionNames = item.options.map((opt: any) => opt.name).join(', ');
+        message += `Food Options = ${optionNames}\n`;
+      }
+      
       message += `Quantity = ${item.quantity}\n`;
-      message += `Price = $${(item.price * item.quantity).toFixed(2)}\n\n`;
+      message += `Price = ${(item.totalPrice || item.price * item.quantity).toFixed(3)} TND\n\n`;
     });
     
-    message += `Total = $${calculateTotal()}\n`;
+    message += `Total = ${calculateTotal()} TND\n`;
     message += `\nCustomer Information:\n`;
     message += `Name = ${orderForm.name}\n`;
     message += `Address = ${orderForm.address}\n`;
@@ -321,6 +424,8 @@ const MenuPage = () => {
     // Add allergies information if provided
     if (orderForm.allergies) {
       message += `Allergies/Preferences = ${orderForm.allergies}\n`;
+    } else {
+      message += `Allergies/Preferences = (none)\n`;
     }
     
     // Send to Telegram
@@ -399,28 +504,34 @@ const MenuPage = () => {
             {t('all')}
           </button>
           <button 
-            className={`filter-btn ${activeFilter === 'main' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('main')}
+            className={`filter-btn ${activeFilter === 'mlawi' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('mlawi')}
           >
-            {t('mainDishes')}
+            {t('mlawi')}
           </button>
           <button 
-            className={`filter-btn ${activeFilter === 'breakfast' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('breakfast')}
+            className={`filter-btn ${activeFilter === 'chapati' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('chapati')}
           >
-            {t('breakfast')}
+            {t('chapati')}
+          </button>
+          <button 
+            className={`filter-btn ${activeFilter === 'tacos' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('tacos')}
+          >
+            {t('tacos')}
+          </button>
+          <button 
+            className={`filter-btn ${activeFilter === 'sides' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('sides')}
+          >
+            {t('sides')}
           </button>
           <button 
             className={`filter-btn ${activeFilter === 'drinks' ? 'active' : ''}`}
             onClick={() => setActiveFilter('drinks')}
           >
             {t('drinks')}
-          </button>
-          <button 
-            className={`filter-btn ${activeFilter === 'healthy' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('healthy')}
-          >
-            {t('healthyOptions')}
           </button>
         </div>
         
@@ -429,7 +540,7 @@ const MenuPage = () => {
             <div key={item.id} className="menu-item" data-category={item.category}>
               <img src={item.image} alt={currentLanguage === 'en' ? item.name : item.frenchName} className="menu-item-img" />
               <h3>{currentLanguage === 'en' ? item.name : item.frenchName}</h3>
-              <div className="menu-item-price">${item.price.toFixed(2)}</div>
+              <div className="menu-item-price">{item.price.toFixed(3)} {t('TND')}</div>
               
               {/* Ingredients button */}
               <button 
@@ -444,9 +555,12 @@ const MenuPage = () => {
                 <div className="ingredients-popup">
                   <h4>{t('ingredients')}</h4>
                   <ul>
-                    {ingredients[item.id as keyof typeof ingredients][currentLanguage as 'en' | 'fr'].map((ingredient, index) => (
-                      <li key={index}>{ingredient}</li>
-                    ))}
+                    {ingredients[item.id as keyof typeof ingredients] 
+                      ? ingredients[item.id as keyof typeof ingredients][currentLanguage as 'en' | 'fr'].map((ingredient, index) => (
+                          <li key={index}>{ingredient}</li>
+                        ))
+                      : <li>{t('noIngredients')}</li>
+                    }
                   </ul>
                   <button 
                     className="close-ingredients"
@@ -463,13 +577,13 @@ const MenuPage = () => {
               <div className="menu-item-actions">
                 <button 
                   className="btn-add-cart" 
-                  onClick={() => addToCart({...item, name: currentLanguage === 'en' ? item.name : item.frenchName})}
+                  onClick={() => addToCart(item)}
                 >
                   {t('addToCart')}
                 </button>
                 <button 
                   className="btn-buy-now"
-                  onClick={() => buyNow({...item, name: currentLanguage === 'en' ? item.name : item.frenchName})}
+                  onClick={() => buyNow(item)}
                 >
                   {t('buyNow')}
                 </button>
@@ -498,7 +612,7 @@ const MenuPage = () => {
                   <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
-                      <span>${item.price.toFixed(2)}</span>
+                      <span>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</span>
                     </div>
                     <div className="cart-item-quantity">
                       <button 
@@ -529,7 +643,7 @@ const MenuPage = () => {
             <div className="cart-footer">
               <div className="cart-total">
                 <span>{t('total')}</span>
-                <span id="cartTotal">${calculateTotal()}</span>
+                <span id="cartTotal">{calculateTotal()} {t('TND')}</span>
               </div>
               
               <div className="cart-actions">
@@ -566,6 +680,60 @@ const MenuPage = () => {
         </div>
       )}
 
+      {/* Food Options Modal */}
+      {showFoodOptionsModal && selectedItem && (
+        <div className="modal" onClick={(e) => {
+          if ((e.target as HTMLElement).classList.contains('modal')) {
+            setShowFoodOptionsModal(false);
+          }
+        }}>
+          <div className="modal-content">
+            <span className="close-modal" onClick={() => setShowFoodOptionsModal(false)}>×</span>
+            <h2>{selectedItem.name}</h2>
+            
+            <div className="food-options-summary">
+              <div className="base-price">
+                <span>{t('basePrice')}</span>
+                <span>{selectedItem.price.toFixed(3)} {t('TND')}</span>
+              </div>
+              
+              <h3>{t('foodOptions')}</h3>
+              <div className="food-options-list">
+                {foodOptions.map((option) => (
+                  <div key={option.id} className="food-option-item">
+                    <div className="option-checkbox">
+                      <Checkbox 
+                        id={`option-${option.id}`}
+                        checked={selectedFoodOptions.includes(option.id)}
+                        onCheckedChange={(checked) => {
+                          handleFoodOptionChange(option.id, checked === true);
+                        }}
+                      />
+                      <label htmlFor={`option-${option.id}`}>
+                        {currentLanguage === 'en' ? option.name : option.frenchName}
+                      </label>
+                    </div>
+                    <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="total-price">
+                <span>{t('total')}</span>
+                <span>{totalPrice.toFixed(3)} {t('TND')}</span>
+              </div>
+              
+              <button 
+                className="btn-primary btn-block"
+                onClick={continueToCheckout}
+              >
+                {t('checkout')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Order Modal */}
       {showOrderModal && (
         <div className="modal">
@@ -579,13 +747,24 @@ const MenuPage = () => {
                 {cart.map((item) => (
                   <div key={item.id} className="order-item">
                     <div>{item.quantity}x {item.name}</div>
-                    <div>${(item.price * item.quantity).toFixed(2)}</div>
+                    <div>
+                      {item.options && item.options.length > 0 && (
+                        <div className="order-options">
+                          {item.options.map((opt: any, index: number) => (
+                            <span key={opt.id} className="order-option-item">
+                              {opt.name}{index < (item.options?.length || 0) - 1 ? ', ' : ''}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</div>
                   </div>
                 ))}
               </div>
               <div className="order-total">
                 <span>{t('total')}</span>
-                <span id="orderTotal">${calculateTotal()}</span>
+                <span id="orderTotal">{calculateTotal()} {t('TND')}</span>
               </div>
             </div>
             
@@ -603,17 +782,6 @@ const MenuPage = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="address">{t('deliveryAddress')}</label>
-                <textarea 
-                  id="address" 
-                  name="address" 
-                  value={orderForm.address}
-                  onChange={handleInputChange}
-                  required
-                ></textarea>
-              </div>
-              
-              <div className="form-group">
                 <label htmlFor="phone">{t('phoneNumber')}</label>
                 <input 
                   type="tel" 
@@ -625,7 +793,18 @@ const MenuPage = () => {
                 />
               </div>
               
-              {/* Added allergies field */}
+              <div className="form-group">
+                <label htmlFor="address">{t('deliveryAddress')}</label>
+                <textarea 
+                  id="address" 
+                  name="address" 
+                  value={orderForm.address}
+                  onChange={handleInputChange}
+                  required
+                ></textarea>
+              </div>
+              
+              {/* Allergies field */}
               <div className="form-group allergies-group">
                 <div className="allergies-label-container">
                   <label htmlFor="allergies">{t('allergies')}</label>

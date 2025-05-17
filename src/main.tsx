@@ -2,9 +2,15 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { Toaster } from "@/components/ui/toaster"
 
 // Import the styles needed for animations and existing styling
 import './styles.css'; 
 
 // Add the Lovable script tag for the select feature
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <>
+    <App />
+    <Toaster />
+  </>
+);
