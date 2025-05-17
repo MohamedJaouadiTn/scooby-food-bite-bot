@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -7,15 +6,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 
+type FoodOption = {
+  id: string;
+  name: string;
+  price: number;
+};
+
 type CartItem = {
   id: string;
   name: string;
   price: number;
   quantity: number;
   category?: string;
+  options?: FoodOption[];  // Added this property
+  totalPrice?: number;     // Added this property
 };
 
-type FoodOption = {
+type FoodOptionType = {
   id: string;
   name: string;
   frenchName: string;
