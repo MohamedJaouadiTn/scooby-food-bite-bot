@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -126,6 +127,9 @@ const MenuPage = () => {
       extras: "Extras",
       totalPrice: "Total Price",
       yourInfo: "Your Information",
+      contactAddress: "123 Food Street, Foodville",
+      contactPhone: "+1 (555) 123-4567",
+      contactEmail: "info@scoobyfood.com"
     },
     fr: {
       home: "Accueil",
@@ -173,6 +177,9 @@ const MenuPage = () => {
       extras: "Extras",
       totalPrice: "Prix Total",
       yourInfo: "Vos Informations",
+      contactAddress: "123 Rue de la Nourriture, Foodville",
+      contactPhone: "+1 (555) 123-4567",
+      contactEmail: "info@scoobyfood.com"
     }
   };
 
@@ -848,9 +855,9 @@ const MenuPage = () => {
           
           <div className="footer-contact">
             <h3>{t('contactUs')}</h3>
-            <p><i className="fa fa-map-marker"></i> 123 Food Street, Foodville</p>
-            <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
-            <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
+            <p><i className="fa fa-map-marker"></i> {t('contactAddress')}</p>
+            <p><i className="fa fa-phone"></i> {t('contactPhone')}</p>
+            <p><i className="fa fa-envelope"></i> {t('contactEmail')}</p>
           </div>
           
           <div className="footer-social">
