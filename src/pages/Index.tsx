@@ -224,9 +224,9 @@ const Index = () => {
           
           <div className={`testimonial-slide ${activeSlide === 2 ? 'active' : ''}`}>
             <div className="testimonial-content">
-              <p>"{t('testimonial3')}"</p>
+              <p className="Very Good Service">"{t('testimonial3')}"</p>
               <div className="customer-info">
-                <h4>Emily Davis</h4>
+                <h4>Ade, Marzougui</h4>
                 <span className="customer-rating">★★★★☆</span>
               </div>
             </div>
