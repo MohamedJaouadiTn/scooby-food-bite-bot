@@ -71,6 +71,13 @@ button {
   justify-content: space-between;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .logo h1 {
   font-family: 'Lobster', cursive;
   font-size: 1.8rem;
@@ -79,6 +86,12 @@ button {
 
 .logo span {
   color: var(--primary-color);
+}
+
+.nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .nav ul {
@@ -128,6 +141,7 @@ button {
   position: relative;
   cursor: pointer;
   color: var(--secondary-color);
+  margin-left: auto;
 }
 
 .cart-count {
@@ -178,6 +192,16 @@ button {
 .section-title p {
   color: #777;
   font-size: 0.9rem;
+  margin-top: 15px; /* Added space between title underline and subtitle */
+}
+
+.section-title:after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 3px;
+  background-color: var(--primary-color);
+  margin: 5px auto 15px; /* Added space between title and underline */
 }
 
 .filter-buttons {
@@ -242,10 +266,21 @@ button {
   color: var(--primary-color);
 }
 
-.menu-item-actions {
+.menu-info {
   display: flex;
+  flex-direction: column;
+}
+
+.menu-price-actions {
+  display: flex;
+  flex-direction: column;
   padding: 0 15px 15px;
+}
+
+.menu-actions {
+  display: flex;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .btn-add-cart, .btn-buy-now {
@@ -278,7 +313,6 @@ button {
 
 /* View Ingredients Button */
 .btn-view-ingredients {
-  margin: 0 15px 15px;
   padding: 5px 10px;
   font-size: 0.8rem;
   color: #777;
@@ -286,9 +320,9 @@ button {
   border: 1px solid #ccc;
   border-radius: 4px;
   transition: all 0.2s;
-  display: block;
+  width: 100%;
   text-align: center;
-  position: relative;
+  margin: 10px 0;
 }
 
 .btn-view-ingredients:hover {
@@ -539,6 +573,36 @@ button:disabled {
   gap: 10px;
 }
 
+.option-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #000;
+  border-radius: 3px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.option-checkbox input[type="checkbox"]:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.option-checkbox input[type="checkbox"]:checked:after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .option-price {
   font-weight: 500;
   color: var(--primary-color);
@@ -559,6 +623,7 @@ button:disabled {
   background-color: #f9f9f9;
   padding: 15px;
   border-radius: 5px;
+  border: 1px solid var(--border-color);
 }
 
 .order-summary h3 {
@@ -615,22 +680,13 @@ button:disabled {
 }
 
 /* Extras section */
-.extras-group {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 5px;
-  margin-bottom: 20px;
-}
-
-.extras-group h3 {
-  margin-bottom: 15px;
-  color: var(--secondary-color);
-}
-
 .extras-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 5px;
 }
 
 /* Allergies field */
@@ -720,6 +776,7 @@ button:disabled {
   color: #fff;
   padding: 50px 20px 15px;
   margin-top: 60px;
+  width: 100%;
 }
 
 .footer-content {
@@ -804,11 +861,16 @@ button:disabled {
     height: 70px;
   }
 
+  .header-content {
+    position: relative;
+  }
+
   .nav {
     position: fixed;
     top: 70px;
     left: 0;
     right: 0;
+    transform: none;
     background-color: var(--bg-color);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     max-height: 0;

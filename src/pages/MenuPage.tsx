@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 
 type FoodOption = {
   id: string;
@@ -37,7 +35,6 @@ const MenuPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [showCartModal, setShowCartModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [showFoodOptionsModal, setShowFoodOptionsModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CartItem | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
@@ -58,28 +55,20 @@ const MenuPage = () => {
   // Menu items data - organized by category
   const menuItems = [
     // Mlawi Category
-    { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi6", name: "Special Mlawi with Ham", frenchName: "Mlawi spécial jambon", price: 5.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi7", name: "Mlawi with Tuna & Salami", frenchName: "Mlawi Thon Salami", price: 4.0, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi8", name: "Mlawi with 4 Cheese & Tuna", frenchName: "Mlawi Thon 4 Fromage", price: 5.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi9", name: "Mlawi with Tuna & Ham", frenchName: "Mlawi thon jambon", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-    { id: "mlawi10", name: "Special Mlawi with Cheese", frenchName: "Mlawi spécial Fromage", price: 8.0, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-
+    { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
+    { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
+    { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+    { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+    { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+    
     // Chapati Category
-    { id: "chapati1", name: "Chapati with Grilled Chicken", frenchName: "Chapati escalope grillée", price: 6.0, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "chapati2", name: "Chapati with Breaded Chicken", frenchName: "Chapati escalope panée", price: 6.5, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "chapati3", name: "Chapati Cordon Bleu", frenchName: "Chapati cordon bleu", price: 6.5, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "chapati4", name: "Chapati with Shawarma", frenchName: "Chapati shawarma", price: 7.0, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-    { id: "chapati5", name: "Chapati with Chicken & Shawarma", frenchName: "Chapati mix escalope-shawarma", price: 10.0, category: "chapati", image: "/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" },
-
+    { id: "chapati1", name: "Chapati with Grilled Chicken", frenchName: "Chapati escalope grillée", price: 6.0, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
+    { id: "chapati2", name: "Chapati with Tuna", frenchName: "Chapati au thon", price: 7.99, category: "chapati", image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" },
+    { id: "chapati3", name: "Chapati Cordon Bleu", frenchName: "Chapati cordon bleu", price: 6.5, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
+    
     // Tacos Category
-    { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
-    { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
-    { id: "tacos3", name: "Tacos with Salami", frenchName: "Tacos au salami", price: 3.5, category: "tacos", image: "https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" },
+    { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" },
+    { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png" },
 
     // Sides & Drinks
     { id: "side1", name: "Cheddar", frenchName: "Cheddar", price: 2.5, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
@@ -136,7 +125,7 @@ const MenuPage = () => {
       quickLinks: "Quick Links",
       followUs: "Follow Us",
       contactUs: "Contact Us",
-      copyright: "2023 Scooby Food. All rights reserved.",
+      copyright: "2025 Scooby Food. All rights reserved.",
       deliciousFood: "Delicious street food for takeaway",
       aboutText: "We are a street food stand offering delicious takeaway food. We don't offer dine-in service, so customers order and enjoy our food at home.",
       noIngredients: "Ingredient information not available for this item.",
@@ -181,7 +170,7 @@ const MenuPage = () => {
       quickLinks: "Liens Rapides",
       followUs: "Suivez-nous",
       contactUs: "Contactez-nous",
-      copyright: "2023 Scooby Food. Tous droits réservés.",
+      copyright: "2025 Scooby Food. Tous droits réservés.",
       deliciousFood: "Délicieuse street food à emporter",
       aboutText: "Nous sommes un stand de street food offrant de délicieux plats à emporter. Nous n'offrons pas de service sur place, donc les clients commandent et profitent de notre nourriture chez eux.",
       noIngredients: "Les informations sur les ingrédients ne sont pas disponibles pour cet article.",
@@ -238,7 +227,7 @@ const MenuPage = () => {
 
   // Calculate total price
   const calculateTotal = () => {
-    return cart.reduce((total, item) => total + (item.totalPrice || item.price * item.quantity), 0).toFixed(2);
+    return cart.reduce((total, item) => total + (item.totalPrice || item.price * item.quantity), 0).toFixed(3);
   };
 
   // Add item to cart
@@ -252,7 +241,7 @@ const MenuPage = () => {
     });
     setSelectedExtras([]);
     setTotalPrice(item.price);
-    setShowFoodOptionsModal(true);
+    setShowOrderModal(true);
   };
 
   // Buy now function
@@ -266,7 +255,7 @@ const MenuPage = () => {
     });
     setSelectedExtras([]);
     setTotalPrice(item.price);
-    setShowFoodOptionsModal(true);
+    setShowOrderModal(true);
   };
 
   // Handle extra option selection
@@ -282,30 +271,6 @@ const MenuPage = () => {
       setSelectedExtras(selectedExtras.filter(id => id !== optionId));
       setTotalPrice(prev => prev - option.price);
     }
-  };
-
-  // Continue to checkout after extra options
-  const continueToCheckout = () => {
-    // Add item to cart with selected extras
-    if (selectedItem) {
-      const itemWithExtras = {
-        ...selectedItem,
-        extras: selectedExtras.map(id => {
-          const option = extraOptions.find(o => o.id === id);
-          return {
-            id,
-            name: currentLanguage === 'en' ? option?.name : option?.frenchName,
-            price: option?.price || 0
-          };
-        }),
-        totalPrice: totalPrice
-      };
-      
-      setCart([itemWithExtras]);
-    }
-    
-    setShowFoodOptionsModal(false);
-    setShowOrderModal(true);
   };
 
   // Toggle ingredients display
@@ -388,10 +353,10 @@ const MenuPage = () => {
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (cart.length === 0) {
+    if (!selectedItem) {
       toast({
-        title: "Empty Cart",
-        description: "Your cart is empty. Please add items before checking out.",
+        title: "Error",
+        description: "No item selected.",
         variant: "destructive",
       });
       return;
@@ -399,28 +364,48 @@ const MenuPage = () => {
 
     // Create message for Telegram
     let message = `New Order!\n\n`;
+    message += `Order = ${selectedItem.name}\n`;
+    message += `Quantity = ${selectedItem.quantity}\n`;
+    message += `Price = ${selectedItem.price.toFixed(3)} TND\n`;
     
-    cart.forEach(item => {
-      message += `Order = ${item.name}\n`;
+    // Add extras if selected
+    if (selectedExtras.length > 0) {
+      const selectedOptions = selectedExtras.map(id => {
+        const option = extraOptions.find(opt => opt.id === id);
+        return {
+          name: currentLanguage === 'en' ? option?.name : option?.frenchName,
+          price: option?.price || 0
+        };
+      });
       
-      // Add extras if available
-      if (item.extras && item.extras.length > 0) {
-        const extraNames = item.extras.map((opt: any) => opt.name).join(', ');
-        message += `Extras = ${extraNames}\n`;
-      }
+      const extraNames = selectedOptions.map(opt => opt.name).join(' + ');
+      message += `Extras = ${extraNames}\n\n`;
       
-      message += `Quantity = ${item.quantity}\n`;
-      message += `Price = ${(item.totalPrice || item.price * item.quantity).toFixed(3)} TND\n\n`;
-    });
+      // Calculate total price with extras
+      let totalWithExtras = selectedItem.price;
+      selectedOptions.forEach(opt => {
+        totalWithExtras += opt.price;
+      });
+      
+      message += `Total = ${selectedItem.price.toFixed(3)} TND`;
+      
+      // Add each extra price
+      selectedOptions.forEach(opt => {
+        message += ` + ${opt.price.toFixed(3)} TND`;
+      });
+      
+      message += ` = ${totalWithExtras.toFixed(3)} TND\n\n`;
+    } else {
+      message += `\nTotal = ${selectedItem.price.toFixed(3)} TND\n\n`;
+    }
     
-    message += `Total = ${calculateTotal()} TND\n`;
-    message += `\nCustomer Information:\n`;
+    message += `Customer Information:\n`;
     message += `Name = ${orderForm.name}\n`;
     message += `Address = ${orderForm.address}\n`;
     message += `Phone = ${orderForm.phone}\n`;
     
     // Add allergies information if provided
-    if (orderForm.allergies) {
+    if (orderForm.allergies.trim()) {
       message += `Allergies/Preferences = ${orderForm.allergies}\n`;
     } else {
       message += `Allergies/Preferences = (none)\n`;
@@ -450,41 +435,45 @@ const MenuPage = () => {
   return (
     <div className="menu-page">
       <header className="header">
-        <div className="logo">
-          <h1>Scooby<span>Food</span></h1>
-        </div>
-        <nav className="nav">
-          <ul>
-            <li><Link to="/">{t('home')}</Link></li>
-            <li><Link to="/menu" className="active">{t('menu')}</Link></li>
-            <li><a href="/#about">{t('about')}</a></li>
-            <li><a href="/#contact">{t('contact')}</a></li>
-          </ul>
-        </nav>
-        
-        {/* Language Switcher */}
-        <div className="language-switcher">
-          <select 
-            value={currentLanguage} 
-            onChange={(e) => setCurrentLanguage(e.target.value)}
-            className="language-select"
-          >
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-          </select>
-        </div>
-        
-        <div className="cart-icon" onClick={() => setShowCartModal(true)}>
-          <ShoppingCart className="w-6 h-6" />
-          {totalCartItems > 0 && <span className="cart-count">{totalCartItems}</span>}
-        </div>
-        <div className="mobile-menu-btn" onClick={() => {
-          const nav = document.querySelector('.nav') as HTMLElement;
-          if (nav) nav.classList.toggle('active');
-        }}>
-          <span></span>
-          <span></span>
-          <span></span>
+        <div className="container">
+          <div className="header-content">
+            <div className="logo">
+              <h1>Scooby<span>Food</span></h1>
+            </div>
+            <nav className="nav">
+              <ul>
+                <li><Link to="/">{t('home')}</Link></li>
+                <li><Link to="/menu" className="active">{t('menu')}</Link></li>
+                <li><a href="/#about">{t('about')}</a></li>
+                <li><a href="/#contact">{t('contact')}</a></li>
+              </ul>
+            </nav>
+            
+            {/* Language Switcher */}
+            <div className="language-switcher">
+              <select 
+                value={currentLanguage} 
+                onChange={(e) => setCurrentLanguage(e.target.value)}
+                className="language-select"
+              >
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
+            
+            <div className="cart-icon" onClick={() => setShowCartModal(true)}>
+              <ShoppingCart className="w-6 h-6" />
+              {totalCartItems > 0 && <span className="cart-count">{totalCartItems}</span>}
+            </div>
+            <div className="mobile-menu-btn" onClick={() => {
+              const nav = document.querySelector('.nav') as HTMLElement;
+              if (nav) nav.classList.toggle('active');
+            }}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -540,7 +529,6 @@ const MenuPage = () => {
               <h3>{currentLanguage === 'en' ? item.name : item.frenchName}</h3>
               <div className="menu-item-price">{item.price.toFixed(3)} {t('TND')}</div>
               
-              {/* Ingredients button - moved to be below the image */}
               <button 
                 className="btn-view-ingredients" 
                 onClick={() => toggleIngredients(item.id)}
@@ -554,7 +542,7 @@ const MenuPage = () => {
                   <h4>{t('ingredients')}</h4>
                   <ul>
                     {ingredients[item.id as keyof typeof ingredients] 
-                      ? ingredients[item.id as keyof typeof ingredients][currentLanguage as 'en' | 'fr'].map((ingredient, index) => (
+                      ? ingredients[item.id as keyof typeof ingredients][currentLanguage as 'en' | 'fr'].map((ingredient: string, index: number) => (
                           <li key={index}>{ingredient}</li>
                         ))
                       : <li>{t('noIngredients')}</li>
@@ -678,72 +666,16 @@ const MenuPage = () => {
         </div>
       )}
 
-      {/* Food Options Modal */}
-      {showFoodOptionsModal && selectedItem && (
+      {/* Order Modal */}
+      {showOrderModal && (
         <div className="modal" onClick={(e) => {
           if ((e.target as HTMLElement).classList.contains('modal')) {
-            setShowFoodOptionsModal(false);
+            setShowOrderModal(false);
           }
         }}>
           <div className="modal-content">
-            <span className="close-modal" onClick={() => setShowFoodOptionsModal(false)}>×</span>
-            <h2>{selectedItem.name}</h2>
-            
-            <div className="food-options-summary">
-              <div className="base-price">
-                <span>{t('basePrice')}</span>
-                <span>{selectedItem.price.toFixed(3)} {t('TND')}</span>
-              </div>
-              
-              <div className="total-price">
-                <span>{t('total')}</span>
-                <span>{totalPrice.toFixed(3)} {t('TND')}</span>
-              </div>
-              
-              <button 
-                className="btn-primary btn-block"
-                onClick={continueToCheckout}
-              >
-                {t('checkout')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Order Modal */}
-      {showOrderModal && (
-        <div className="modal">
-          <div className="modal-content">
             <span className="close-modal" onClick={() => setShowOrderModal(false)}>×</span>
             <h2>{t('completeOrder')}</h2>
-            
-            <div className="order-summary">
-              <h3>{t('orderSummary')}</h3>
-              <div id="orderSummary">
-                {cart.map((item) => (
-                  <div key={item.id} className="order-item">
-                    <div>{item.quantity}x {item.name}</div>
-                    <div>
-                      {item.extras && item.extras.length > 0 && (
-                        <div className="order-extras">
-                          {item.extras.map((opt: any, index: number) => (
-                            <span key={opt.id} className="order-extra-item">
-                              {opt.name}{index < (item.extras?.length || 0) - 1 ? ', ' : ''}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="order-total">
-                <span>{t('total')}</span>
-                <span id="orderTotal">{calculateTotal()} {t('TND')}</span>
-              </div>
-            </div>
             
             <form id="orderForm" onSubmit={handleSubmitOrder}>
               <div className="form-group">
@@ -753,18 +685,6 @@ const MenuPage = () => {
                   id="name" 
                   name="name" 
                   value={orderForm.name}
-                  onChange={handleInputChange}
-                  required 
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="phone">{t('phoneNumber')}</label>
-                <input 
-                  type="tel" 
-                  id="phone" 
-                  name="phone" 
-                  value={orderForm.phone}
                   onChange={handleInputChange}
                   required 
                 />
@@ -781,25 +701,36 @@ const MenuPage = () => {
                 ></textarea>
               </div>
               
+              <div className="form-group">
+                <label htmlFor="phone">{t('phoneNumber')}</label>
+                <input 
+                  type="tel" 
+                  id="phone" 
+                  name="phone" 
+                  value={orderForm.phone}
+                  onChange={handleInputChange}
+                  required 
+                />
+              </div>
+              
               {/* Extras section */}
-              <div className="form-group extras-group">
+              <div className="form-group">
                 <h3>{t('extras')}</h3>
                 <div className="extras-list">
                   {extraOptions.map((option) => (
                     <div key={option.id} className="extra-option-item">
                       <div className="option-checkbox">
-                        <Checkbox 
+                        <input
+                          type="checkbox"
                           id={`option-${option.id}`}
                           checked={selectedExtras.includes(option.id)}
-                          onCheckedChange={(checked) => {
-                            handleExtraOptionChange(option.id, checked === true);
-                          }}
+                          onChange={(e) => handleExtraOptionChange(option.id, e.target.checked)}
                         />
                         <label htmlFor={`option-${option.id}`}>
                           {currentLanguage === 'en' ? option.name : option.frenchName}
                         </label>
                       </div>
-                      <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
+                      <span className="option-price">{option.price.toFixed(3)} {t('TND')}</span>
                     </div>
                   ))}
                 </div>
@@ -820,6 +751,36 @@ const MenuPage = () => {
                   value={orderForm.allergies}
                   onChange={handleInputChange}
                 ></textarea>
+              </div>
+              
+              <div className="order-summary">
+                <h3>{t('orderSummary')}</h3>
+                {selectedItem && (
+                  <div className="order-item">
+                    <div>{selectedItem.quantity}x {selectedItem.name}</div>
+                    <div>{selectedItem.price.toFixed(3)} {t('TND')}</div>
+                  </div>
+                )}
+                
+                {selectedExtras.length > 0 && (
+                  <div className="order-extras">
+                    {selectedExtras.map((id) => {
+                      const extra = extraOptions.find((opt) => opt.id === id);
+                      if (!extra) return null;
+                      return (
+                        <div key={id} className="order-item">
+                          <div>+ {currentLanguage === 'en' ? extra.name : extra.frenchName}</div>
+                          <div>{extra.price.toFixed(3)} {t('TND')}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                
+                <div className="order-total">
+                  <span>{t('total')}</span>
+                  <span id="orderTotal">{totalPrice.toFixed(3)} {t('TND')}</span>
+                </div>
               </div>
               
               <button type="submit" className="btn-primary btn-block">{t('placeOrder')}</button>
@@ -847,47 +808,49 @@ const MenuPage = () => {
       )}
 
       <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-logo">
-            <h2>Scooby<span>Food</span></h2>
-            <p>{t('deliciousFood')}</p>
-          </div>
-          
-          <div className="footer-links">
-            <h3>{t('quickLinks')}</h3>
-            <ul>
-              <li><Link to="/">{t('home')}</Link></li>
-              <li><Link to="/menu">{t('menu')}</Link></li>
-              <li><a href="/#about">{t('about')}</a></li>
-              <li><a href="/#contact">{t('contact')}</a></li>
-            </ul>
-          </div>
-          
-          <div className="footer-contact">
-            <h3>{t('contactUs')}</h3>
-            <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
-            <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
-            <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
-          </div>
-          
-          <div className="footer-hours">
-            <h3>{t('openingHours')}</h3>
-            <p><strong>Monday - Friday:</strong> 10:00 AM - 10:00 PM</p>
-            <p><strong>Saturday - Sunday:</strong> 11:00 AM - 11:00 PM</p>
-          </div>
-          
-          <div className="footer-social">
-            <h3>{t('followUs')}</h3>
-            <div className="social-icons">
-              <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>
-              <a href="#" className="social-icon"><i className="fa fa-instagram"></i></a>
-              <a href="#" className="social-icon"><i className="fa fa-twitter"></i></a>
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-logo">
+              <h2>Scooby<span>Food</span></h2>
+              <p>{t('deliciousFood')}</p>
+            </div>
+            
+            <div className="footer-links">
+              <h3>{t('quickLinks')}</h3>
+              <ul>
+                <li><Link to="/">{t('home')}</Link></li>
+                <li><Link to="/menu">{t('menu')}</Link></li>
+                <li><a href="/#about">{t('about')}</a></li>
+                <li><a href="/#contact">{t('contact')}</a></li>
+              </ul>
+            </div>
+            
+            <div className="footer-contact">
+              <h3>{t('contactUs')}</h3>
+              <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
+              <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
+              <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
+            </div>
+            
+            <div className="footer-hours">
+              <h3>{t('openingHours')}</h3>
+              <p><strong>Monday - Friday:</strong> 10:00 AM - 10:00 PM</p>
+              <p><strong>Saturday - Sunday:</strong> 11:00 AM - 11:00 PM</p>
+            </div>
+            
+            <div className="footer-social">
+              <h3>{t('followUs')}</h3>
+              <div className="social-icons">
+                <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>
+                <a href="#" className="social-icon"><i className="fa fa-instagram"></i></a>
+                <a href="#" className="social-icon"><i className="fa fa-twitter"></i></a>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div className="footer-bottom">
-          <p>&copy; {t('copyright')}</p>
+          
+          <div className="footer-bottom">
+            <p>&copy; {t('copyright')}</p>
+          </div>
         </div>
       </footer>
     </div>
