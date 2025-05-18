@@ -226,7 +226,7 @@ const Index = () => {
             <div className="testimonial-content">
               <p className="Very Good Service">"{t('testimonial3')}"</p>
               <div className="customer-info">
-                <h4>Ade, Marzougui</h4>
+                <h4>Adem Marzougui</h4>
                 <span className="customer-rating">★★★★☆</span>
               </div>
             </div>
