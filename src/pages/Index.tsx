@@ -206,7 +206,7 @@ const Index = () => {
             <div className="testimonial-content">
               <p>"{t('testimonial1')}"</p>
               <div className="customer-info">
-                <h4>Sarah Johnson</h4>
+                <h4>Mohamed Jaouadi</h4>
                 <span className="customer-rating">★★★★★</span>
               </div>
             </div>
@@ -216,7 +216,7 @@ const Index = () => {
             <div className="testimonial-content">
               <p>"{t('testimonial2')}"</p>
               <div className="customer-info">
-                <h4>Michael Brown</h4>
+                <h4>Abdel Waheb Magdoud</h4>
                 <span className="customer-rating">★★★★★</span>
               </div>
             </div>
