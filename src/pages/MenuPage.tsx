@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -89,43 +88,26 @@ const MenuPage = () => {
     { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
   ];
 
-  // Updated food options that can be added - organized by category
+  // Food options that can be added
   const foodOptions = [
-    // Base options
-    { id: "base1", name: "Mlewi", frenchName: "Mlewi", price: 0, category: "base" },
-    { id: "base2", name: "Chapati", frenchName: "Chapati", price: 0, category: "base" },
-    { id: "base3", name: "Tacos", frenchName: "Tacos", price: 0, category: "base" },
-    
-    // Filling options
-    { id: "fill1", name: "Tuna", frenchName: "Thon", price: 3.5, category: "filling" },
-    { id: "fill2", name: "Special Tuna", frenchName: "Spécial Thon", price: 4.5, category: "filling" },
-    { id: "fill3", name: "Salami", frenchName: "Salami", price: 3.5, category: "filling" },
-    { id: "fill4", name: "Special Salami", frenchName: "Spécial Salami", price: 4.5, category: "filling" },
-    { id: "fill5", name: "Ham", frenchName: "Jambon", price: 4.0, category: "filling" },
-    { id: "fill6", name: "Special Ham", frenchName: "Spécial Jambon", price: 5.5, category: "filling" },
-    { id: "fill7", name: "Tuna & Salami", frenchName: "Thon + Salami", price: 4.0, category: "filling" },
-    { id: "fill8", name: "Tuna 4 Cheese", frenchName: "Thon 4 Fromages", price: 5.5, category: "filling" },
-    { id: "fill9", name: "Tuna & Ham", frenchName: "Thon + Jambon", price: 4.5, category: "filling" },
-    { id: "fill10", name: "Special Cheese", frenchName: "Spécial Fromage", price: 8.0, category: "filling" },
-    
-    // Meat options
-    { id: "meat1", name: "Grilled Chicken", frenchName: "Escalope grillée", price: 6.0, category: "meat" },
-    { id: "meat2", name: "Breaded Chicken", frenchName: "Escalope panée", price: 6.5, category: "meat" },
-    { id: "meat3", name: "Cordon Bleu", frenchName: "Cordon Bleu", price: 6.5, category: "meat" },
-    { id: "meat4", name: "Shawarma", frenchName: "Shawarma", price: 7.0, category: "meat" },
-    { id: "meat5", name: "Chicken & Shawarma Mix", frenchName: "Mix Escalope + Shawarma", price: 10.0, category: "meat" },
-    
-    // Extras
-    { id: "extra1", name: "Cheddar", frenchName: "Cheddar", price: 2.5, category: "extra" },
-    { id: "extra2", name: "Mozzarella", frenchName: "Mozzarella", price: 2.5, category: "extra" },
-    { id: "extra3", name: "French Fries", frenchName: "Frites", price: 2.0, category: "extra" },
-    
-    // Drinks
-    { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drink" },
-    { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drink" },
+    { id: "opt1", name: "Tuna", frenchName: "thon", price: 3.5, category: "addon" },
+    { id: "opt2", name: "Special Tuna", frenchName: "spécial thon", price: 4.5, category: "addon" },
+    { id: "opt3", name: "Salami", frenchName: "salami", price: 3.5, category: "addon" },
+    { id: "opt4", name: "Special Salami", frenchName: "spécial salami", price: 4.5, category: "addon" },
+    { id: "opt5", name: "Ham", frenchName: "jambon", price: 4.0, category: "addon" },
+    { id: "opt6", name: "Special Ham", frenchName: "spécial jambon", price: 5.5, category: "addon" },
+    { id: "opt7", name: "Tuna & Salami", frenchName: "Thon Salami", price: 4.0, category: "addon" },
+    { id: "opt8", name: "4 Cheese & Tuna", frenchName: "Thon 4 Fromage", price: 5.5, category: "addon" },
+    { id: "opt9", name: "Tuna & Ham", frenchName: "thon jambon", price: 4.5, category: "addon" },
+    { id: "opt10", name: "Special Cheese", frenchName: "spécial Fromage", price: 8.0, category: "addon" },
+    { id: "opt11", name: "Cheddar", frenchName: "cheddar", price: 2.5, category: "addon" },
+    { id: "opt12", name: "Mozzarella", frenchName: "mozzarella", price: 2.5, category: "addon" },
+    { id: "opt13", name: "French Fries", frenchName: "frite", price: 2.0, category: "addon" },
+    { id: "opt14", name: "Soda Can", frenchName: "canette", price: 2.0, category: "addon" },
+    { id: "opt15", name: "Water", frenchName: "eau", price: 1.5, category: "addon" },
   ];
 
-  // Get translation function
+  // Translation data
   const translations = {
     en: {
       home: "Home",
@@ -150,12 +132,7 @@ const MenuPage = () => {
       completeOrder: "Complete Your Order",
       orderSummary: "Order Summary",
       basePrice: "Base Price:",
-      customizeOrder: "Customize Your Order",
       foodOptions: "Food Options",
-      base: "Base",
-      fillings: "Fillings",
-      meat: "Meat",
-      extras: "Extras",
       name: "Name",
       deliveryAddress: "Delivery Address",
       phoneNumber: "Phone Number",
@@ -199,12 +176,7 @@ const MenuPage = () => {
       completeOrder: "Compléter Votre Commande",
       orderSummary: "Résumé de la Commande",
       basePrice: "Prix de base:",
-      customizeOrder: "Personnalisez Votre Commande",
       foodOptions: "Options de Nourriture",
-      base: "Base",
-      fillings: "Garnitures",
-      meat: "Viande",
-      extras: "Extras",
       name: "Nom",
       deliveryAddress: "Adresse de Livraison",
       phoneNumber: "Numéro de Téléphone",
@@ -227,7 +199,27 @@ const MenuPage = () => {
     }
   };
 
-  // Translation helper function
+  // Ingredients data with French translations
+  const ingredients = {
+    "mlawi1": {
+      en: ["Flour", "Water", "Salt", "Oil", "Tuna", "Harissa", "Olives"],
+      fr: ["Farine", "Eau", "Sel", "Huile", "Thon", "Harissa", "Olives"]
+    },
+    "mlawi2": {
+      en: ["Flour", "Water", "Salt", "Oil", "Premium Tuna", "Harissa", "Olives", "Special sauce"],
+      fr: ["Farine", "Eau", "Sel", "Huile", "Thon premium", "Harissa", "Olives", "Sauce spéciale"]
+    },
+    "chapati1": {
+      en: ["Flour", "Water", "Salt", "Grilled Chicken", "Vegetables", "Sauce"],
+      fr: ["Farine", "Eau", "Sel", "Escalope grillée", "Légumes", "Sauce"]
+    },
+    "tacos1": {
+      en: ["Tortilla", "Tuna", "Lettuce", "Tomato", "Cheese", "Sauce"],
+      fr: ["Tortilla", "Thon", "Laitue", "Tomate", "Fromage", "Sauce"]
+    },
+  };
+
+  // Get translation function
   const t = (key: string) => {
     return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
   };
@@ -255,11 +247,7 @@ const MenuPage = () => {
 
   // Calculate total price
   const calculateTotal = () => {
-    return cart.reduce((total, item) => {
-      // Use totalPrice if available, otherwise calculate from price * quantity
-      const itemTotal = item.totalPrice !== undefined ? item.totalPrice : item.price * item.quantity;
-      return total + itemTotal;
-    }, 0).toFixed(3);
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
   };
 
   // Add item to cart
@@ -267,12 +255,12 @@ const MenuPage = () => {
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
-      price: 0, // Start with 0 since we'll build it up with options
+      price: item.price,
       quantity: 1,
       category: item.category
     });
     setSelectedFoodOptions([]);
-    setTotalPrice(0); // Start with 0 price, options will add to it
+    setTotalPrice(item.price);
     setShowFoodOptionsModal(true);
   };
 
@@ -281,12 +269,12 @@ const MenuPage = () => {
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
-      price: 0, // Start with 0 since we'll build it up with options
+      price: item.price,
       quantity: 1,
       category: item.category
     });
     setSelectedFoodOptions([]);
-    setTotalPrice(0); // Start with 0 price, options will add to it
+    setTotalPrice(item.price);
     setShowFoodOptionsModal(true);
   };
 
@@ -468,29 +456,8 @@ const MenuPage = () => {
       });
   };
 
-  // Get ingredients info for a specific item
-  const ingredients = {
-    "mlawi1": {
-      en: ["Flour", "Water", "Salt", "Oil", "Tuna", "Harissa", "Olives"],
-      fr: ["Farine", "Eau", "Sel", "Huile", "Thon", "Harissa", "Olives"]
-    },
-    "mlawi2": {
-      en: ["Flour", "Water", "Salt", "Oil", "Premium Tuna", "Harissa", "Olives", "Special sauce"],
-      fr: ["Farine", "Eau", "Sel", "Huile", "Thon premium", "Harissa", "Olives", "Sauce spéciale"]
-    },
-    "chapati1": {
-      en: ["Flour", "Water", "Salt", "Grilled Chicken", "Vegetables", "Sauce"],
-      fr: ["Farine", "Eau", "Sel", "Escalope grillée", "Légumes", "Sauce"]
-    },
-    "tacos1": {
-      en: ["Tortilla", "Tuna", "Lettuce", "Tomato", "Cheese", "Sauce"],
-      fr: ["Tortilla", "Thon", "Laitue", "Tomate", "Fromage", "Sauce"]
-    },
-  };
-
   return (
     <div className="menu-page">
-      {/* Header Section */}
       <header className="header">
         <div className="logo">
           <h1>Scooby<span>Food</span></h1>
@@ -530,7 +497,6 @@ const MenuPage = () => {
         </div>
       </header>
 
-      {/* Menu Section */}
       <section className="menu-section">
         <div className="section-title">
           <h2>{t('ourMenu')}</h2>
@@ -721,7 +687,7 @@ const MenuPage = () => {
         </div>
       )}
 
-      {/* Food Options Modal - Updated for customization with categories */}
+      {/* Food Options Modal */}
       {showFoodOptionsModal && selectedItem && (
         <div className="modal" onClick={(e) => {
           if ((e.target as HTMLElement).classList.contains('modal')) {
@@ -730,110 +696,33 @@ const MenuPage = () => {
         }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowFoodOptionsModal(false)}>×</span>
-            <h2>{t('customizeOrder')}</h2>
+            <h2>{selectedItem.name}</h2>
             
             <div className="food-options-summary">
-              <div className="order-item-name">{selectedItem.name}</div>
+              <div className="base-price">
+                <span>{t('basePrice')}</span>
+                <span>{selectedItem.price.toFixed(3)} {t('TND')}</span>
+              </div>
               
               <h3>{t('foodOptions')}</h3>
-              
-              {/* Display options by category */}
-              <div className="food-options-by-category">
-                {/* Base options */}
-                <div className="option-category">
-                  <h4>{t('base')}</h4>
-                  <div className="option-group">
-                    {foodOptions.filter(opt => opt.category === "base").map((option) => (
-                      <div key={option.id} className="food-option-item">
-                        <div className="option-checkbox">
-                          <Checkbox 
-                            id={`option-${option.id}`}
-                            checked={selectedFoodOptions.includes(option.id)}
-                            onCheckedChange={(checked) => {
-                              handleFoodOptionChange(option.id, checked === true);
-                            }}
-                          />
-                          <label htmlFor={`option-${option.id}`}>
-                            {currentLanguage === 'en' ? option.name : option.frenchName}
-                          </label>
-                        </div>
-                        <span className="option-price">{option.price > 0 ? `+${option.price.toFixed(3)} ${t('TND')}` : ''}</span>
-                      </div>
-                    ))}
+              <div className="food-options-list">
+                {foodOptions.map((option) => (
+                  <div key={option.id} className="food-option-item">
+                    <div className="option-checkbox">
+                      <Checkbox 
+                        id={`option-${option.id}`}
+                        checked={selectedFoodOptions.includes(option.id)}
+                        onCheckedChange={(checked) => {
+                          handleFoodOptionChange(option.id, checked === true);
+                        }}
+                      />
+                      <label htmlFor={`option-${option.id}`}>
+                        {currentLanguage === 'en' ? option.name : option.frenchName}
+                      </label>
+                    </div>
+                    <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
                   </div>
-                </div>
-                
-                {/* Filling options */}
-                <div className="option-category">
-                  <h4>{t('fillings')}</h4>
-                  <div className="option-group">
-                    {foodOptions.filter(opt => opt.category === "filling").map((option) => (
-                      <div key={option.id} className="food-option-item">
-                        <div className="option-checkbox">
-                          <Checkbox 
-                            id={`option-${option.id}`}
-                            checked={selectedFoodOptions.includes(option.id)}
-                            onCheckedChange={(checked) => {
-                              handleFoodOptionChange(option.id, checked === true);
-                            }}
-                          />
-                          <label htmlFor={`option-${option.id}`}>
-                            {currentLanguage === 'en' ? option.name : option.frenchName}
-                          </label>
-                        </div>
-                        <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Meat options */}
-                <div className="option-category">
-                  <h4>{t('meat')}</h4>
-                  <div className="option-group">
-                    {foodOptions.filter(opt => opt.category === "meat").map((option) => (
-                      <div key={option.id} className="food-option-item">
-                        <div className="option-checkbox">
-                          <Checkbox 
-                            id={`option-${option.id}`}
-                            checked={selectedFoodOptions.includes(option.id)}
-                            onCheckedChange={(checked) => {
-                              handleFoodOptionChange(option.id, checked === true);
-                            }}
-                          />
-                          <label htmlFor={`option-${option.id}`}>
-                            {currentLanguage === 'en' ? option.name : option.frenchName}
-                          </label>
-                        </div>
-                        <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Extras options */}
-                <div className="option-category">
-                  <h4>{t('extras')}</h4>
-                  <div className="option-group">
-                    {foodOptions.filter(opt => opt.category === "extra" || opt.category === "drink").map((option) => (
-                      <div key={option.id} className="food-option-item">
-                        <div className="option-checkbox">
-                          <Checkbox 
-                            id={`option-${option.id}`}
-                            checked={selectedFoodOptions.includes(option.id)}
-                            onCheckedChange={(checked) => {
-                              handleFoodOptionChange(option.id, checked === true);
-                            }}
-                          />
-                          <label htmlFor={`option-${option.id}`}>
-                            {currentLanguage === 'en' ? option.name : option.frenchName}
-                          </label>
-                        </div>
-                        <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
               
               <div className="total-price">
@@ -844,7 +733,6 @@ const MenuPage = () => {
               <button 
                 className="btn-primary btn-block"
                 onClick={continueToCheckout}
-                disabled={totalPrice <= 0 || selectedFoodOptions.length === 0}
               >
                 {t('checkout')}
               </button>
@@ -964,7 +852,6 @@ const MenuPage = () => {
         </div>
       )}
 
-      {/* Footer Section */}
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-logo">
