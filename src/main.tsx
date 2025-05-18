@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 // Import the styles needed for animations and existing styling
 import './styles.css'; 
 
-// Add the Lovable script tag for the select feature
+// Create root and render app
 createRoot(document.getElementById("root")!).render(
   <>
     <App />
