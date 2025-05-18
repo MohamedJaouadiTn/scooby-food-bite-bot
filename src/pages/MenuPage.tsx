@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -19,9 +18,8 @@ type CartItem = {
   price: number;
   quantity: number;
   category?: string;
-  options?: FoodOption[];
-  totalPrice?: number;
-  extras?: string[];
+  options?: FoodOption[];  // Added this property
+  totalPrice?: number;     // Added this property
 };
 
 type FoodOptionType = {
@@ -41,7 +39,7 @@ const MenuPage = () => {
   const [showFoodOptionsModal, setShowFoodOptionsModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CartItem | null>(null);
-  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [selectedFoodOptions, setSelectedFoodOptions] = useState<string[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [orderForm, setOrderForm] = useState({
     name: localStorage.getItem("customerName") || "",
@@ -90,11 +88,23 @@ const MenuPage = () => {
     { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
   ];
 
-  // Extras that can be added to any order
-  const extras = [
-    { id: "extra1", name: "Cheddar", frenchName: "Cheddar", price: 2.5 },
-    { id: "extra2", name: "Mozzarella", frenchName: "Mozzarella", price: 2.5 },
-    { id: "extra3", name: "French Fries", frenchName: "Frites", price: 2.0 },
+  // Food options that can be added
+  const foodOptions = [
+    { id: "opt1", name: "Tuna", frenchName: "thon", price: 3.5, category: "addon" },
+    { id: "opt2", name: "Special Tuna", frenchName: "spécial thon", price: 4.5, category: "addon" },
+    { id: "opt3", name: "Salami", frenchName: "salami", price: 3.5, category: "addon" },
+    { id: "opt4", name: "Special Salami", frenchName: "spécial salami", price: 4.5, category: "addon" },
+    { id: "opt5", name: "Ham", frenchName: "jambon", price: 4.0, category: "addon" },
+    { id: "opt6", name: "Special Ham", frenchName: "spécial jambon", price: 5.5, category: "addon" },
+    { id: "opt7", name: "Tuna & Salami", frenchName: "Thon Salami", price: 4.0, category: "addon" },
+    { id: "opt8", name: "4 Cheese & Tuna", frenchName: "Thon 4 Fromage", price: 5.5, category: "addon" },
+    { id: "opt9", name: "Tuna & Ham", frenchName: "thon jambon", price: 4.5, category: "addon" },
+    { id: "opt10", name: "Special Cheese", frenchName: "spécial Fromage", price: 8.0, category: "addon" },
+    { id: "opt11", name: "Cheddar", frenchName: "cheddar", price: 2.5, category: "addon" },
+    { id: "opt12", name: "Mozzarella", frenchName: "mozzarella", price: 2.5, category: "addon" },
+    { id: "opt13", name: "French Fries", frenchName: "frite", price: 2.0, category: "addon" },
+    { id: "opt14", name: "Soda Can", frenchName: "canette", price: 2.0, category: "addon" },
+    { id: "opt15", name: "Water", frenchName: "eau", price: 1.5, category: "addon" },
   ];
 
   // Translation data
@@ -121,8 +131,8 @@ const MenuPage = () => {
       checkout: "Checkout",
       completeOrder: "Complete Your Order",
       orderSummary: "Order Summary",
-      basePrice: "Price:",
-      extras: "Extras (Optional)",
+      basePrice: "Base Price:",
+      foodOptions: "Food Options",
       name: "Name",
       deliveryAddress: "Delivery Address",
       phoneNumber: "Phone Number",
@@ -165,8 +175,8 @@ const MenuPage = () => {
       checkout: "Commander",
       completeOrder: "Compléter Votre Commande",
       orderSummary: "Résumé de la Commande",
-      basePrice: "Prix:",
-      extras: "Suppléments (Optionnel)",
+      basePrice: "Prix de base:",
+      foodOptions: "Options de Nourriture",
       name: "Nom",
       deliveryAddress: "Adresse de Livraison",
       phoneNumber: "Numéro de Téléphone",
@@ -237,7 +247,7 @@ const MenuPage = () => {
 
   // Calculate total price
   const calculateTotal = () => {
-    return cart.reduce((total, item) => total + (item.totalPrice || item.price * item.quantity), 0).toFixed(2);
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
   };
 
   // Add item to cart
@@ -247,10 +257,9 @@ const MenuPage = () => {
       name: currentLanguage === 'en' ? item.name : item.frenchName,
       price: item.price,
       quantity: 1,
-      category: item.category,
-      extras: []
+      category: item.category
     });
-    setSelectedExtras([]);
+    setSelectedFoodOptions([]);
     setTotalPrice(item.price);
     setShowFoodOptionsModal(true);
   };
@@ -262,50 +271,46 @@ const MenuPage = () => {
       name: currentLanguage === 'en' ? item.name : item.frenchName,
       price: item.price,
       quantity: 1,
-      category: item.category,
-      extras: []
+      category: item.category
     });
-    setSelectedExtras([]);
+    setSelectedFoodOptions([]);
     setTotalPrice(item.price);
     setShowFoodOptionsModal(true);
   };
 
-  // Handle extras selection
-  const handleExtraChange = (extraId: string, checked: boolean) => {
-    const extra = extras.find(item => item.id === extraId);
+  // Handle food option selection
+  const handleFoodOptionChange = (optionId: string, checked: boolean) => {
+    const option = foodOptions.find(opt => opt.id === optionId);
     
-    if (!extra) return;
+    if (!option) return;
     
     if (checked) {
-      setSelectedExtras([...selectedExtras, extraId]);
-      setTotalPrice(prev => prev + extra.price);
+      setSelectedFoodOptions([...selectedFoodOptions, optionId]);
+      setTotalPrice(prev => prev + option.price);
     } else {
-      setSelectedExtras(selectedExtras.filter(id => id !== extraId));
-      setTotalPrice(prev => prev - extra.price);
+      setSelectedFoodOptions(selectedFoodOptions.filter(id => id !== optionId));
+      setTotalPrice(prev => prev - option.price);
     }
   };
 
   // Continue to checkout after food options
   const continueToCheckout = () => {
-    // Add item to cart with selected extras
+    // Add item to cart with selected options
     if (selectedItem) {
-      const selectedExtrasDetails = selectedExtras.map(id => {
-        const extra = extras.find(e => e.id === id);
-        return {
-          id,
-          name: currentLanguage === 'en' ? extra?.name : extra?.frenchName,
-          price: extra?.price || 0
-        };
-      });
-      
-      const itemWithExtras = {
+      const itemWithOptions = {
         ...selectedItem,
-        options: selectedExtrasDetails,
-        extras: selectedExtras,
+        options: selectedFoodOptions.map(id => {
+          const option = foodOptions.find(o => o.id === id);
+          return {
+            id,
+            name: currentLanguage === 'en' ? option?.name : option?.frenchName,
+            price: option?.price || 0
+          };
+        }),
         totalPrice: totalPrice
       };
       
-      setCart([itemWithExtras]);
+      setCart([itemWithOptions]);
     }
     
     setShowFoodOptionsModal(false);
@@ -392,16 +397,6 @@ const MenuPage = () => {
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!orderForm.name.trim() || !orderForm.address.trim() || !orderForm.phone.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields (Name, Address, Phone).",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     if (cart.length === 0) {
       toast({
         title: "Empty Cart",
@@ -417,10 +412,10 @@ const MenuPage = () => {
     cart.forEach(item => {
       message += `Order = ${item.name}\n`;
       
-      // Add extras if available
+      // Add food options if available
       if (item.options && item.options.length > 0) {
-        const extrasNames = item.options.map((opt: any) => opt.name).join(', ');
-        message += `Extras = ${extrasNames}\n`;
+        const optionNames = item.options.map((opt: any) => opt.name).join(', ');
+        message += `Food Options = ${optionNames}\n`;
       }
       
       message += `Quantity = ${item.quantity}\n`;
@@ -709,98 +704,38 @@ const MenuPage = () => {
                 <span>{selectedItem.price.toFixed(3)} {t('TND')}</span>
               </div>
               
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                continueToCheckout();
-              }}>
-                <div className="form-group">
-                  <label htmlFor="name">{t('name')} *</label>
-                  <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    value={orderForm.name}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="phone">{t('phoneNumber')} *</label>
-                  <input 
-                    type="tel" 
-                    id="phone" 
-                    name="phone" 
-                    value={orderForm.phone}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="address">{t('deliveryAddress')} *</label>
-                  <textarea 
-                    id="address" 
-                    name="address" 
-                    value={orderForm.address}
-                    onChange={handleInputChange}
-                    required
-                  ></textarea>
-                </div>
-                
-                {/* Allergies field */}
-                <div className="form-group allergies-group">
-                  <div className="allergies-label-container">
-                    <label htmlFor="allergies">{t('allergies')}</label>
-                    <div className="info-tooltip">
-                      <Info size={16} />
-                      <span className="tooltip-text">{t('allergiesInfo')}</span>
+              <h3>{t('foodOptions')}</h3>
+              <div className="food-options-list">
+                {foodOptions.map((option) => (
+                  <div key={option.id} className="food-option-item">
+                    <div className="option-checkbox">
+                      <Checkbox 
+                        id={`option-${option.id}`}
+                        checked={selectedFoodOptions.includes(option.id)}
+                        onCheckedChange={(checked) => {
+                          handleFoodOptionChange(option.id, checked === true);
+                        }}
+                      />
+                      <label htmlFor={`option-${option.id}`}>
+                        {currentLanguage === 'en' ? option.name : option.frenchName}
+                      </label>
                     </div>
+                    <span className="option-price">+{option.price.toFixed(3)} {t('TND')}</span>
                   </div>
-                  <textarea 
-                    id="allergies" 
-                    name="allergies" 
-                    value={orderForm.allergies}
-                    onChange={handleInputChange}
-                  ></textarea>
-                </div>
-                
-                {/* Extras section */}
-                <div className="extras-section">
-                  <h3 className="extras-title">{t('extras')}</h3>
-                  <div className="extras-list">
-                    {extras.map((extra) => (
-                      <div key={extra.id} className="extras-item">
-                        <div className="extras-checkbox">
-                          <Checkbox 
-                            id={`extra-${extra.id}`}
-                            checked={selectedExtras.includes(extra.id)}
-                            onCheckedChange={(checked) => {
-                              handleExtraChange(extra.id, checked === true);
-                            }}
-                          />
-                          <label htmlFor={`extra-${extra.id}`}>
-                            {currentLanguage === 'en' ? extra.name : extra.frenchName}
-                          </label>
-                        </div>
-                        <span className="extras-price">+{extra.price.toFixed(3)} {t('TND')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="total-price">
-                  <span>{t('total')}</span>
-                  <span>{totalPrice.toFixed(3)} {t('TND')}</span>
-                </div>
-                
-                <button 
-                  className="btn-primary btn-block"
-                  type="submit"
-                >
-                  {t('placeOrder')}
-                </button>
-              </form>
+                ))}
+              </div>
+              
+              <div className="total-price">
+                <span>{t('total')}</span>
+                <span>{totalPrice.toFixed(3)} {t('TND')}</span>
+              </div>
+              
+              <button 
+                className="btn-primary btn-block"
+                onClick={continueToCheckout}
+              >
+                {t('checkout')}
+              </button>
             </div>
           </div>
         </div>
@@ -936,8 +871,8 @@ const MenuPage = () => {
           
           <div className="footer-contact">
             <h3>{t('contactUs')}</h3>
-            <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
-            <p><i className="fa fa-phone"></i> (123) 456-7890</p>
+            <p><i className="fa fa-map-marker"></i> 123 Food Street, Foodville</p>
+            <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
             <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
           </div>
           
