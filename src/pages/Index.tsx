@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
 const Index = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [currentLanguage, setCurrentLanguage] = useState("en");
-  
+
   // Translation data
   const translations = {
     en: {
@@ -80,48 +78,42 @@ const Index = () => {
   const t = (key: string) => {
     return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
   };
-  
   useEffect(() => {
     // Testimonial slider effect
     const slideInterval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % 3);
+      setActiveSlide(prev => (prev + 1) % 3);
     }, 5000);
-    
+
     // Animation on scroll function
     const animateOnScroll = () => {
       const elements = document.querySelectorAll('.featured-item, .about-content, .footer-content');
       const windowHeight = window.innerHeight;
-      
       elements.forEach(element => {
         const elementPosition = element.getBoundingClientRect().top;
         const elementVisible = 150;
-        
         if (elementPosition < windowHeight - elementVisible) {
           element.classList.add('animate-active');
         }
       });
     };
-    
+
     // Set initial animations
     const elementsToAnimate = document.querySelectorAll('.featured-item, .about-content, .footer-content');
     elementsToAnimate.forEach(element => {
       element.classList.add('animate-on-scroll');
     });
-    
+
     // Run animation on scroll
     window.addEventListener('scroll', animateOnScroll);
-    
+
     // Run once on page load
     animateOnScroll();
-    
     return () => {
       clearInterval(slideInterval);
       window.removeEventListener('scroll', animateOnScroll);
     };
   }, []);
-  
-  return (
-    <div className="home-page">
+  return <div className="home-page">
       <header className="header">
         <div className="logo">
           <h1>Scooby<span>Food</span></h1>
@@ -137,11 +129,7 @@ const Index = () => {
         
         {/* Language Switcher */}
         <div className="language-switcher">
-          <select 
-            value={currentLanguage} 
-            onChange={(e) => setCurrentLanguage(e.target.value)}
-            className="language-select"
-          >
+          <select value={currentLanguage} onChange={e => setCurrentLanguage(e.target.value)} className="language-select">
             <option value="en">English</option>
             <option value="fr">Français</option>
           </select>
@@ -176,7 +164,8 @@ const Index = () => {
             <h3>Chapaty</h3>
             <p>{t('chapatyDesc')}</p>
             <p className="ingredients-text"><small>{t('chapatyIngredients')}</small></p>
-            <div className="featured-price">$5.99</div>
+            <div className="featured-price">Starting From
+3.50 TND</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
           
@@ -187,7 +176,8 @@ const Index = () => {
             <h3>Malawi</h3>
             <p>{t('malawiDesc')}</p>
             <p className="ingredients-text"><small>{t('malawiIngredients')}</small></p>
-            <div className="featured-price">$7.99</div>
+            <div className="featured-price">Starting From
+3.50 TND</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
           
@@ -198,7 +188,8 @@ const Index = () => {
             <h3>Refreshing Sodas</h3>
             <p>{t('sodaDesc')}</p>
             <p className="ingredients-text"><small>{t('sodaIngredients')}</small></p>
-            <div className="featured-price">$2.50</div>
+            <div className="featured-price">Starting From
+3.50 TND</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
         </div>
@@ -301,8 +292,6 @@ const Index = () => {
           <p>&copy; {t('copyright')}</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
