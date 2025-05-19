@@ -1,17 +1,14 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-
 type FoodOption = {
   id: string;
   name: string;
   price: number;
 };
-
 type CartItem = {
   id: string;
   name: string;
@@ -22,7 +19,6 @@ type CartItem = {
   totalPrice?: number;
   sodaType?: string;
 };
-
 type FoodOptionType = {
   id: string;
   name: string;
@@ -31,9 +27,10 @@ type FoodOptionType = {
   category: string;
   image: string;
 };
-
 const MenuPage = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [showCartModal, setShowCartModal] = useState(false);
@@ -48,7 +45,7 @@ const MenuPage = () => {
     name: localStorage.getItem("customerName") || "",
     address: localStorage.getItem("customerAddress") || "",
     phone: localStorage.getItem("customerPhone") || "",
-    allergies: localStorage.getItem("customerAllergies") || "",
+    allergies: localStorage.getItem("customerAllergies") || ""
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
 
@@ -58,42 +55,117 @@ const MenuPage = () => {
 
   // Menu items data - now excluding extras
   const menuItems = [
-    // Mlawi Category
-    { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
-    { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
-    { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
-    { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
-    { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
-    
-    // Chapati Category
-    { id: "chapati1", name: "Chapati with Grilled Chicken", frenchName: "Chapati escalope grillée", price: 6.0, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
-    { id: "chapati2", name: "Chapati with Tuna", frenchName: "Chapati au thon", price: 7.99, category: "chapati", image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" },
-    { id: "chapati3", name: "Chapati Cordon Bleu", frenchName: "Chapati cordon bleu", price: 6.5, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
-    
-    // Tacos Category
-    { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" },
-    { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png" },
-
-    // Drinks (only soda now)
-    { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drinks", image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png" },
-  ];
+  // Mlawi Category
+  {
+    id: "mlawi1",
+    name: "Mlawi with Tuna",
+    frenchName: "Mlawi au thon",
+    price: 3.5,
+    category: "mlawi",
+    image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png"
+  }, {
+    id: "mlawi2",
+    name: "Special Mlawi with Tuna",
+    frenchName: "Mlawi spécial thon",
+    price: 4.5,
+    category: "mlawi",
+    image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png"
+  }, {
+    id: "mlawi3",
+    name: "Mlawi with Salami",
+    frenchName: "Mlawi au salami",
+    price: 3.5,
+    category: "mlawi",
+    image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
+  }, {
+    id: "mlawi4",
+    name: "Special Mlawi with Salami",
+    frenchName: "Mlawi spécial salami",
+    price: 4.5,
+    category: "mlawi",
+    image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
+  }, {
+    id: "mlawi5",
+    name: "Mlawi with Ham",
+    frenchName: "Mlawi au jambon",
+    price: 4.0,
+    category: "mlawi",
+    image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
+  },
+  // Chapati Category
+  {
+    id: "chapati1",
+    name: "Chapati with Grilled Chicken",
+    frenchName: "Chapati escalope grillée",
+    price: 6.0,
+    category: "chapati",
+    image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png"
+  }, {
+    id: "chapati2",
+    name: "Chapati with Tuna",
+    frenchName: "Chapati au thon",
+    price: 7.99,
+    category: "chapati",
+    image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png"
+  }, {
+    id: "chapati3",
+    name: "Chapati Cordon Bleu",
+    frenchName: "Chapati cordon bleu",
+    price: 6.5,
+    category: "chapati",
+    image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png"
+  },
+  // Tacos Category
+  {
+    id: "tacos1",
+    name: "Tacos with Tuna",
+    frenchName: "Tacos au thon",
+    price: 3.5,
+    category: "tacos",
+    image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png"
+  }, {
+    id: "tacos2",
+    name: "Tacos with Special Tuna",
+    frenchName: "Tacos spécial thon",
+    price: 4.5,
+    category: "tacos",
+    image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png"
+  },
+  // Drinks (only soda now)
+  {
+    id: "drink1",
+    name: "Soda Can",
+    frenchName: "Canette",
+    price: 2.0,
+    category: "drinks",
+    image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png"
+  }];
 
   // Extras options - now separate from menu
-  const extraOptions = [
-    { id: "extra1", name: "Cheddar", frenchName: "Cheddar", price: 2.5 },
-    { id: "extra2", name: "Mozzarella", frenchName: "Mozzarella", price: 2.5 },
-    { id: "extra3", name: "French Fries", frenchName: "Frites", price: 2.0 },
-    { id: "extra4", name: "Water", frenchName: "Eau", price: 1.5 },
-  ];
+  const extraOptions = [{
+    id: "extra1",
+    name: "Cheddar",
+    frenchName: "Cheddar",
+    price: 2.5
+  }, {
+    id: "extra2",
+    name: "Mozzarella",
+    frenchName: "Mozzarella",
+    price: 2.5
+  }, {
+    id: "extra3",
+    name: "French Fries",
+    frenchName: "Frites",
+    price: 2.0
+  }, {
+    id: "extra4",
+    name: "Water",
+    frenchName: "Eau",
+    price: 1.5
+  }];
 
   // Soda options
-  const sodaOptions = [
-    "Coca-Cola",
-    "Fanta",
-    "Sprite", 
-    "Schweppes",
-    "Boga"
-  ];
+  const sodaOptions = ["Coca-Cola", "Fanta", "Sprite", "Schweppes", "Boga"];
 
   // Translation data
   const translations = {
@@ -214,9 +286,7 @@ const MenuPage = () => {
   }, [cart]);
 
   // Filter menu items based on category
-  const filteredItems = activeFilter === 'all' 
-    ? menuItems 
-    : menuItems.filter(item => item.category === activeFilter);
+  const filteredItems = activeFilter === 'all' ? menuItems : menuItems.filter(item => item.category === activeFilter);
 
   // Calculate total items in cart
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
@@ -239,7 +309,6 @@ const MenuPage = () => {
       setShowSodaModal(true);
       return;
     }
-
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
@@ -265,7 +334,6 @@ const MenuPage = () => {
       setShowSodaModal(true);
       return;
     }
-
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
@@ -281,9 +349,7 @@ const MenuPage = () => {
   // Handle extra option selection
   const handleExtraOptionChange = (optionId: string, checked: boolean) => {
     const option = extraOptions.find(opt => opt.id === optionId);
-    
     if (!option) return;
-    
     if (checked) {
       setSelectedExtras([...selectedExtras, optionId]);
       setTotalPrice(prev => prev + option.price);
@@ -296,13 +362,11 @@ const MenuPage = () => {
   // Handle soda selection confirmation
   const handleSodaConfirm = () => {
     if (!selectedItem) return;
-    
     const sodaItem = {
       ...selectedItem,
       name: `${selectedItem.name} (${selectedSodaType})`,
       sodaType: selectedSodaType
     };
-    
     setSelectedItem(sodaItem);
     setShowSodaModal(false);
     setSelectedExtras([]);
@@ -314,7 +378,10 @@ const MenuPage = () => {
   const decreaseQuantity = (id: string) => {
     const updatedCart = cart.map(item => {
       if (item.id === id) {
-        return { ...item, quantity: Math.max(1, item.quantity - 1) };
+        return {
+          ...item,
+          quantity: Math.max(1, item.quantity - 1)
+        };
       }
       return item;
     });
@@ -325,7 +392,10 @@ const MenuPage = () => {
   const increaseQuantity = (id: string) => {
     const updatedCart = cart.map(item => {
       if (item.id === id) {
-        return { ...item, quantity: item.quantity + 1 };
+        return {
+          ...item,
+          quantity: item.quantity + 1
+        };
       }
       return item;
     });
@@ -344,12 +414,15 @@ const MenuPage = () => {
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
     setOrderForm({
       ...orderForm,
-      [name]: value,
+      [name]: value
     });
-    
+
     // Store customer info in localStorage
     localStorage.setItem(`customer${name.charAt(0).toUpperCase() + name.slice(1)}`, value);
   };
@@ -358,7 +431,6 @@ const MenuPage = () => {
   const sendToTelegram = (message: string) => {
     console.log("Sending to Telegram with token:", token, "and chat ID:", chatId);
     console.log("Message:", message);
-    
     return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: {
@@ -368,8 +440,7 @@ const MenuPage = () => {
         chat_id: chatId,
         text: message
       })
-    })
-    .then(response => {
+    }).then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -380,22 +451,21 @@ const MenuPage = () => {
   // Handle order submission
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate required fields
     if (!orderForm.name || !orderForm.address || !orderForm.phone) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-    
     if (!selectedItem) {
       toast({
         title: "Error",
         description: "No item selected.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -405,7 +475,7 @@ const MenuPage = () => {
     message += `Order = ${selectedItem.name}\n`;
     message += `Quantity = ${selectedItem.quantity}\n`;
     message += `Price = ${selectedItem.price.toFixed(3)} TND\n`;
-    
+
     // Add extras if selected
     if (selectedExtras.length > 0) {
       const selectedOptions = selectedExtras.map(id => {
@@ -415,63 +485,55 @@ const MenuPage = () => {
           price: option?.price || 0
         };
       });
-      
       const extraNames = selectedOptions.map(opt => opt.name).join(' + ');
       message += `Extras = ${extraNames}\n\n`;
-      
+
       // Calculate total price with extras
       let totalWithExtras = selectedItem.price;
       selectedOptions.forEach(opt => {
         totalWithExtras += opt.price;
       });
-      
       message += `Total = ${selectedItem.price.toFixed(3)} TND`;
-      
+
       // Add each extra price
       selectedOptions.forEach(opt => {
         message += ` + ${opt.price.toFixed(3)} TND`;
       });
-      
       message += ` = ${totalWithExtras.toFixed(3)} TND\n\n`;
     } else {
       message += `\nTotal = ${selectedItem.price.toFixed(3)} TND\n\n`;
     }
-    
     message += `Customer Information:\n`;
     message += `Name = ${orderForm.name}\n`;
     message += `Address = ${orderForm.address}\n`;
     message += `Phone = ${orderForm.phone}\n`;
-    
+
     // Add allergies information if provided
     if (orderForm.allergies.trim()) {
       message += `Allergies/Preferences = ${orderForm.allergies}\n`;
     } else {
       message += `Allergies/Preferences = (none)\n`;
     }
-    
-    // Send to Telegram
-    sendToTelegram(message)
-      .then(() => {
-        toast({
-          title: "Order Sent",
-          description: "Your order has been sent successfully!",
-        });
-        setShowOrderModal(false);
-        setShowConfirmationModal(true);
-        setCart([]);
-      })
-      .catch(error => {
-        console.error("Error sending to Telegram:", error);
-        toast({
-          title: "Error",
-          description: "Error sending order. Please try again.",
-          variant: "destructive",
-        });
-      });
-  };
 
-  return (
-    <div className="menu-page">
+    // Send to Telegram
+    sendToTelegram(message).then(() => {
+      toast({
+        title: "Order Sent",
+        description: "Your order has been sent successfully!"
+      });
+      setShowOrderModal(false);
+      setShowConfirmationModal(true);
+      setCart([]);
+    }).catch(error => {
+      console.error("Error sending to Telegram:", error);
+      toast({
+        title: "Error",
+        description: "Error sending order. Please try again.",
+        variant: "destructive"
+      });
+    });
+  };
+  return <div className="menu-page">
       <header className="header">
         <div className="container">
           <div className="header-content">
@@ -490,11 +552,7 @@ const MenuPage = () => {
             <div className="right-header-items">
               {/* Language Switcher moved next to cart icon */}
               <div className="language-switcher">
-                <select 
-                  value={currentLanguage} 
-                  onChange={(e) => setCurrentLanguage(e.target.value)}
-                  className="language-select"
-                >
+                <select value={currentLanguage} onChange={e => setCurrentLanguage(e.target.value)} className="language-select">
                   <option value="en">English</option>
                   <option value="fr">Français</option>
                 </select>
@@ -507,9 +565,9 @@ const MenuPage = () => {
             </div>
             
             <div className="mobile-menu-btn" onClick={() => {
-              const nav = document.querySelector('.nav') as HTMLElement;
-              if (nav) nav.classList.toggle('active');
-            }}>
+            const nav = document.querySelector('.nav') as HTMLElement;
+            if (nav) nav.classList.toggle('active');
+          }}>
               <span></span>
               <span></span>
               <span></span>
@@ -525,109 +583,70 @@ const MenuPage = () => {
         </div>
         
         <div className="filter-buttons">
-          <button 
-            className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('all')}
-          >
+          <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>
             {t('all')}
           </button>
-          <button 
-            className={`filter-btn ${activeFilter === 'mlawi' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('mlawi')}
-          >
+          <button className={`filter-btn ${activeFilter === 'mlawi' ? 'active' : ''}`} onClick={() => setActiveFilter('mlawi')}>
             {t('mlawi')}
           </button>
-          <button 
-            className={`filter-btn ${activeFilter === 'chapati' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('chapati')}
-          >
+          <button className={`filter-btn ${activeFilter === 'chapati' ? 'active' : ''}`} onClick={() => setActiveFilter('chapati')}>
             {t('chapati')}
           </button>
-          <button 
-            className={`filter-btn ${activeFilter === 'tacos' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('tacos')}
-          >
+          <button className={`filter-btn ${activeFilter === 'tacos' ? 'active' : ''}`} onClick={() => setActiveFilter('tacos')}>
             {t('tacos')}
           </button>
-          <button 
-            className={`filter-btn ${activeFilter === 'drinks' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('drinks')}
-          >
+          <button className={`filter-btn ${activeFilter === 'drinks' ? 'active' : ''}`} onClick={() => setActiveFilter('drinks')}>
             {t('drinks')}
           </button>
         </div>
         
         <div className="menu-items">
-          {filteredItems.map((item) => (
-            <div key={item.id} className="menu-item" data-category={item.category}>
+          {filteredItems.map(item => <div key={item.id} className="menu-item" data-category={item.category}>
               <img src={item.image} alt={currentLanguage === 'en' ? item.name : item.frenchName} className="menu-item-img" />
               <h3>{currentLanguage === 'en' ? item.name : item.frenchName}</h3>
               <div className="menu-item-price">{item.price.toFixed(3)} {t('TND')}</div>
               
               <div className="menu-item-actions">
-                <button 
-                  className="btn-add-cart" 
-                  onClick={() => addToCart(item)}
-                >
+                <button className="btn-add-cart" onClick={() => addToCart(item)}>
                   {t('addToCart')}
                 </button>
-                <button 
-                  className="btn-buy-now"
-                  onClick={() => buyNow(item)}
-                >
+                <button className="btn-buy-now" onClick={() => buyNow(item)}>
                   {t('buyNow')}
                 </button>
               </div>
-            </div>
-          ))}
+            </div>)}
         </div>
       </section>
 
       {/* Cart Modal */}
-      {showCartModal && (
-        <div className="modal" onClick={(e) => {
-          if ((e.target as HTMLElement).classList.contains('modal')) {
-            setShowCartModal(false);
-          }
-        }}>
+      {showCartModal && <div className="modal" onClick={e => {
+      if ((e.target as HTMLElement).classList.contains('modal')) {
+        setShowCartModal(false);
+      }
+    }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowCartModal(false)}>×</span>
             <h2>{t('yourCart')}</h2>
             
             <div className="cart-items">
-              {cart.length === 0 ? (
-                <p className="empty-cart">{t('emptyCart')}</p>
-              ) : (
-                cart.map((item) => (
-                  <div key={item.id} className="cart-item">
+              {cart.length === 0 ? <p className="empty-cart">{t('emptyCart')}</p> : cart.map(item => <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
                       <span>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</span>
                     </div>
                     <div className="cart-item-quantity">
-                      <button 
-                        className="quantity-decrease"
-                        onClick={() => decreaseQuantity(item.id)}
-                      >
+                      <button className="quantity-decrease" onClick={() => decreaseQuantity(item.id)}>
                         -
                       </button>
                       <span className="quantity-value">{item.quantity}</span>
-                      <button 
-                        className="quantity-increase"
-                        onClick={() => increaseQuantity(item.id)}
-                      >
+                      <button className="quantity-increase" onClick={() => increaseQuantity(item.id)}>
                         +
                       </button>
-                      <span 
-                        className="remove-item"
-                        onClick={() => removeFromCart(item.id)}
-                      >
+                      <span className="remove-item" onClick={() => removeFromCart(item.id)}>
                         ×
                       </span>
                     </div>
-                  </div>
-                ))
-              )}
+                  </div>)}
             </div>
             
             <div className="cart-footer">
@@ -637,84 +656,57 @@ const MenuPage = () => {
               </div>
               
               <div className="cart-actions">
-                <button 
-                  id="clearCart" 
-                  className="btn-secondary"
-                  onClick={clearCart}
-                  disabled={cart.length === 0}
-                >
+                <button id="clearCart" className="btn-secondary" onClick={clearCart} disabled={cart.length === 0}>
                   {t('clearCart')}
                 </button>
-                <button 
-                  id="checkoutBtn" 
-                  className="btn-primary"
-                  onClick={() => {
-                    if (cart.length === 0) {
-                      toast({
-                        title: "Empty Cart",
-                        description: "Your cart is empty. Please add items before checking out.",
-                        variant: "destructive",
-                      });
-                      return;
-                    }
-                    setShowCartModal(false);
-                    setShowOrderModal(true);
-                  }}
-                  disabled={cart.length === 0}
-                >
+                <button id="checkoutBtn" className="btn-primary" onClick={() => {
+              if (cart.length === 0) {
+                toast({
+                  title: "Empty Cart",
+                  description: "Your cart is empty. Please add items before checking out.",
+                  variant: "destructive"
+                });
+                return;
+              }
+              setShowCartModal(false);
+              setShowOrderModal(true);
+            }} disabled={cart.length === 0}>
                   {t('checkout')}
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Soda Selection Modal */}
-      {showSodaModal && (
-        <div className="modal" onClick={(e) => {
-          if ((e.target as HTMLElement).classList.contains('modal')) {
-            setShowSodaModal(false);
-          }
-        }}>
+      {showSodaModal && <div className="modal" onClick={e => {
+      if ((e.target as HTMLElement).classList.contains('modal')) {
+        setShowSodaModal(false);
+      }
+    }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowSodaModal(false)}>×</span>
             <h2>{t('chooseSodaType')}</h2>
             
             <div className="soda-options">
-              {sodaOptions.map((soda) => (
-                <div key={soda} className="soda-option">
-                  <input
-                    type="radio"
-                    id={`soda-${soda}`}
-                    name="sodaType"
-                    value={soda}
-                    checked={selectedSodaType === soda}
-                    onChange={(e) => setSelectedSodaType(e.target.value)}
-                    className="soda-radio"
-                  />
+              {sodaOptions.map(soda => <div key={soda} className="soda-option">
+                  <input type="radio" id={`soda-${soda}`} name="sodaType" value={soda} checked={selectedSodaType === soda} onChange={e => setSelectedSodaType(e.target.value)} className="soda-radio" />
                   <label htmlFor={`soda-${soda}`} className="soda-label">{soda}</label>
-                </div>
-              ))}
+                </div>)}
             </div>
             
-            <button 
-              className="btn-primary btn-block mt-4"
-              onClick={handleSodaConfirm}
-            >
+            <button className="btn-primary btn-block mt-4" onClick={handleSodaConfirm}>
               {t('confirm')}
             </button>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Order Modal */}
-      {showOrderModal && (
-        <div className="modal" onClick={(e) => {
-          if ((e.target as HTMLElement).classList.contains('modal')) {
-            setShowOrderModal(false);
-          }
-        }}>
+      {showOrderModal && <div className="modal" onClick={e => {
+      if ((e.target as HTMLElement).classList.contains('modal')) {
+        setShowOrderModal(false);
+      }
+    }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowOrderModal(false)}>×</span>
             <h2>{t('completeOrder')}</h2>
@@ -722,60 +714,32 @@ const MenuPage = () => {
             <form id="orderForm" onSubmit={handleSubmitOrder}>
               <div className="form-group">
                 <label htmlFor="name">{t('name')} *</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  name="name" 
-                  value={orderForm.name}
-                  onChange={handleInputChange}
-                  required 
-                />
+                <input type="text" id="name" name="name" value={orderForm.name} onChange={handleInputChange} required />
               </div>
               
               <div className="form-group">
                 <label htmlFor="address">{t('deliveryAddress')} *</label>
-                <textarea 
-                  id="address" 
-                  name="address" 
-                  value={orderForm.address}
-                  onChange={handleInputChange}
-                  required
-                ></textarea>
+                <textarea id="address" name="address" value={orderForm.address} onChange={handleInputChange} required></textarea>
               </div>
               
               <div className="form-group">
                 <label htmlFor="phone">{t('phoneNumber')} *</label>
-                <input 
-                  type="tel" 
-                  id="phone" 
-                  name="phone" 
-                  value={orderForm.phone}
-                  onChange={handleInputChange}
-                  required 
-                />
+                <input type="tel" id="phone" name="phone" value={orderForm.phone} onChange={handleInputChange} required />
               </div>
               
               {/* Extras section with better checkbox styling */}
               <div className="form-group">
                 <h3>{t('extras')}</h3>
                 <div className="extras-list">
-                  {extraOptions.map((option) => (
-                    <div key={option.id} className="extra-option-item">
+                  {extraOptions.map(option => <div key={option.id} className="extra-option-item">
                       <div className="option-checkbox">
-                        <input
-                          type="checkbox"
-                          id={`option-${option.id}`}
-                          checked={selectedExtras.includes(option.id)}
-                          onChange={(e) => handleExtraOptionChange(option.id, e.target.checked)}
-                          className="checkbox-with-border" // Added class for visible border
-                        />
+                        <input type="checkbox" id={`option-${option.id}`} checked={selectedExtras.includes(option.id)} onChange={e => handleExtraOptionChange(option.id, e.target.checked)} className="checkbox-with-border width=\"10px\"" />
                         <label htmlFor={`option-${option.id}`}>
                           {currentLanguage === 'en' ? option.name : option.frenchName}
                         </label>
                       </div>
                       <span className="option-price">{option.price.toFixed(3)} {t('TND')}</span>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </div>
               
@@ -788,37 +752,26 @@ const MenuPage = () => {
                     <span className="tooltip-text">{t('allergiesInfo')}</span>
                   </div>
                 </div>
-                <textarea 
-                  id="allergies" 
-                  name="allergies" 
-                  value={orderForm.allergies}
-                  onChange={handleInputChange}
-                ></textarea>
+                <textarea id="allergies" name="allergies" value={orderForm.allergies} onChange={handleInputChange}></textarea>
               </div>
               
               <div className="order-summary">
                 <h3>{t('orderSummary')}</h3>
-                {selectedItem && (
-                  <div className="order-item">
+                {selectedItem && <div className="order-item">
                     <div>{selectedItem.quantity}x {selectedItem.name}</div>
                     <div>{selectedItem.price.toFixed(3)} {t('TND')}</div>
-                  </div>
-                )}
+                  </div>}
                 
-                {selectedExtras.length > 0 && (
-                  <div className="order-extras">
-                    {selectedExtras.map((id) => {
-                      const extra = extraOptions.find((opt) => opt.id === id);
-                      if (!extra) return null;
-                      return (
-                        <div key={id} className="order-item">
+                {selectedExtras.length > 0 && <div className="order-extras">
+                    {selectedExtras.map(id => {
+                const extra = extraOptions.find(opt => opt.id === id);
+                if (!extra) return null;
+                return <div key={id} className="order-item">
                           <div>+ {currentLanguage === 'en' ? extra.name : extra.frenchName}</div>
                           <div>{extra.price.toFixed(3)} {t('TND')}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        </div>;
+              })}
+                  </div>}
                 
                 <div className="order-total">
                   <span>{t('total')}</span>
@@ -829,26 +782,19 @@ const MenuPage = () => {
               <button type="submit" className="btn-primary btn-block">{t('placeOrder')}</button>
             </form>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Confirmation Modal */}
-      {showConfirmationModal && (
-        <div className="modal">
+      {showConfirmationModal && <div className="modal">
           <div className="modal-content confirmation-modal">
             <h2>{t('orderConfirmed')}</h2>
             <p>{t('thankYou')}</p>
             <div className="confirmation-icon">✓</div>
-            <button 
-              id="backToMenuBtn" 
-              className="btn-primary"
-              onClick={() => setShowConfirmationModal(false)}
-            >
+            <button id="backToMenuBtn" className="btn-primary" onClick={() => setShowConfirmationModal(false)}>
               {t('continueShopping')}
             </button>
           </div>
-        </div>
-      )}
+        </div>}
 
       <footer className="footer">
         <div className="container">
@@ -896,8 +842,6 @@ const MenuPage = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default MenuPage;
