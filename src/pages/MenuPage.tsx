@@ -605,7 +605,8 @@ const MenuPage = () => {
         </div>
         
         <div className="menu-items">
-          {filteredItems.map(item => <div key={item.id} className="menu-item" data-category={item.category}>
+          {filteredItems.map(item => (
+            <div key={item.id} className="menu-item" data-category={item.category}>
               <img src={item.image} alt={currentLanguage === 'en' ? item.name : item.frenchName} className="menu-item-img" />
               <h3>{currentLanguage === 'en' ? item.name : item.frenchName}</h3>
               <div className="menu-item-price">{item.price.toFixed(3)} {t('TND')}</div>
@@ -618,22 +619,28 @@ const MenuPage = () => {
                   {t('buyNow')}
                 </button>
               </div>
-            </div>)}
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Cart Modal */}
-      {showCartModal && <div className="modal" onClick={e => {
-      if ((e.target as HTMLElement).classList.contains('modal')) {
-        setShowCartModal(false);
-      }
-    }}>
+      {showCartModal && (
+        <div className="modal" onClick={e => {
+          if ((e.target as HTMLElement).classList.contains('modal')) {
+            setShowCartModal(false);
+          }
+        }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowCartModal(false)}>×</span>
             <h2>{t('yourCart')}</h2>
             
             <div className="cart-items">
-              {cart.length === 0 ? <p className="empty-cart">{t('emptyCart')}</p> : cart.map(item => <div key={item.id} className="cart-item">
+              {cart.length === 0 ? (
+                <p className="empty-cart">{t('emptyCart')}</p>
+              ) : (
+                cart.map(item => (
+                  <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
                       <span>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</span>
@@ -650,7 +657,9 @@ const MenuPage = () => {
                         ×
                       </span>
                     </div>
-                  </div>)}
+                  </div>
+                ))
+              )}
             </div>
             
             <div className="cart-footer">
@@ -664,53 +673,59 @@ const MenuPage = () => {
                   {t('clearCart')}
                 </button>
                 <button id="checkoutBtn" className="btn-primary" onClick={() => {
-              if (cart.length === 0) {
-                toast({
-                  title: "Empty Cart",
-                  description: "Your cart is empty. Please add items before checking out.",
-                  variant: "destructive"
-                });
-                return;
-              }
-              setShowCartModal(false);
-              setShowOrderModal(true);
-            }} disabled={cart.length === 0}>
+                  if (cart.length === 0) {
+                    toast({
+                      title: "Empty Cart",
+                      description: "Your cart is empty. Please add items before checking out.",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  setShowCartModal(false);
+                  setShowOrderModal(true);
+                }} disabled={cart.length === 0}>
                   {t('checkout')}
                 </button>
               </div>
             </div>
           </div>
-        </div>}
+        </div>
+      )}
 
       {/* Soda Selection Modal */}
-      {showSodaModal && <div className="modal" onClick={e => {
-      if ((e.target as HTMLElement).classList.contains('modal')) {
-        setShowSodaModal(false);
-      }
-    }}>
+      {showSodaModal && (
+        <div className="modal" onClick={e => {
+          if ((e.target as HTMLElement).classList.contains('modal')) {
+            setShowSodaModal(false);
+          }
+        }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowSodaModal(false)}>×</span>
             <h2>{t('chooseSodaType')}</h2>
             
             <div className="soda-options">
-              {sodaOptions.map(soda => <div key={soda} className="soda-option">
+              {sodaOptions.map(soda => (
+                <div key={soda} className="soda-option">
                   <input type="radio" id={`soda-${soda}`} name="sodaType" value={soda} checked={selectedSodaType === soda} onChange={e => setSelectedSodaType(e.target.value)} className="soda-radio" />
                   <label htmlFor={`soda-${soda}`} className="soda-label">{soda}</label>
-                </div>)}
+                </div>
+              ))}
             </div>
             
             <button className="btn-primary btn-block mt-4" onClick={handleSodaConfirm}>
               {t('confirm')}
             </button>
           </div>
-        </div>}
+        </div>
+      )}
 
       {/* Order Modal */}
-      {showOrderModal && <div className="modal" onClick={e => {
-      if ((e.target as HTMLElement).classList.contains('modal')) {
-        setShowOrderModal(false);
-      }
-    }}>
+      {showOrderModal && (
+        <div className="modal" onClick={e => {
+          if ((e.target as HTMLElement).classList.contains('modal')) {
+            setShowOrderModal(false);
+          }
+        }}>
           <div className="modal-content">
             <span className="close-modal" onClick={() => setShowOrderModal(false)}>×</span>
             <h2>{t('completeOrder')}</h2>
@@ -735,15 +750,23 @@ const MenuPage = () => {
               <div className="form-group">
                 <h3>{t('extras')}</h3>
                 <div className="extras-list">
-                  {extraOptions.map(option => <div key={option.id} className="extra-option-item">
+                  {extraOptions.map(option => (
+                    <div key={option.id} className="extra-option-item">
                       <div className="option-checkbox">
-                        <input type="checkbox" id={`option-${option.id}`} checked={selectedExtras.includes(option.id)} onChange={e => handleExtraOptionChange(option.id, e.target.checked)} className="checkbox-with-border width=\"10px\"" />
+                        <input 
+                          type="checkbox" 
+                          id={`option-${option.id}`} 
+                          checked={selectedExtras.includes(option.id)} 
+                          onChange={e => handleExtraOptionChange(option.id, e.target.checked)} 
+                          className="checkbox-with-border" 
+                        />
                         <label htmlFor={`option-${option.id}`}>
                           {currentLanguage === 'en' ? option.name : option.frenchName}
                         </label>
                       </div>
                       <span className="option-price">{option.price.toFixed(3)} {t('TND')}</span>
-                    </div>)}
+                    </div>
+                  ))}
                 </div>
               </div>
               
@@ -761,21 +784,27 @@ const MenuPage = () => {
               
               <div className="order-summary">
                 <h3>{t('orderSummary')}</h3>
-                {selectedItem && <div className="order-item">
+                {selectedItem && (
+                  <div className="order-item">
                     <div>{selectedItem.quantity}x {selectedItem.name}</div>
                     <div>{selectedItem.price.toFixed(3)} {t('TND')}</div>
-                  </div>}
+                  </div>
+                )}
                 
-                {selectedExtras.length > 0 && <div className="order-extras">
+                {selectedExtras.length > 0 && (
+                  <div className="order-extras">
                     {selectedExtras.map(id => {
-                const extra = extraOptions.find(opt => opt.id === id);
-                if (!extra) return null;
-                return <div key={id} className="order-item">
+                      const extra = extraOptions.find(opt => opt.id === id);
+                      if (!extra) return null;
+                      return (
+                        <div key={id} className="order-item">
                           <div>+ {currentLanguage === 'en' ? extra.name : extra.frenchName}</div>
                           <div>{extra.price.toFixed(3)} {t('TND')}</div>
-                        </div>;
-              })}
-                  </div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 
                 <div className="order-total">
                   <span>{t('total')}</span>
@@ -786,10 +815,12 @@ const MenuPage = () => {
               <button type="submit" className="btn-primary btn-block">{t('placeOrder')}</button>
             </form>
           </div>
-        </div>}
+        </div>
+      )}
 
       {/* Confirmation Modal */}
-      {showConfirmationModal && <div className="modal">
+      {showConfirmationModal && (
+        <div className="modal">
           <div className="modal-content confirmation-modal">
             <h2>{t('orderConfirmed')}</h2>
             <p>{t('thankYou')}</p>
@@ -798,7 +829,8 @@ const MenuPage = () => {
               {t('continueShopping')}
             </button>
           </div>
-        </div>}
+        </div>
+      )}
 
       <footer className="footer">
         <div className="container">
