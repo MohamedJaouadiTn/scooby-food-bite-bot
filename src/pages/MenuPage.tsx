@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 type FoodOption = {
   id: string;
@@ -38,6 +39,7 @@ const MenuPage = () => {
   const [showCartModal, setShowCartModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showSodaModal, setShowSodaModal] = useState(false);
+  const [showExtrasModal, setShowExtrasModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CartItem | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
@@ -320,7 +322,7 @@ const MenuPage = () => {
     });
     setSelectedExtras([]);
     setTotalPrice(item.price);
-    setShowOrderModal(true);
+    setShowExtrasModal(true); // Open extras modal instead of order modal
   };
 
   // Buy now function
@@ -345,7 +347,7 @@ const MenuPage = () => {
     });
     setSelectedExtras([]);
     setTotalPrice(item.price);
-    setShowOrderModal(true);
+    setShowExtrasModal(true); // Open extras modal first
   };
 
   // Handle extra option selection
@@ -450,7 +452,49 @@ const MenuPage = () => {
     });
   };
 
-  // Handle order submission
+  // New function to confirm extras and add item to cart
+  const handleExtrasConfirm = () => {
+    if (!selectedItem) return;
+    
+    // Calculate total price with extras
+    let finalPrice = selectedItem.price;
+    const selectedExtraItems: FoodOption[] = [];
+    
+    if (selectedExtras.length > 0) {
+      selectedExtras.forEach(id => {
+        const extraOption = extraOptions.find(opt => opt.id === id);
+        if (extraOption) {
+          finalPrice += extraOption.price;
+          selectedExtraItems.push({
+            id: extraOption.id,
+            name: currentLanguage === 'en' ? extraOption.name : extraOption.frenchName,
+            price: extraOption.price
+          });
+        }
+      });
+    }
+    
+    // Create the final item to add to cart
+    const cartItem: CartItem = {
+      ...selectedItem,
+      totalPrice: finalPrice,
+      extras: selectedExtraItems.length > 0 ? selectedExtraItems : undefined
+    };
+    
+    // Add to cart
+    setCart(prevCart => [...prevCart, cartItem]);
+    
+    // Show success toast
+    toast({
+      title: "Added to Cart",
+      description: `${cartItem.name} has been added to your cart.`
+    });
+    
+    // Close the extras modal
+    setShowExtrasModal(false);
+  };
+
+  // Handle order submission - only called from checkout now
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -463,48 +507,34 @@ const MenuPage = () => {
       });
       return;
     }
-    if (!selectedItem) {
+    if (cart.length === 0) {
       toast({
         title: "Error",
-        description: "No item selected.",
+        description: "Your cart is empty.",
         variant: "destructive"
       });
       return;
     }
 
-    // Create message for Telegram
+    // Create message for Telegram - updated to handle multiple cart items
     let message = `New Order!\n\n`;
-    message += `Order = ${selectedItem.name}\n`;
-    message += `Quantity = ${selectedItem.quantity}\n`;
-    message += `Price = ${selectedItem.price.toFixed(3)} TND\n`;
-
-    // Add extras if selected
-    if (selectedExtras.length > 0) {
-      const selectedOptions = selectedExtras.map(id => {
-        const option = extraOptions.find(opt => opt.id === id);
-        return {
-          name: currentLanguage === 'en' ? option?.name : option?.frenchName,
-          price: option?.price || 0
-        };
-      });
-      const extraNames = selectedOptions.map(opt => opt.name).join(' + ');
-      message += `Extras = ${extraNames}\n\n`;
-
-      // Calculate total price with extras
-      let totalWithExtras = selectedItem.price;
-      selectedOptions.forEach(opt => {
-        totalWithExtras += opt.price;
-      });
-      message += `Total = ${selectedItem.price.toFixed(3)} TND`;
-
-      // Add each extra price
-      selectedOptions.forEach(opt => {
-        message += ` + ${opt.price.toFixed(3)} TND`;
-      });
-      message += ` = ${totalWithExtras.toFixed(3)} TND\n\n`;
-    } else {
-      message += `\nTotal = ${selectedItem.price.toFixed(3)} TND\n\n`;
-    }
+    
+    // Add all cart items
+    cart.forEach((item, index) => {
+      message += `Item ${index + 1}: ${item.name}\n`;
+      message += `Quantity: ${item.quantity}\n`;
+      message += `Price: ${item.price.toFixed(3)} TND\n`;
+      
+      // Add extras if present
+      if (item.extras && item.extras.length > 0) {
+        message += `Extras: ${item.extras.map(extra => extra.name).join(', ')}\n`;
+        message += `Extra prices: ${item.extras.map(extra => `${extra.price.toFixed(3)} TND`).join(' + ')}\n`;
+      }
+      
+      message += `Item Total: ${(item.totalPrice || item.price * item.quantity).toFixed(3)} TND\n\n`;
+    });
+    
+    message += `Order Total: ${calculateTotal()} TND\n\n`;
     message += `Customer Information:\n`;
     message += `Name = ${orderForm.name}\n`;
     message += `Address = ${orderForm.address}\n`;
@@ -643,6 +673,11 @@ const MenuPage = () => {
                   <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
+                      {item.extras && item.extras.length > 0 && (
+                        <div className="cart-item-extras">
+                          <small>+ {item.extras.map(extra => extra.name).join(', ')}</small>
+                        </div>
+                      )}
                       <span>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</span>
                     </div>
                     <div className="cart-item-quantity">
@@ -692,6 +727,47 @@ const MenuPage = () => {
         </div>
       )}
 
+      {/* Extras Selection Modal */}
+      {showExtrasModal && (
+        <Dialog open={showExtrasModal} onOpenChange={setShowExtrasModal}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{t('extras')}</DialogTitle>
+            </DialogHeader>
+            <div className="extras-list py-4">
+              {extraOptions.map(option => (
+                <div key={option.id} className="extra-option-item py-2 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`extras-${option.id}`} 
+                      checked={selectedExtras.includes(option.id)} 
+                      onCheckedChange={(checked) => {
+                        handleExtraOptionChange(option.id, checked === true);
+                      }}
+                    />
+                    <label htmlFor={`extras-${option.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      {currentLanguage === 'en' ? option.name : option.frenchName}
+                    </label>
+                  </div>
+                  <span className="text-sm">{option.price.toFixed(3)} {t('TND')}</span>
+                </div>
+              ))}
+            </div>
+            <div className="order-total pt-4 border-t">
+              <div className="flex justify-between">
+                <span>{t('total')}</span>
+                <span>{totalPrice.toFixed(3)} {t('TND')}</span>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" onClick={handleExtrasConfirm}>
+                {t('confirm')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {/* Soda Selection Modal */}
       {showSodaModal && (
         <div className="modal" onClick={e => {
@@ -719,7 +795,7 @@ const MenuPage = () => {
         </div>
       )}
 
-      {/* Order Modal */}
+      {/* Order Modal - Now only for checkout */}
       {showOrderModal && (
         <div className="modal" onClick={e => {
           if ((e.target as HTMLElement).classList.contains('modal')) {
@@ -746,30 +822,6 @@ const MenuPage = () => {
                 <input type="tel" id="phone" name="phone" value={orderForm.phone} onChange={handleInputChange} required />
               </div>
               
-              {/* Extras section with better checkbox styling */}
-              <div className="form-group">
-                <h3>{t('extras')}</h3>
-                <div className="extras-list">
-                  {extraOptions.map(option => (
-                    <div key={option.id} className="extra-option-item">
-                      <div className="option-checkbox">
-                        <input 
-                          type="checkbox" 
-                          id={`option-${option.id}`} 
-                          checked={selectedExtras.includes(option.id)} 
-                          onChange={e => handleExtraOptionChange(option.id, e.target.checked)} 
-                          className="checkbox-with-border" 
-                        />
-                        <label htmlFor={`option-${option.id}`}>
-                          {currentLanguage === 'en' ? option.name : option.frenchName}
-                        </label>
-                      </div>
-                      <span className="option-price">{option.price.toFixed(3)} {t('TND')}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
               {/* Allergies field */}
               <div className="form-group allergies-group">
                 <div className="allergies-label-container">
@@ -784,31 +836,28 @@ const MenuPage = () => {
               
               <div className="order-summary">
                 <h3>{t('orderSummary')}</h3>
-                {selectedItem && (
-                  <div className="order-item">
-                    <div>{selectedItem.quantity}x {selectedItem.name}</div>
-                    <div>{selectedItem.price.toFixed(3)} {t('TND')}</div>
+                {cart.map((item, index) => (
+                  <div key={`order-${index}`} className="order-item">
+                    <div className="flex justify-between">
+                      <div>{item.quantity}x {item.name}</div>
+                      <div>{(item.totalPrice || item.price * item.quantity).toFixed(3)} {t('TND')}</div>
+                    </div>
+                    {item.extras && item.extras.length > 0 && (
+                      <div className="order-extras ml-4 text-sm">
+                        {item.extras.map((extra, i) => (
+                          <div key={`extra-${i}`} className="flex justify-between text-gray-600">
+                            <div>+ {extra.name}</div>
+                            <div>{extra.price.toFixed(3)} {t('TND')}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-                
-                {selectedExtras.length > 0 && (
-                  <div className="order-extras">
-                    {selectedExtras.map(id => {
-                      const extra = extraOptions.find(opt => opt.id === id);
-                      if (!extra) return null;
-                      return (
-                        <div key={id} className="order-item">
-                          <div>+ {currentLanguage === 'en' ? extra.name : extra.frenchName}</div>
-                          <div>{extra.price.toFixed(3)} {t('TND')}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                ))}
                 
                 <div className="order-total">
                   <span>{t('total')}</span>
-                  <span id="orderTotal">{totalPrice.toFixed(3)} {t('TND')}</span>
+                  <span id="orderTotal">{calculateTotal()} {t('TND')}</span>
                 </div>
               </div>
               
