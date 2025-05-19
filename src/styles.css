@@ -1,4 +1,3 @@
-
 /* Base styles */
 :root {
   --primary-color: #ff4e00;
@@ -25,6 +24,7 @@ body {
   font-family: 'Poppins', sans-serif;
   color: var(--text-color);
   line-height: 1.6;
+  margin: 0; /* Explicitly setting margin to 0 */
 }
 
 a {
