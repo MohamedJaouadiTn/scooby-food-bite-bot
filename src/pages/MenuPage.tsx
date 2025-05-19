@@ -4,11 +4,13 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+
 type FoodOption = {
   id: string;
   name: string;
   price: number;
 };
+
 type CartItem = {
   id: string;
   name: string;
@@ -19,6 +21,7 @@ type CartItem = {
   totalPrice?: number;
   sodaType?: string;
 };
+
 type FoodOptionType = {
   id: string;
   name: string;
@@ -27,10 +30,9 @@ type FoodOptionType = {
   category: string;
   image: string;
 };
+
 const MenuPage = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [showCartModal, setShowCartModal] = useState(false);
@@ -533,7 +535,9 @@ const MenuPage = () => {
       });
     });
   };
-  return <div className="menu-page">
+
+  return (
+    <div className="menu-page">
       <header className="header">
         <div className="container">
           <div className="header-content">
@@ -842,6 +846,8 @@ const MenuPage = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default MenuPage;
