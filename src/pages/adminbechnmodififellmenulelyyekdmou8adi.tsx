@@ -3,6 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 // Admin password - stored in JS file as requested
 const ADMIN_PASSWORD = "ScoobyAdmin2025!";
@@ -31,19 +39,28 @@ const AdminPanel = () => {
     image: "",
   });
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  // Mock function to simulate loading products from storage/API
+  // Load products from storage/API
   const loadProducts = () => {
     const storedProducts = localStorage.getItem('scoobyfood_products');
     if (storedProducts) {
       setProducts(JSON.parse(storedProducts));
     } else {
-      // Default products if none in storage
+      // Default products if none in storage - now including all menu items
       const defaultProducts = [
         { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-        { id: "chapati1", name: "Chapati with Tuna", frenchName: "Chapati au thon", price: 7.99, category: "chapati", image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" },
-        { id: "chapati2", name: "Regular Chapati", frenchName: "Chapati régulier", price: 5.49, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
-        { id: "tacos1", name: "Tacos", frenchName: "Tacos", price: 9.99, category: "tacos", image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" },
+        { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+        { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+        { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+        { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+        { id: "chapati1", name: "Chapati with Grilled Chicken", frenchName: "Chapati escalope grillée", price: 6.0, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
+        { id: "chapati2", name: "Chapati with Tuna", frenchName: "Chapati au thon", price: 7.99, category: "chapati", image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" },
+        { id: "chapati3", name: "Chapati Cordon Bleu", frenchName: "Chapati cordon bleu", price: 6.5, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
+        { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" },
+        { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png" },
+        { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drinks", image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png" },
+        { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drinks", image: "/lovable-uploads/aecdc132-2508-4edd-b708-436456343d31.png" },
       ];
       setProducts(defaultProducts);
       localStorage.setItem('scoobyfood_products', JSON.stringify(defaultProducts));
@@ -164,7 +181,13 @@ const AdminPanel = () => {
   };
 
   const handleDeleteProduct = (id: string) => {
-    const updatedProducts = products.filter(p => p.id !== id);
+    setConfirmDelete(id);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (!confirmDelete) return;
+    
+    const updatedProducts = products.filter(p => p.id !== confirmDelete);
     setProducts(updatedProducts);
     localStorage.setItem('scoobyfood_products', JSON.stringify(updatedProducts));
     
@@ -172,13 +195,15 @@ const AdminPanel = () => {
       title: "Product Deleted",
       description: "The product has been removed from the menu",
     });
+    
+    setConfirmDelete(null);
   };
 
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto my-10 p-6 max-w-md bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} className="space-y-4">
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Password</label>
             <input
@@ -196,20 +221,20 @@ const AdminPanel = () => {
 
   return (
     <div className="container mx-auto my-10 p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Scooby Food Admin Panel</h1>
+      <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow">
+        <h1 className="text-3xl font-bold text-primary">Scooby Food Admin Panel</h1>
         <Button variant="outline" onClick={handleLogout}>Logout</Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Product Form Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">
             {editingProductId ? "Edit Product" : "Add New Product"}
           </h2>
-          <form onSubmit={editingProductId ? handleUpdateProduct : handleAddProduct}>
+          <form onSubmit={editingProductId ? handleUpdateProduct : handleAddProduct} className="space-y-4">
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Product ID</label>
+              <label className="block text-gray-700 mb-2 font-medium">Product ID</label>
               <input
                 type="text"
                 value={newProduct.id}
@@ -220,7 +245,7 @@ const AdminPanel = () => {
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Name (English)</label>
+              <label className="block text-gray-700 mb-2 font-medium">Name (English)</label>
               <input
                 type="text"
                 value={newProduct.name}
@@ -231,7 +256,7 @@ const AdminPanel = () => {
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Name (French)</label>
+              <label className="block text-gray-700 mb-2 font-medium">Name (French)</label>
               <input
                 type="text"
                 value={newProduct.frenchName}
@@ -242,10 +267,10 @@ const AdminPanel = () => {
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Price (TND)</label>
+              <label className="block text-gray-700 mb-2 font-medium">Price (TND)</label>
               <input
                 type="number"
-                step="0.01"
+                step="0.001"
                 value={newProduct.price}
                 onChange={(e) => setNewProduct({...newProduct, price: Number(e.target.value)})}
                 required
@@ -254,22 +279,21 @@ const AdminPanel = () => {
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Category</label>
+              <label className="block text-gray-700 mb-2 font-medium">Category</label>
               <select
                 value={newProduct.category}
                 onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary bg-white"
               >
                 <option value="mlawi">Mlawi</option>
                 <option value="chapati">Chapati</option>
                 <option value="tacos">Tacos</option>
-                <option value="sides">Sides</option>
                 <option value="drinks">Drinks</option>
               </select>
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Image URL</label>
+              <label className="block text-gray-700 mb-2 font-medium">Image URL</label>
               <input
                 type="text"
                 value={newProduct.image}
@@ -279,7 +303,7 @@ const AdminPanel = () => {
               />
             </div>
             
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-primary">
               {editingProductId ? "Update Product" : "Add Product"}
             </Button>
             
@@ -307,11 +331,11 @@ const AdminPanel = () => {
         </div>
         
         {/* Products List Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Current Menu Items</h2>
+        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Current Menu Items</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead>
+              <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Name</th>
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Price</th>
@@ -319,22 +343,22 @@ const AdminPanel = () => {
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-200">
                 {products.map(product => (
-                  <tr key={product.id}>
+                  <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 whitespace-nowrap">{product.name}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{product.price.toFixed(3)} TND</td>
                     <td className="px-4 py-3 whitespace-nowrap capitalize">{product.category}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <button
                         onClick={() => handleEditProduct(product)}
-                        className="text-blue-600 hover:text-blue-900 mr-2"
+                        className="text-blue-600 hover:text-blue-900 mr-2 px-3 py-1 rounded border border-blue-600 hover:bg-blue-50"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 px-3 py-1 rounded border border-red-600 hover:bg-red-50"
                       >
                         Delete
                       </button>
@@ -353,6 +377,26 @@ const AdminPanel = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this product? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteProduct}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

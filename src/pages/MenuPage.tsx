@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -17,8 +18,9 @@ type CartItem = {
   price: number;
   quantity: number;
   category?: string;
-  extras?: FoodOption[];  // Changed from options to extras
+  extras?: FoodOption[];
   totalPrice?: number;
+  sodaType?: string;
 };
 
 type FoodOptionType = {
@@ -27,6 +29,7 @@ type FoodOptionType = {
   frenchName: string;
   price: number;
   category: string;
+  image: string;
 };
 
 const MenuPage = () => {
@@ -35,9 +38,11 @@ const MenuPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [showCartModal, setShowCartModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showSodaModal, setShowSodaModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CartItem | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [selectedSodaType, setSelectedSodaType] = useState<string>("Coca-Cola");
   const [totalPrice, setTotalPrice] = useState(0);
   const [orderForm, setOrderForm] = useState({
     name: localStorage.getItem("customerName") || "",
@@ -46,13 +51,12 @@ const MenuPage = () => {
     allergies: localStorage.getItem("customerAllergies") || "",
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
-  const [showIngredients, setShowIngredients] = useState<string | null>(null);
 
   // Telegram Bot Configuration
   const token = "8170617850:AAFJWVcrDKSCaRknRSs_XTj_6epWef8qnjQ";
   const chatId = "7809319602";
 
-  // Menu items data - organized by category
+  // Menu items data - now excluding extras
   const menuItems = [
     // Mlawi Category
     { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
@@ -70,19 +74,25 @@ const MenuPage = () => {
     { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" },
     { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png" },
 
-    // Sides & Drinks
-    { id: "side1", name: "Cheddar", frenchName: "Cheddar", price: 2.5, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "side2", name: "Mozzarella", frenchName: "Mozzarella", price: 2.5, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "side3", name: "French Fries", frenchName: "Frite", price: 2.0, category: "sides", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
-    { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drinks", image: "/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" },
+    // Drinks (only soda now)
+    { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drinks", image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png" },
   ];
 
-  // Extras options that can be added
+  // Extras options - now separate from menu
   const extraOptions = [
     { id: "extra1", name: "Cheddar", frenchName: "Cheddar", price: 2.5 },
     { id: "extra2", name: "Mozzarella", frenchName: "Mozzarella", price: 2.5 },
     { id: "extra3", name: "French Fries", frenchName: "Frites", price: 2.0 },
+    { id: "extra4", name: "Water", frenchName: "Eau", price: 1.5 },
+  ];
+
+  // Soda options
+  const sodaOptions = [
+    "Coca-Cola",
+    "Fanta",
+    "Sprite", 
+    "Schweppes",
+    "Boga"
   ];
 
   // Translation data
@@ -130,7 +140,10 @@ const MenuPage = () => {
       aboutText: "We are a street food stand offering delicious takeaway food. We don't offer dine-in service, so customers order and enjoy our food at home.",
       noIngredients: "Ingredient information not available for this item.",
       TND: "TND",
-      openingHours: "Opening Hours"
+      openingHours: "Opening Hours",
+      chooseSodaType: "Which soda would you like?",
+      selectSoda: "Select a soda",
+      confirm: "Confirm"
     },
     fr: {
       home: "Accueil",
@@ -175,28 +188,11 @@ const MenuPage = () => {
       aboutText: "Nous sommes un stand de street food offrant de délicieux plats à emporter. Nous n'offrons pas de service sur place, donc les clients commandent et profitent de notre nourriture chez eux.",
       noIngredients: "Les informations sur les ingrédients ne sont pas disponibles pour cet article.",
       TND: "TND",
-      openingHours: "Horaires d'Ouverture"
+      openingHours: "Horaires d'Ouverture",
+      chooseSodaType: "Quelle boisson voulez-vous?",
+      selectSoda: "Sélectionnez une boisson",
+      confirm: "Confirmer"
     }
-  };
-
-  // Ingredients data with French translations
-  const ingredients = {
-    "mlawi1": {
-      en: ["Flour", "Water", "Salt", "Oil", "Tuna", "Harissa", "Olives"],
-      fr: ["Farine", "Eau", "Sel", "Huile", "Thon", "Harissa", "Olives"]
-    },
-    "mlawi2": {
-      en: ["Flour", "Water", "Salt", "Oil", "Premium Tuna", "Harissa", "Olives", "Special sauce"],
-      fr: ["Farine", "Eau", "Sel", "Huile", "Thon premium", "Harissa", "Olives", "Sauce spéciale"]
-    },
-    "chapati1": {
-      en: ["Flour", "Water", "Salt", "Grilled Chicken", "Vegetables", "Sauce"],
-      fr: ["Farine", "Eau", "Sel", "Escalope grillée", "Légumes", "Sauce"]
-    },
-    "tacos1": {
-      en: ["Tortilla", "Tuna", "Lettuce", "Tomato", "Cheese", "Sauce"],
-      fr: ["Tortilla", "Thon", "Laitue", "Tomate", "Fromage", "Sauce"]
-    },
   };
 
   // Get translation function
@@ -232,6 +228,18 @@ const MenuPage = () => {
 
   // Add item to cart
   const addToCart = (item: any) => {
+    if (item.category === "drinks" && item.id === "drink1") {
+      setSelectedItem({
+        id: item.id,
+        name: currentLanguage === 'en' ? item.name : item.frenchName,
+        price: item.price,
+        quantity: 1,
+        category: item.category
+      });
+      setShowSodaModal(true);
+      return;
+    }
+
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
@@ -246,6 +254,18 @@ const MenuPage = () => {
 
   // Buy now function
   const buyNow = (item: any) => {
+    if (item.category === "drinks" && item.id === "drink1") {
+      setSelectedItem({
+        id: item.id,
+        name: currentLanguage === 'en' ? item.name : item.frenchName,
+        price: item.price,
+        quantity: 1,
+        category: item.category
+      });
+      setShowSodaModal(true);
+      return;
+    }
+
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
@@ -273,13 +293,21 @@ const MenuPage = () => {
     }
   };
 
-  // Toggle ingredients display
-  const toggleIngredients = (id: string) => {
-    if (showIngredients === id) {
-      setShowIngredients(null);
-    } else {
-      setShowIngredients(id);
-    }
+  // Handle soda selection confirmation
+  const handleSodaConfirm = () => {
+    if (!selectedItem) return;
+    
+    const sodaItem = {
+      ...selectedItem,
+      name: `${selectedItem.name} (${selectedSodaType})`,
+      sodaType: selectedSodaType
+    };
+    
+    setSelectedItem(sodaItem);
+    setShowSodaModal(false);
+    setSelectedExtras([]);
+    setTotalPrice(sodaItem.price);
+    setShowOrderModal(true);
   };
 
   // Decrease quantity
@@ -352,6 +380,16 @@ const MenuPage = () => {
   // Handle order submission
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!orderForm.name || !orderForm.address || !orderForm.phone) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (!selectedItem) {
       toast({
@@ -449,22 +487,25 @@ const MenuPage = () => {
               </ul>
             </nav>
             
-            {/* Language Switcher */}
-            <div className="language-switcher">
-              <select 
-                value={currentLanguage} 
-                onChange={(e) => setCurrentLanguage(e.target.value)}
-                className="language-select"
-              >
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-              </select>
+            <div className="right-header-items">
+              {/* Language Switcher moved next to cart icon */}
+              <div className="language-switcher">
+                <select 
+                  value={currentLanguage} 
+                  onChange={(e) => setCurrentLanguage(e.target.value)}
+                  className="language-select"
+                >
+                  <option value="en">English</option>
+                  <option value="fr">Français</option>
+                </select>
+              </div>
+              
+              <div className="cart-icon" onClick={() => setShowCartModal(true)}>
+                <ShoppingCart className="w-6 h-6" />
+                {totalCartItems > 0 && <span className="cart-count">{totalCartItems}</span>}
+              </div>
             </div>
             
-            <div className="cart-icon" onClick={() => setShowCartModal(true)}>
-              <ShoppingCart className="w-6 h-6" />
-              {totalCartItems > 0 && <span className="cart-count">{totalCartItems}</span>}
-            </div>
             <div className="mobile-menu-btn" onClick={() => {
               const nav = document.querySelector('.nav') as HTMLElement;
               if (nav) nav.classList.toggle('active');
@@ -509,12 +550,6 @@ const MenuPage = () => {
             {t('tacos')}
           </button>
           <button 
-            className={`filter-btn ${activeFilter === 'sides' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('sides')}
-          >
-            {t('sides')}
-          </button>
-          <button 
             className={`filter-btn ${activeFilter === 'drinks' ? 'active' : ''}`}
             onClick={() => setActiveFilter('drinks')}
           >
@@ -528,37 +563,6 @@ const MenuPage = () => {
               <img src={item.image} alt={currentLanguage === 'en' ? item.name : item.frenchName} className="menu-item-img" />
               <h3>{currentLanguage === 'en' ? item.name : item.frenchName}</h3>
               <div className="menu-item-price">{item.price.toFixed(3)} {t('TND')}</div>
-              
-              <button 
-                className="btn-view-ingredients" 
-                onClick={() => toggleIngredients(item.id)}
-              >
-                {t('viewIngredients')}
-              </button>
-              
-              {/* Ingredients popup */}
-              {showIngredients === item.id && (
-                <div className="ingredients-popup">
-                  <h4>{t('ingredients')}</h4>
-                  <ul>
-                    {ingredients[item.id as keyof typeof ingredients] 
-                      ? ingredients[item.id as keyof typeof ingredients][currentLanguage as 'en' | 'fr'].map((ingredient: string, index: number) => (
-                          <li key={index}>{ingredient}</li>
-                        ))
-                      : <li>{t('noIngredients')}</li>
-                    }
-                  </ul>
-                  <button 
-                    className="close-ingredients"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowIngredients(null);
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
               
               <div className="menu-item-actions">
                 <button 
@@ -666,6 +670,44 @@ const MenuPage = () => {
         </div>
       )}
 
+      {/* Soda Selection Modal */}
+      {showSodaModal && (
+        <div className="modal" onClick={(e) => {
+          if ((e.target as HTMLElement).classList.contains('modal')) {
+            setShowSodaModal(false);
+          }
+        }}>
+          <div className="modal-content">
+            <span className="close-modal" onClick={() => setShowSodaModal(false)}>×</span>
+            <h2>{t('chooseSodaType')}</h2>
+            
+            <div className="soda-options">
+              {sodaOptions.map((soda) => (
+                <div key={soda} className="soda-option">
+                  <input
+                    type="radio"
+                    id={`soda-${soda}`}
+                    name="sodaType"
+                    value={soda}
+                    checked={selectedSodaType === soda}
+                    onChange={(e) => setSelectedSodaType(e.target.value)}
+                    className="soda-radio"
+                  />
+                  <label htmlFor={`soda-${soda}`} className="soda-label">{soda}</label>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              className="btn-primary btn-block mt-4"
+              onClick={handleSodaConfirm}
+            >
+              {t('confirm')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Order Modal */}
       {showOrderModal && (
         <div className="modal" onClick={(e) => {
@@ -679,7 +721,7 @@ const MenuPage = () => {
             
             <form id="orderForm" onSubmit={handleSubmitOrder}>
               <div className="form-group">
-                <label htmlFor="name">{t('name')}</label>
+                <label htmlFor="name">{t('name')} *</label>
                 <input 
                   type="text" 
                   id="name" 
@@ -691,7 +733,7 @@ const MenuPage = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="address">{t('deliveryAddress')}</label>
+                <label htmlFor="address">{t('deliveryAddress')} *</label>
                 <textarea 
                   id="address" 
                   name="address" 
@@ -702,7 +744,7 @@ const MenuPage = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="phone">{t('phoneNumber')}</label>
+                <label htmlFor="phone">{t('phoneNumber')} *</label>
                 <input 
                   type="tel" 
                   id="phone" 
@@ -713,7 +755,7 @@ const MenuPage = () => {
                 />
               </div>
               
-              {/* Extras section */}
+              {/* Extras section with better checkbox styling */}
               <div className="form-group">
                 <h3>{t('extras')}</h3>
                 <div className="extras-list">
@@ -725,6 +767,7 @@ const MenuPage = () => {
                           id={`option-${option.id}`}
                           checked={selectedExtras.includes(option.id)}
                           onChange={(e) => handleExtraOptionChange(option.id, e.target.checked)}
+                          className="checkbox-with-border" // Added class for visible border
                         />
                         <label htmlFor={`option-${option.id}`}>
                           {currentLanguage === 'en' ? option.name : option.frenchName}
@@ -828,7 +871,7 @@ const MenuPage = () => {
             <div className="footer-contact">
               <h3>{t('contactUs')}</h3>
               <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
-              <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
+              <p><i className="fa fa-phone"></i> (123) 456-7890</p>
               <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
             </div>
             

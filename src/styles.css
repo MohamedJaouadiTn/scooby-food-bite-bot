@@ -123,6 +123,12 @@ button {
   background-color: var(--primary-color);
 }
 
+.right-header-items {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
@@ -141,7 +147,6 @@ button {
   position: relative;
   cursor: pointer;
   color: var(--secondary-color);
-  margin-left: auto;
 }
 
 .cart-count {
@@ -161,7 +166,7 @@ button {
 }
 
 .language-switcher {
-  margin-right: 15px;
+  margin-right: 5px;
 }
 
 .language-select {
@@ -283,6 +288,12 @@ button {
   margin-top: 10px;
 }
 
+.menu-item-actions {
+  display: flex;
+  gap: 10px;
+  padding: 10px 15px 15px;
+}
+
 .btn-add-cart, .btn-buy-now {
   flex: 1;
   padding: 8px 0;
@@ -309,68 +320,6 @@ button {
 
 .btn-buy-now:hover {
   background-color: var(--primary-dark);
-}
-
-/* View Ingredients Button */
-.btn-view-ingredients {
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  color: #777;
-  background-color: transparent;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  transition: all 0.2s;
-  width: 100%;
-  text-align: center;
-  margin: 10px 0;
-}
-
-.btn-view-ingredients:hover {
-  background-color: #f5f5f5;
-}
-
-.ingredients-popup {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--bg-color);
-  border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  width: 80%;
-  max-width: 300px;
-  z-index: 10;
-}
-
-.ingredients-popup h4 {
-  margin-bottom: 10px;
-  color: var(--secondary-color);
-}
-
-.ingredients-popup ul {
-  padding-left: 20px;
-  margin-bottom: 15px;
-}
-
-.ingredients-popup li {
-  font-size: 0.9rem;
-  margin-bottom: 5px;
-  list-style: disc;
-}
-
-.close-ingredients {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 1.5rem;
-  line-height: 1;
-  color: #777;
-  cursor: pointer;
-}
-
-.close-ingredients:hover {
-  color: var(--primary-color);
 }
 
 /* Modals */
@@ -539,29 +488,46 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Food Options Modal */
-.food-options-summary {
+/* Soda Selection Modal */
+.soda-options {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
+  margin: 20px 0;
 }
 
-.base-price {
+.soda-option {
   display: flex;
-  justify-content: space-between;
-  font-weight: 500;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  gap: 10px;
 }
 
-.food-options-list {
+.soda-radio {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.soda-label {
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+/* Extras section */
+.extras-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 12px;
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 5px;
 }
 
-.food-option-item, .extra-option-item {
+.extra-option-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -573,7 +539,8 @@ button:disabled {
   gap: 10px;
 }
 
-.option-checkbox input[type="checkbox"] {
+/* Added visible border for checkboxes */
+.checkbox-with-border {
   width: 18px;
   height: 18px;
   border: 1px solid #000;
@@ -586,12 +553,12 @@ button:disabled {
   outline: none;
 }
 
-.option-checkbox input[type="checkbox"]:checked {
+.checkbox-with-border:checked {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.option-checkbox input[type="checkbox"]:checked:after {
+.checkbox-with-border:checked:after {
   content: '';
   position: absolute;
   left: 5px;
@@ -606,87 +573,6 @@ button:disabled {
 .option-price {
   font-weight: 500;
   color: var(--primary-color);
-}
-
-.total-price {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  padding-top: 15px;
-  border-top: 1px solid var(--border-color);
-  font-size: 1.1rem;
-}
-
-/* Order Modal */
-.order-summary {
-  margin-bottom: 25px;
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-}
-
-.order-summary h3 {
-  margin-bottom: 15px;
-  color: var(--secondary-color);
-}
-
-.order-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.order-extras {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 5px;
-}
-
-.order-total {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin-top: 10px;
-  font-size: 1.05rem;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  color: var(--secondary-color);
-}
-
-.form-group input, .form-group textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-family: inherit;
-  font-size: 0.95rem;
-}
-
-.form-group textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-/* Extras section */
-.extras-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  border: 1px solid var(--border-color);
-  padding: 15px;
-  border-radius: 5px;
 }
 
 /* Allergies field */
@@ -739,6 +625,71 @@ button:disabled {
   border-width: 5px;
   border-style: solid;
   border-color: var(--secondary-color) transparent transparent transparent;
+}
+
+/* Form fields */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: var(--secondary-color);
+}
+
+.form-group input, 
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Order Summary */
+.order-summary {
+  margin-bottom: 25px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+}
+
+.order-summary h3 {
+  margin-bottom: 15px;
+  color: var(--secondary-color);
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.order-extras {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 1.05rem;
 }
 
 /* Confirmation Modal */
@@ -909,6 +860,10 @@ button:disabled {
     margin-top: 90px;
   }
 
+  .right-header-items {
+    gap: 10px;
+  }
+
   .filter-buttons {
     overflow-x: auto;
     padding-bottom: 5px;
@@ -952,6 +907,10 @@ button:disabled {
 
   .cart-actions {
     flex-direction: column;
+  }
+
+  .right-header-items {
+    gap: 5px;
   }
 
   .food-option-item {
