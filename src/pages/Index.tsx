@@ -27,11 +27,11 @@ const translations = {
       startingFrom: "Starting from ",
       viewAll: "View All"
     },
-    about: {
+    aboutSection: {
       title: "About Us",
       desc: "We are a street food stand offering delicious takeaway food. Our passion is to provide high-quality, flavorful dishes that you can enjoy at home or on the go. With fresh ingredients and authentic recipes, we bring the best of street food to your table."
     },
-    contact: {
+    contactSection: {
       title: "Contact Us",
       address: "123 Food Street, Tasty Town",
       phone: "(123) 456-7890",
@@ -68,11 +68,11 @@ const translations = {
       startingFrom: "À partir de ",
       viewAll: "Voir Tout"
     },
-    about: {
+    aboutSection: {
       title: "À Propos de Nous",
       desc: "Nous sommes un stand de street food proposant de délicieux plats à emporter. Notre passion est de fournir des plats de haute qualité et savoureux que vous pouvez déguster à la maison ou en déplacement. Avec des ingrédients frais et des recettes authentiques, nous apportons le meilleur de la street food à votre table."
     },
-    contact: {
+    contactSection: {
       title: "Contactez-Nous",
       address: "123 Rue de la Nourriture, Ville Savoureuse",
       phone: "(123) 456-7890",
@@ -240,8 +240,8 @@ const Home = () => {
           <div className="container">
             <div className="about-content">
               <div className="about-text">
-                <h2>{t("about.title")}</h2>
-                <p>{t("about.desc")}</p>
+                <h2>{t("aboutSection.title")}</h2>
+                <p>{t("aboutSection.desc")}</p>
               </div>
               <div className="about-image">
                 <img src="/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" alt="About Us" />
@@ -253,29 +253,29 @@ const Home = () => {
         <section id="contact" className="contact-section">
           <div className="container">
             <div className="section-title">
-              <h2>{t("contact.title")}</h2>
+              <h2>{t("contactSection.title")}</h2>
             </div>
             
             <div className="contact-content">
               <div className="contact-info">
                 <div className="contact-item">
                   <i className="fas fa-map-marker-alt"></i>
-                  <p>{t("contact.address")}</p>
+                  <p>{t("contactSection.address")}</p>
                 </div>
                 <div className="contact-item">
                   <i className="fas fa-phone"></i>
-                  <p>{t("contact.phone")}</p>
+                  <p>{t("contactSection.phone")}</p>
                 </div>
                 <div className="contact-item">
                   <i className="fas fa-envelope"></i>
-                  <p>{t("contact.email")}</p>
+                  <p>{t("contactSection.email")}</p>
                 </div>
               </div>
               
               <div className="opening-hours">
-                <h3>{t("contact.hours")}</h3>
-                <p>{t("contact.weekdays")}</p>
-                <p>{t("contact.weekends")}</p>
+                <h3>{t("contactSection.hours")}</h3>
+                <p>{t("contactSection.weekdays")}</p>
+                <p>{t("contactSection.weekends")}</p>
               </div>
             </div>
           </div>
@@ -287,7 +287,7 @@ const Home = () => {
           <div className="footer-content">
             <div className="footer-logo">
               <h2>Scooby<span>Food</span></h2>
-              <p>{t("contact.address")}</p>
+              <p>{t("contactSection.address")}</p>
             </div>
             
             <div className="footer-links">
@@ -302,15 +302,15 @@ const Home = () => {
             
             <div className="footer-contact text-center">
               <h3>{t("footer.contactUs")}</h3>
-              <p><i className="fas fa-map-marker-alt"></i> {t("contact.address")}</p>
-              <p><i className="fas fa-phone"></i> {t("contact.phone")}</p>
-              <p><i className="fas fa-envelope"></i> {t("contact.email")}</p>
+              <p><i className="fas fa-map-marker-alt"></i> {t("contactSection.address")}</p>
+              <p><i className="fas fa-phone"></i> {t("contactSection.phone")}</p>
+              <p><i className="fas fa-envelope"></i> {t("contactSection.email")}</p>
             </div>
             
             <div className="footer-hours">
-              <h3>{t("contact.hours")}</h3>
-              <p>{t("contact.weekdays")}</p>
-              <p>{t("contact.weekends")}</p>
+              <h3>{t("contactSection.hours")}</h3>
+              <p>{t("contactSection.weekdays")}</p>
+              <p>{t("contactSection.weekends")}</p>
             </div>
             
             <div className="footer-social text-center">
