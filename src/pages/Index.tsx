@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const translations = {
   en: {
@@ -90,21 +92,44 @@ const translations = {
 
 const Home = () => {
   const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [showExtrasDialog, setShowExtrasDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [extras, setExtras] = useState<string[]>([]);
 
   // Function to get translated text
-  const t = (key: string) => {
+  const t = (key: string): string => {
     const keys = key.split(".");
-    let translation = translations[currentLanguage as keyof typeof translations];
+    let translation: any = translations[currentLanguage as keyof typeof translations];
     
     for (const k of keys) {
       if (translation && typeof translation === 'object' && k in translation) {
-        translation = (translation as any)[k];
+        translation = translation[k];
       } else {
         return key; // Return key if translation not found
       }
     }
     
-    return translation;
+    return translation as string;
+  };
+
+  const handleOrderClick = (itemName: string) => {
+    setSelectedItem(itemName);
+    setExtras([]);
+    setShowExtrasDialog(true);
+  };
+
+  const handleExtrasConfirm = () => {
+    // Here you would typically handle the order with the selected extras
+    console.log(`Order confirmed for ${selectedItem} with extras:`, extras);
+    setShowExtrasDialog(false);
+  };
+
+  const handleExtraToggle = (extra: string) => {
+    if (extras.includes(extra)) {
+      setExtras(extras.filter(e => e !== extra));
+    } else {
+      setExtras([...extras, extra]);
+    }
   };
 
   return (
@@ -177,7 +202,7 @@ const Home = () => {
                 <div className="featured-info">
                   <h3>{t("featured.mlawi")}</h3>
                   <p>{t("featured.startingFrom")}3.50 TND</p>
-                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                  <button onClick={() => handleOrderClick("Mlawi")} className="featured-btn">{t("featured.viewAll")}</button>
                 </div>
               </div>
               
@@ -186,7 +211,7 @@ const Home = () => {
                 <div className="featured-info">
                   <h3>{t("featured.chapati")}</h3>
                   <p>{t("featured.startingFrom")}6.00 TND</p>
-                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                  <button onClick={() => handleOrderClick("Chapati")} className="featured-btn">{t("featured.viewAll")}</button>
                 </div>
               </div>
               
@@ -195,7 +220,7 @@ const Home = () => {
                 <div className="featured-info">
                   <h3>{t("featured.tacos")}</h3>
                   <p>{t("featured.startingFrom")}3.50 TND</p>
-                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                  <button onClick={() => handleOrderClick("Tacos")} className="featured-btn">{t("featured.viewAll")}</button>
                 </div>
               </div>
               
@@ -204,7 +229,7 @@ const Home = () => {
                 <div className="featured-info">
                   <h3>{t("featured.sodas")}</h3>
                   <p>{t("featured.startingFrom")}2.00 TND</p>
-                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                  <button onClick={() => handleOrderClick("Sodas")} className="featured-btn">{t("featured.viewAll")}</button>
                 </div>
               </div>
             </div>
@@ -262,7 +287,7 @@ const Home = () => {
           <div className="footer-content">
             <div className="footer-logo">
               <h2>Scooby<span>Food</span></h2>
-              <p>{translations.en.contact.address}</p>
+              <p>{t("contact.address")}</p>
             </div>
             
             <div className="footer-links">
@@ -303,8 +328,61 @@ const Home = () => {
           </div>
         </div>
       </footer>
+
+      {/* Extras Dialog */}
+      <Dialog open={showExtrasDialog} onOpenChange={setShowExtrasDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add extras to your order</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <h4 className="font-medium mb-3">Select extras for {selectedItem}</h4>
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="extra-cheese" 
+                  checked={extras.includes('Cheese')}
+                  onChange={() => handleExtraToggle('Cheese')}
+                  className="mr-2"
+                />
+                <label htmlFor="extra-cheese">Extra Cheese (+1.00 TND)</label>
+              </div>
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="extra-sauce" 
+                  checked={extras.includes('Special Sauce')}
+                  onChange={() => handleExtraToggle('Special Sauce')}
+                  className="mr-2"
+                />
+                <label htmlFor="extra-sauce">Special Sauce (+0.50 TND)</label>
+              </div>
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="extra-toppings" 
+                  checked={extras.includes('Extra Toppings')}
+                  onChange={() => handleExtraToggle('Extra Toppings')}
+                  className="mr-2"
+                />
+                <label htmlFor="extra-toppings">Extra Toppings (+1.50 TND)</label>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setShowExtrasDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleExtrasConfirm}>
+              Add to Cart
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default Home;
+
