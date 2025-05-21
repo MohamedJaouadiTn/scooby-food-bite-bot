@@ -540,11 +540,11 @@ button:disabled {
   gap: 10px;
 }
 
-/* Added visible border for checkboxes */
-.checkbox-with-border {
+/* Consistent checkbox styling */
+input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  border: 1px solid #000;
+  border: 1px solid var(--border-color);
   border-radius: 3px;
   appearance: none;
   -webkit-appearance: none;
@@ -554,12 +554,12 @@ button:disabled {
   outline: none;
 }
 
-.checkbox-with-border:checked {
+input[type="checkbox"]:checked {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.checkbox-with-border:checked:after {
+input[type="checkbox"]:checked:after {
   content: '';
   position: absolute;
   left: 5px;
@@ -569,11 +569,6 @@ button:disabled {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
-}
-
-.option-price {
-  font-weight: 500;
-  color: var(--primary-color);
 }
 
 /* Allergies field */
@@ -742,6 +737,11 @@ button:disabled {
 .footer h2, .footer h3 {
   margin-bottom: 15px;
   color: #fff;
+  text-align: center; /* Center headings */
+}
+
+.footer-logo {
+  text-align: center; /* Center logo section */
 }
 
 .footer-logo h2 {
@@ -757,6 +757,10 @@ button:disabled {
   color: #bbb;
 }
 
+.footer-links ul {
+  text-align: center; /* Center links */
+}
+
 .footer-links ul li {
   margin-bottom: 10px;
 }
@@ -770,13 +774,26 @@ button:disabled {
   color: var(--primary-color);
 }
 
+.footer-contact {
+  text-align: center; /* Center contact info */
+}
+
 .footer-contact p, .footer-hours p {
   color: #bbb;
   margin-bottom: 8px;
 }
 
+.footer-hours {
+  text-align: center; /* Center hours */
+}
+
+.footer-social {
+  text-align: center; /* Center social section */
+}
+
 .social-icons {
   display: flex;
+  justify-content: center; /* Center social icons */
   gap: 15px;
 }
 
@@ -802,7 +819,7 @@ button:disabled {
   text-align: center;
   color: #999;
   font-size: 0.9rem;
-  width: 100%; /* Changed from max-width: 1200px to width: 100% */
+  width: 100%;
   margin: 0 auto;
 }
 
