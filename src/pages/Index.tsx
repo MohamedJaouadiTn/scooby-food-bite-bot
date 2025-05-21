@@ -142,7 +142,7 @@ const Home = () => {
             </div>
             <nav className="nav">
               <ul>
-                <li><Link to="/" className="active">{t("home")}</Link></li>
+                <li><Link to="/">{t("home")}</Link></li>
                 <li><Link to="/menu">{t("menu")}</Link></li>
                 <li><a href="#about">{t("about")}</a></li>
                 <li><a href="#contact">{t("contact")}</a></li>
@@ -385,4 +385,3 @@ const Home = () => {
 };
 
 export default Home;
-
