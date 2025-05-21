@@ -1,297 +1,310 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-const Index = () => {
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [currentLanguage, setCurrentLanguage] = useState("en");
 
-  // Translation data
-  const translations = {
-    en: {
-      home: "Home",
-      menu: "Menu",
-      about: "About",
-      contact: "Contact",
-      heroTitle: "Delicious Food for Every Mood",
-      heroSubtitle: "Experience the taste that makes you come back for more",
-      exploreMenu: "Explore Menu",
-      featuredItems: "Featured Items",
-      popularItems: "Our most popular and delicious offerings",
-      orderNow: "Order Now",
-      testimonials: "What Our Customers Say",
-      testimonialSubtitle: "Hear from people who love our food",
-      aboutTitle: "About Scooby Food",
-      aboutText1: "Since 2010, Scooby Food has been serving delicious, high-quality fast food with a twist of homemade goodness. We believe in using fresh ingredients to create meals that not only satisfy hunger but also delight the taste buds.",
-      aboutText2: "Our passionate team works hard to ensure every customer leaves with a smile, making us one of the most beloved food spots in town.",
-      viewMenu: "View Our Menu",
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
+
+const translations = {
+  en: {
+    home: "Home",
+    menu: "Menu",
+    about: "About",
+    contact: "Contact",
+    hero: {
+      title: "Delicious Street Food",
+      subtitle: "Enjoy the best quality food with fast delivery",
+      viewMenu: "View Menu",
+      orderNow: "Order Now"
+    },
+    featured: {
+      title: "Featured Items",
+      subtitle: "Our most popular dishes",
+      mlawi: "Mlawi Collection",
+      chapati: "Chapati Specialties",
+      tacos: "Tasty Tacos",
+      sodas: "Refreshing Sodas",
+      startingFrom: "Starting from ",
+      viewAll: "View All"
+    },
+    about: {
+      title: "About Us",
+      desc: "We are a street food stand offering delicious takeaway food. Our passion is to provide high-quality, flavorful dishes that you can enjoy at home or on the go. With fresh ingredients and authentic recipes, we bring the best of street food to your table."
+    },
+    contact: {
+      title: "Contact Us",
+      address: "123 Food Street, Tasty Town",
+      phone: "(123) 456-7890",
+      email: "info@scoobyfood.com",
+      hours: "Opening Hours",
+      weekdays: "Monday - Friday: 10:00 AM - 10:00 PM",
+      weekends: "Saturday - Sunday: 11:00 AM - 11:00 PM"
+    },
+    footer: {
       quickLinks: "Quick Links",
       followUs: "Follow Us",
-      copyright: "2023 Scooby Food. All rights reserved.",
-      // Featured items descriptions
-      chapatyDesc: "Soft, fluffy chapati bread perfect for any meal",
-      malawiDesc: "Traditional Malawi with authentic flavors",
-      sodaDesc: "Ice-cold sodas to complement your meal",
-      // Testimonials
-      testimonial1: "The best chapaty I've ever had! Scooby Food never disappoints with their quality and taste.",
-      testimonial2: "Quick service, friendly staff and delicious food. What more could you ask for? Highly recommend!",
-      testimonial3: "Their burgers are juicy and flavorful. My go-to place when I'm craving fast food that's actually good.",
-      // Ingredients
-      chapatyIngredients: "Made with premium flour, water, salt, and a touch of oil",
-      malawiIngredients: "Prepared with fine flour, water, salt, oil and traditional spices",
-      sodaIngredients: "Various refreshing flavors with natural ingredients"
-    },
-    fr: {
-      home: "Accueil",
-      menu: "Menu",
-      about: "À Propos",
-      contact: "Contact",
-      heroTitle: "Des Plats Délicieux pour Chaque Humeur",
-      heroSubtitle: "Découvrez le goût qui vous fera revenir pour plus",
-      exploreMenu: "Explorer le Menu",
-      featuredItems: "Articles Vedettes",
-      popularItems: "Nos offres les plus populaires et délicieuses",
-      orderNow: "Commander",
-      testimonials: "Ce Que Disent Nos Clients",
-      testimonialSubtitle: "Écoutez les personnes qui adorent notre nourriture",
-      aboutTitle: "À Propos de Scooby Food",
-      aboutText1: "Depuis 2010, Scooby Food sert de la restauration rapide délicieuse et de qualité avec une touche de bonté maison. Nous croyons en l'utilisation d'ingrédients frais pour créer des repas qui non seulement satisfont la faim mais ravissent aussi les papilles.",
-      aboutText2: "Notre équipe passionnée travaille dur pour s'assurer que chaque client repart avec le sourire, faisant de nous l'un des endroits les plus aimés en ville.",
-      viewMenu: "Voir Notre Menu",
-      quickLinks: "Liens Rapides",
-      followUs: "Suivez-nous",
-      copyright: "2023 Scooby Food. Tous droits réservés.",
-      // Featured items descriptions in French
-      chapatyDesc: "Pain chapati moelleux et léger, parfait pour tous les repas",
-      malawiDesc: "Malawi traditionnel avec des saveurs authentiques",
-      sodaDesc: "Sodas glacés pour accompagner votre repas",
-      // Testimonials in French
-      testimonial1: "Le meilleur chapati que j'ai jamais mangé ! Scooby Food ne déçoit jamais avec sa qualité et son goût.",
-      testimonial2: "Service rapide, personnel sympathique et nourriture délicieuse. Que demander de plus ? Je recommande vivement !",
-      testimonial3: "Leurs hamburgers sont juteux et savoureux. Mon endroit préféré quand j'ai envie de fast-food qui est vraiment bon.",
-      // Ingredients in French
-      chapatyIngredients: "Préparé avec de la farine premium, de l'eau, du sel et un peu d'huile",
-      malawiIngredients: "Préparé avec de la farine fine, de l'eau, du sel, de l'huile et des épices traditionnelles",
-      sodaIngredients: "Diverses saveurs rafraîchissantes avec des ingrédients naturels"
+      contactUs: "Contact Us",
+      copyright: "2024 Scooby Food. All rights reserved."
     }
-  };
+  },
+  fr: {
+    home: "Accueil",
+    menu: "Menu",
+    about: "À Propos",
+    contact: "Contact",
+    hero: {
+      title: "Délicieuse Street Food",
+      subtitle: "Profitez de la meilleure qualité de nourriture avec une livraison rapide",
+      viewMenu: "Voir le Menu",
+      orderNow: "Commander"
+    },
+    featured: {
+      title: "Articles Vedettes",
+      subtitle: "Nos plats les plus populaires",
+      mlawi: "Collection Mlawi",
+      chapati: "Spécialités Chapati",
+      tacos: "Délicieux Tacos",
+      sodas: "Sodas Rafraîchissants",
+      startingFrom: "À partir de ",
+      viewAll: "Voir Tout"
+    },
+    about: {
+      title: "À Propos de Nous",
+      desc: "Nous sommes un stand de street food proposant de délicieux plats à emporter. Notre passion est de fournir des plats de haute qualité et savoureux que vous pouvez déguster à la maison ou en déplacement. Avec des ingrédients frais et des recettes authentiques, nous apportons le meilleur de la street food à votre table."
+    },
+    contact: {
+      title: "Contactez-Nous",
+      address: "123 Rue de la Nourriture, Ville Savoureuse",
+      phone: "(123) 456-7890",
+      email: "info@scoobyfood.com",
+      hours: "Heures d'Ouverture",
+      weekdays: "Lundi - Vendredi: 10:00 - 22:00",
+      weekends: "Samedi - Dimanche: 11:00 - 23:00"
+    },
+    footer: {
+      quickLinks: "Liens Rapides",
+      followUs: "Suivez-Nous",
+      contactUs: "Contactez-Nous",
+      copyright: "2024 Scooby Food. Tous droits réservés."
+    }
+  }
+};
 
-  // Get translation function
+const Home = () => {
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+
+  // Function to get translated text
   const t = (key: string) => {
-    return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
+    const keys = key.split(".");
+    let translation = translations[currentLanguage as keyof typeof translations];
+    
+    for (const k of keys) {
+      if (translation && typeof translation === 'object' && k in translation) {
+        translation = (translation as any)[k];
+      } else {
+        return key; // Return key if translation not found
+      }
+    }
+    
+    return translation;
   };
-  useEffect(() => {
-    // Testimonial slider effect
-    const slideInterval = setInterval(() => {
-      setActiveSlide(prev => (prev + 1) % 3);
-    }, 5000);
 
-    // Animation on scroll function
-    const animateOnScroll = () => {
-      const elements = document.querySelectorAll('.featured-item, .about-content, .footer-content');
-      const windowHeight = window.innerHeight;
-      elements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const elementVisible = 150;
-        if (elementPosition < windowHeight - elementVisible) {
-          element.classList.add('animate-active');
-        }
-      });
-    };
-
-    // Set initial animations
-    const elementsToAnimate = document.querySelectorAll('.featured-item, .about-content, .footer-content');
-    elementsToAnimate.forEach(element => {
-      element.classList.add('animate-on-scroll');
-    });
-
-    // Run animation on scroll
-    window.addEventListener('scroll', animateOnScroll);
-
-    // Run once on page load
-    animateOnScroll();
-    return () => {
-      clearInterval(slideInterval);
-      window.removeEventListener('scroll', animateOnScroll);
-    };
-  }, []);
-  return <div className="home-page">
+  return (
+    <div className="homepage">
       <header className="header">
-        <div className="logo">
-          <h1>Scooby<span>Food</span></h1>
-        </div>
-        <nav className="nav">
-          <ul>
-            <li><Link to="/" className="active">{t('home')}</Link></li>
-            <li><Link to="/menu">{t('menu')}</Link></li>
-            <li><a href="#about">{t('about')}</a></li>
-            <li><a href="#contact">{t('contact')}</a></li>
-          </ul>
-        </nav>
-        
-        {/* Language Switcher */}
-        <div className="language-switcher">
-          <select value={currentLanguage} onChange={e => setCurrentLanguage(e.target.value)} className="language-select">
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-          </select>
-        </div>
-        
-        <div className="mobile-menu-btn">
-          <span></span>
-          <span></span>
-          <span></span>
+        <div className="container">
+          <div className="header-content">
+            <div className="logo">
+              <h1>Scooby<span>Food</span></h1>
+            </div>
+            <nav className="nav">
+              <ul>
+                <li><Link to="/" className="active">{t("home")}</Link></li>
+                <li><Link to="/menu">{t("menu")}</Link></li>
+                <li><a href="#about">{t("about")}</a></li>
+                <li><a href="#contact">{t("contact")}</a></li>
+              </ul>
+            </nav>
+            
+            <div className="right-header-items">
+              {/* Language Switcher */}
+              <div className="language-switcher">
+                <select value={currentLanguage} onChange={e => setCurrentLanguage(e.target.value)} className="language-select">
+                  <option value="en">English</option>
+                  <option value="fr">Français</option>
+                </select>
+              </div>
+              
+              <Link to="/menu" className="cart-icon">
+                <ShoppingCart className="w-6 h-6" />
+              </Link>
+            </div>
+            
+            <div className="mobile-menu-btn" onClick={() => {
+              const nav = document.querySelector('.nav') as HTMLElement;
+              if (nav) nav.classList.toggle('active');
+            }}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
         </div>
       </header>
-      
-      <section className="hero">
-        <div className="hero-content">
-          <h2>{t('heroTitle')}</h2>
-          <p>{t('heroSubtitle')}</p>
-          <Link to="/menu" className="btn-primary">{t('exploreMenu')}</Link>
-        </div>
-      </section>
-      
-      <section className="featured">
-        <div className="section-title">
-          <h2>{t('featuredItems')}</h2>
-          <p>{t('popularItems')}</p>
-        </div>
+
+      <main>
+        <section className="hero">
+          <div className="container">
+            <div className="hero-content">
+              <h1>{t("hero.title")}</h1>
+              <p>{t("hero.subtitle")}</p>
+              <div className="hero-buttons">
+                <Link to="/menu" className="btn-primary">{t("hero.viewMenu")}</Link>
+                <Link to="/menu" className="btn-secondary">{t("hero.orderNow")}</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="featured-section">
+          <div className="container">
+            <div className="section-title">
+              <h2>{t("featured.title")}</h2>
+              <p>{t("featured.subtitle")}</p>
+            </div>
+            
+            <div className="featured-grid">
+              <div className="featured-card">
+                <img src="/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" alt="Mlawi" />
+                <div className="featured-info">
+                  <h3>{t("featured.mlawi")}</h3>
+                  <p>{t("featured.startingFrom")}3.50 TND</p>
+                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                </div>
+              </div>
+              
+              <div className="featured-card">
+                <img src="/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" alt="Chapati" />
+                <div className="featured-info">
+                  <h3>{t("featured.chapati")}</h3>
+                  <p>{t("featured.startingFrom")}6.00 TND</p>
+                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                </div>
+              </div>
+              
+              <div className="featured-card">
+                <img src="/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" alt="Tacos" />
+                <div className="featured-info">
+                  <h3>{t("featured.tacos")}</h3>
+                  <p>{t("featured.startingFrom")}3.50 TND</p>
+                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                </div>
+              </div>
+              
+              <div className="featured-card">
+                <img src="/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png" alt="Sodas" />
+                <div className="featured-info">
+                  <h3>{t("featured.sodas")}</h3>
+                  <p>{t("featured.startingFrom")}2.00 TND</p>
+                  <Link to="/menu" className="featured-btn">{t("featured.viewAll")}</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
         
-        <div className="featured-items">
-          <div className="featured-item">
-            <div className="featured-img">
-              <img src="/lovable-uploads/a0b46da6-d8b9-474a-9eb4-4721b602592e.png" alt="Chapaty" />
+        <section id="about" className="about-section">
+          <div className="container">
+            <div className="about-content">
+              <div className="about-text">
+                <h2>{t("about.title")}</h2>
+                <p>{t("about.desc")}</p>
+              </div>
+              <div className="about-image">
+                <img src="/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" alt="About Us" />
+              </div>
             </div>
-            <h3>Chapaty</h3>
-            <p>{t('chapatyDesc')}</p>
-            <p className="ingredients-text"><small>{t('chapatyIngredients')}</small></p>
-            <div className="featured-price">Starting From
-3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
-          
-          <div className="featured-item">
-            <div className="featured-img">
-              <img src="/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" alt="Malawi" />
-            </div>
-            <h3>Malawi</h3>
-            <p>{t('malawiDesc')}</p>
-            <p className="ingredients-text"><small>{t('malawiIngredients')}</small></p>
-            <div className="featured-price">Starting From
-3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
-          </div>
-          
-          <div className="featured-item">
-            <div className="featured-img">
-              <img src="/lovable-uploads/2886d120-1731-41be-ab2f-00af287ea3e6.png" alt="Sodas" />
-            </div>
-            <h3>Refreshing Sodas</h3>
-            <p>{t('sodaDesc')}</p>
-            <p className="ingredients-text"><small>{t('sodaIngredients')}</small></p>
-            <div className="featured-price">Starting From
-3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
-          </div>
-        </div>
-      </section>
-      
-      <section className="testimonials" id="testimonials">
-        <div className="section-title">
-          <h2>{t('testimonials')}</h2>
-          <p>{t('testimonialSubtitle')}</p>
-        </div>
+        </section>
         
-        <div className="testimonial-slider">
-          <div className={`testimonial-slide ${activeSlide === 0 ? 'active' : ''}`}>
-            <div className="testimonial-content">
-              <p>"{t('testimonial1')}"</p>
-              <div className="customer-info">
-                <h4>Mohamed Jaouadi</h4>
-                <span className="customer-rating">★★★★★</span>
+        <section id="contact" className="contact-section">
+          <div className="container">
+            <div className="section-title">
+              <h2>{t("contact.title")}</h2>
+            </div>
+            
+            <div className="contact-content">
+              <div className="contact-info">
+                <div className="contact-item">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <p>{t("contact.address")}</p>
+                </div>
+                <div className="contact-item">
+                  <i className="fas fa-phone"></i>
+                  <p>{t("contact.phone")}</p>
+                </div>
+                <div className="contact-item">
+                  <i className="fas fa-envelope"></i>
+                  <p>{t("contact.email")}</p>
+                </div>
+              </div>
+              
+              <div className="opening-hours">
+                <h3>{t("contact.hours")}</h3>
+                <p>{t("contact.weekdays")}</p>
+                <p>{t("contact.weekends")}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-logo">
+              <h2>Scooby<span>Food</span></h2>
+              <p>{translations.en.contact.address}</p>
+            </div>
+            
+            <div className="footer-links">
+              <h3>{t("footer.quickLinks")}</h3>
+              <ul>
+                <li><Link to="/">{t("home")}</Link></li>
+                <li><Link to="/menu">{t("menu")}</Link></li>
+                <li><a href="#about">{t("about")}</a></li>
+                <li><a href="#contact">{t("contact")}</a></li>
+              </ul>
+            </div>
+            
+            <div className="footer-contact text-center">
+              <h3>{t("footer.contactUs")}</h3>
+              <p><i className="fas fa-map-marker-alt"></i> {t("contact.address")}</p>
+              <p><i className="fas fa-phone"></i> {t("contact.phone")}</p>
+              <p><i className="fas fa-envelope"></i> {t("contact.email")}</p>
+            </div>
+            
+            <div className="footer-hours">
+              <h3>{t("contact.hours")}</h3>
+              <p>{t("contact.weekdays")}</p>
+              <p>{t("contact.weekends")}</p>
+            </div>
+            
+            <div className="footer-social text-center">
+              <h3>{t("footer.followUs")}</h3>
+              <div className="social-icons">
+                <a href="#" className="social-icon"><i className="fab fa-facebook-f"></i></a>
+                <a href="#" className="social-icon"><i className="fab fa-instagram"></i></a>
+                <a href="#" className="social-icon"><i className="fab fa-twitter"></i></a>
               </div>
             </div>
           </div>
           
-          <div className={`testimonial-slide ${activeSlide === 1 ? 'active' : ''}`}>
-            <div className="testimonial-content">
-              <p>"{t('testimonial2')}"</p>
-              <div className="customer-info">
-                <h4>Abdel Waheb Magdoud</h4>
-                <span className="customer-rating">★★★★★</span>
-              </div>
-            </div>
+          <div className="footer-bottom">
+            <p>&copy; {t("footer.copyright")}</p>
           </div>
-          
-          <div className={`testimonial-slide ${activeSlide === 2 ? 'active' : ''}`}>
-            <div className="testimonial-content">
-              <p className="Very Good Service">"{t('testimonial3')}"</p>
-              <div className="customer-info">
-                <h4>Adem Marzougui</h4>
-                <span className="customer-rating">★★★★☆</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="slider-controls">
-            <span className={`dot ${activeSlide === 0 ? 'active' : ''}`} onClick={() => setActiveSlide(0)}></span>
-            <span className={`dot ${activeSlide === 1 ? 'active' : ''}`} onClick={() => setActiveSlide(1)}></span>
-            <span className={`dot ${activeSlide === 2 ? 'active' : ''}`} onClick={() => setActiveSlide(2)}></span>
-          </div>
-        </div>
-      </section>
-      
-      <section className="about" id="about">
-        <div className="about-content">
-          <div className="about-text">
-            <h2>{t('aboutTitle')}</h2>
-            <p>{t('aboutText1')}</p>
-            <p>{t('aboutText2')}</p>
-            <Link to="/menu" className="btn-secondary">{t('viewMenu')}</Link>
-          </div>
-          <div className="about-image">
-            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="Restaurant Interior" />
-          </div>
-        </div>
-      </section>
-      
-      <footer className="footer" id="contact">
-        <div className="footer-content">
-          <div className="footer-logo">
-            <h2>Scooby<span>Food</span></h2>
-            <p>Delicious food for every mood</p>
-          </div>
-          
-          <div className="footer-links">
-            <h3>{t('quickLinks')}</h3>
-            <ul>
-              <li><Link to="/">{t('home')}</Link></li>
-              <li><Link to="/menu">{t('menu')}</Link></li>
-              <li><a href="#about">{t('about')}</a></li>
-              <li><a href="#contact">{t('contact')}</a></li>
-            </ul>
-          </div>
-          
-          <div className="footer-contact">
-            <h3>{t('contact')}</h3>
-            <p><i className="fa fa-map-marker"></i> 123 Food Street, Foodville</p>
-            <p><i className="fa fa-phone"></i> +1 (555) 123-4567</p>
-            <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
-          </div>
-          
-          <div className="footer-social">
-            <h3>{t('followUs')}</h3>
-            <div className="social-icons">
-              <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>
-              <a href="#" className="social-icon"><i className="fa fa-instagram"></i></a>
-              <a href="#" className="social-icon"><i className="fa fa-twitter"></i></a>
-            </div>
-          </div>
-        </div>
-        
-        <div className="footer-bottom">
-          <p>&copy; {t('copyright')}</p>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
-export default Index;
+
+export default Home;

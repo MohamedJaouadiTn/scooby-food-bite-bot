@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import { 
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ const AdminPanel = () => {
   });
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("products");
 
   // Load products from storage/API
   const loadProducts = () => {
@@ -49,8 +51,8 @@ const AdminPanel = () => {
     } else {
       // Default products if none in storage - now including all menu items
       const defaultProducts = [
-        { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
-        { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/0f6b3ba4-8c6f-47d4-a4eb-9d1fd36d62d4.png" },
+        { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
+        { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
         { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
         { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
         { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
@@ -143,6 +145,7 @@ const AdminPanel = () => {
   const handleEditProduct = (product: Product) => {
     setEditingProductId(product.id);
     setNewProduct({ ...product });
+    setActiveTab("add-edit");
   };
 
   const handleUpdateProduct = (e: React.FormEvent) => {
@@ -173,6 +176,7 @@ const AdminPanel = () => {
       image: "",
     });
     setEditingProductId(null);
+    setActiveTab("products");
     
     toast({
       title: "Product Updated",
@@ -201,89 +205,162 @@ const AdminPanel = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="container mx-auto my-10 p-6 max-w-md bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Password</label>
+      <div className="admin-login-container">
+        <h1 className="admin-login-title">Scooby Food Admin</h1>
+        <form onSubmit={handleLogin} className="admin-form">
+          <div className="admin-form-group">
+            <label>Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
+              className="w-full"
             />
           </div>
-          <Button type="submit" className="w-full">Login</Button>
+          <button type="submit" className="admin-submit">Login</button>
+          <div className="mt-4 text-center">
+            <Link to="/menu" className="text-blue-500 hover:underline">Back to Menu</Link>
+          </div>
         </form>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto my-10 p-6">
-      <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow">
-        <h1 className="text-3xl font-bold text-primary">Scooby Food Admin Panel</h1>
-        <Button variant="outline" onClick={handleLogout}>Logout</Button>
+    <div className="admin-panel">
+      <div className="admin-header">
+        <h1 className="admin-title">Scooby Food Admin Panel</h1>
+        <button className="admin-logout" onClick={handleLogout}>Logout</button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Product Form Section */}
-        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">
-            {editingProductId ? "Edit Product" : "Add New Product"}
-          </h2>
-          <form onSubmit={editingProductId ? handleUpdateProduct : handleAddProduct} className="space-y-4">
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2 font-medium">Product ID</label>
+      <div className="admin-tabs">
+        <div 
+          className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('products')}
+        >
+          Products
+        </div>
+        <div 
+          className={`admin-tab ${activeTab === 'add-edit' ? 'active' : ''}`} 
+          onClick={() => {
+            setActiveTab('add-edit');
+            if (editingProductId) {
+              setEditingProductId(null);
+              setNewProduct({
+                id: "",
+                name: "",
+                frenchName: "",
+                price: 0,
+                category: "mlawi",
+                image: "",
+              });
+            }
+          }}
+        >
+          {editingProductId ? 'Edit Product' : 'Add New Product'}
+        </div>
+      </div>
+      
+      {activeTab === 'products' && (
+        <div className="admin-card">
+          <h2>Current Menu Items</h2>
+          <div className="overflow-x-auto">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>French Name</th>
+                  <th>Price</th>
+                  <th>Category</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(product => (
+                  <tr key={product.id}>
+                    <td>{product.name}</td>
+                    <td>{product.frenchName}</td>
+                    <td>{product.price.toFixed(3)} TND</td>
+                    <td className="capitalize">{product.category}</td>
+                    <td>
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="admin-action-btn admin-edit-btn"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="admin-action-btn admin-delete-btn"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {products.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="text-center py-4 text-gray-500">
+                      No products found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      
+      {activeTab === 'add-edit' && (
+        <div className="admin-card">
+          <h2>{editingProductId ? "Edit Product" : "Add New Product"}</h2>
+          <form onSubmit={editingProductId ? handleUpdateProduct : handleAddProduct} className="admin-form">
+            <div className="admin-form-group">
+              <label>Product ID</label>
               <input
                 type="text"
                 value={newProduct.id}
                 onChange={(e) => setNewProduct({...newProduct, id: e.target.value})}
                 placeholder="Auto-generated if empty"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
               />
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2 font-medium">Name (English)</label>
+            <div className="admin-form-group">
+              <label>Name (English)</label>
               <input
                 type="text"
                 value={newProduct.name}
                 onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
                 required
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
               />
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2 font-medium">Name (French)</label>
+            <div className="admin-form-group">
+              <label>Name (French)</label>
               <input
                 type="text"
                 value={newProduct.frenchName}
                 onChange={(e) => setNewProduct({...newProduct, frenchName: e.target.value})}
                 required
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
               />
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2 font-medium">Price (TND)</label>
+            <div className="admin-form-group">
+              <label>Price (TND)</label>
               <input
                 type="number"
                 step="0.001"
                 value={newProduct.price}
                 onChange={(e) => setNewProduct({...newProduct, price: Number(e.target.value)})}
                 required
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
               />
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2 font-medium">Category</label>
+            <div className="admin-form-group">
+              <label>Category</label>
               <select
                 value={newProduct.category}
                 onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary bg-white"
               >
                 <option value="mlawi">Mlawi</option>
                 <option value="chapati">Chapati</option>
@@ -292,26 +369,24 @@ const AdminPanel = () => {
               </select>
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2 font-medium">Image URL</label>
+            <div className="admin-form-group">
+              <label>Image URL</label>
               <input
                 type="text"
                 value={newProduct.image}
                 onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
                 placeholder="Image path or URL"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-primary"
               />
             </div>
             
-            <Button type="submit" className="w-full bg-primary">
+            <button type="submit" className="admin-submit">
               {editingProductId ? "Update Product" : "Add Product"}
-            </Button>
+            </button>
             
             {editingProductId && (
-              <Button 
+              <button 
                 type="button" 
-                variant="outline" 
-                className="w-full mt-2"
+                className="admin-cancel"
                 onClick={() => {
                   setEditingProductId(null);
                   setNewProduct({
@@ -322,61 +397,15 @@ const AdminPanel = () => {
                     category: "mlawi",
                     image: "",
                   });
+                  setActiveTab("products");
                 }}
               >
                 Cancel Edit
-              </Button>
+              </button>
             )}
           </form>
         </div>
-        
-        {/* Products List Section */}
-        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Current Menu Items</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {products.map(product => (
-                  <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap">{product.name}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{product.price.toFixed(3)} TND</td>
-                    <td className="px-4 py-3 whitespace-nowrap capitalize">{product.category}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="text-blue-600 hover:text-blue-900 mr-2 px-3 py-1 rounded border border-blue-600 hover:bg-blue-50"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="text-red-600 hover:text-red-900 px-3 py-1 rounded border border-red-600 hover:bg-red-50"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {products.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-3 text-center text-gray-500">
-                      No products found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Confirmation Dialog */}
       <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
