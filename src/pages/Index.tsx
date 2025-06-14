@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+
 const Index = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [currentLanguage, setCurrentLanguage] = useState("en");
@@ -30,6 +31,7 @@ const Index = () => {
       chapatyDesc: "Soft, fluffy chapati bread perfect for any meal",
       malawiDesc: "Traditional Malawi with authentic flavors",
       sodaDesc: "Ice-cold sodas to complement your meal",
+      tacosDesc: "Delicious tacos with fresh ingredients and bold flavors",
       // Testimonials
       testimonial1: "The best chapaty I've ever had! Scooby Food never disappoints with their quality and taste.",
       testimonial2: "Quick service, friendly staff and delicious food. What more could you ask for? Highly recommend!",
@@ -37,7 +39,8 @@ const Index = () => {
       // Ingredients
       chapatyIngredients: "Made with premium flour, water, salt, and a touch of oil",
       malawiIngredients: "Prepared with fine flour, water, salt, oil and traditional spices",
-      sodaIngredients: "Various refreshing flavors with natural ingredients"
+      sodaIngredients: "Various refreshing flavors with natural ingredients",
+      tacosIngredients: "Fresh tortillas, seasoned meat, lettuce, tomatoes, cheese and sauce"
     },
     fr: {
       home: "Accueil",
@@ -63,6 +66,7 @@ const Index = () => {
       chapatyDesc: "Pain chapati moelleux et léger, parfait pour tous les repas",
       malawiDesc: "Malawi traditionnel avec des saveurs authentiques",
       sodaDesc: "Sodas glacés pour accompagner votre repas",
+      tacosDesc: "Délicieux tacos avec des ingrédients frais et des saveurs audacieuses",
       // Testimonials in French
       testimonial1: "Le meilleur chapati que j'ai jamais mangé ! Scooby Food ne déçoit jamais avec sa qualité et son goût.",
       testimonial2: "Service rapide, personnel sympathique et nourriture délicieuse. Que demander de plus ? Je recommande vivement !",
@@ -70,7 +74,8 @@ const Index = () => {
       // Ingredients in French
       chapatyIngredients: "Préparé avec de la farine premium, de l'eau, du sel et un peu d'huile",
       malawiIngredients: "Préparé avec de la farine fine, de l'eau, du sel, de l'huile et des épices traditionnelles",
-      sodaIngredients: "Diverses saveurs rafraîchissantes avec des ingrédients naturels"
+      sodaIngredients: "Diverses saveurs rafraîchissantes avec des ingrédients naturels",
+      tacosIngredients: "Tortillas fraîches, viande assaisonnée, laitue, tomates, fromage et sauce"
     }
   };
 
@@ -78,6 +83,7 @@ const Index = () => {
   const t = (key: string) => {
     return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
   };
+
   useEffect(() => {
     // Testimonial slider effect
     const slideInterval = setInterval(() => {
@@ -192,6 +198,18 @@ const Index = () => {
 3.50 TND</div>
             <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
           </div>
+
+          <div className="featured-item">
+            <div className="featured-img">
+              <img src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8dGFjb3N8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60" alt="Tacos" />
+            </div>
+            <h3>Tacos</h3>
+            <p>{t('tacosDesc')}</p>
+            <p className="ingredients-text"><small>{t('tacosIngredients')}</small></p>
+            <div className="featured-price">Starting From
+3.50 TND</div>
+            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
+          </div>
         </div>
       </section>
       
@@ -294,4 +312,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;
