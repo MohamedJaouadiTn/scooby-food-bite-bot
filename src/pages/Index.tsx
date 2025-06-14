@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -59,21 +58,6 @@ const Index = () => {
   // Get translation function
   const t = (key: string) => {
     return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
-  };
-
-  // Cart functionality
-  const handleAddToCart = (itemName: string) => {
-    toast({
-      title: "Added to cart!",
-      description: `${itemName} has been added to your cart`,
-    });
-  };
-
-  const handleBuyNow = (itemName: string) => {
-    toast({
-      title: "Redirecting to checkout",
-      description: `Processing order for ${itemName}`,
-    });
   };
 
   return (
@@ -139,29 +123,20 @@ const Index = () => {
             <div className="featured-item">
               <img src="/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" alt="Mlawi" />
               <h3>{t('featuredItemsMlawi')}</h3>
-              <p>{t('startingFrom')} 3,50 TND</p>
-              <div className="menu-item-actions">
-                <button className="btn-add-cart" onClick={() => handleAddToCart('Mlawi')}>Add to Cart</button>
-                <button className="btn-buy-now" onClick={() => handleBuyNow('Mlawi')}>Buy Now</button>
-              </div>
+              <p>{t('startingFrom')} 3.50 TND</p>
+              <Link to="/menu" className="btn">{t('orderNow')}</Link>
             </div>
             <div className="featured-item">
               <img src="/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" alt="Chapati" />
               <h3>{t('featuredItemsChapati')}</h3>
-              <p>{t('startingFrom')} 6,00 TND</p>
-              <div className="menu-item-actions">
-                <button className="btn-add-cart" onClick={() => handleAddToCart('Chapati')}>Add to Cart</button>
-                <button className="btn-buy-now" onClick={() => handleBuyNow('Chapati')}>Buy Now</button>
-              </div>
+              <p>{t('startingFrom')} 6.00 TND</p>
+              <Link to="/menu" className="btn">{t('orderNow')}</Link>
             </div>
             <div className="featured-item">
               <img src="/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" alt="Tacos" />
               <h3>{t('featuredItemsTacos')}</h3>
-              <p>{t('startingFrom')} 3,50 TND</p>
-              <div className="menu-item-actions">
-                <button className="btn-add-cart" onClick={() => handleAddToCart('Tacos')}>Add to Cart</button>
-                <button className="btn-buy-now" onClick={() => handleBuyNow('Tacos')}>Buy Now</button>
-              </div>
+              <p>{t('startingFrom')} 3.50 TND</p>
+              <Link to="/menu" className="btn">{t('orderNow')}</Link>
             </div>
           </div>
         </div>
@@ -187,11 +162,9 @@ const Index = () => {
             
             <div className="footer-contact">
               <h3>{t('contactUs')}</h3>
-              <div className="contact-info">
-                <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
-                <p><i className="fa fa-phone"></i> (123) 456-7890</p>
-                <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
-              </div>
+              <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
+              <p><i className="fa fa-phone"></i> (123) 456-7890</p>
+              <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
             </div>
             
             <div className="footer-hours">
