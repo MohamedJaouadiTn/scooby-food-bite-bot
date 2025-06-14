@@ -39,10 +39,12 @@ const MenuPage = () => {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showSodaModal, setShowSodaModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showExtrasModal, setShowExtrasModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CartItem | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [selectedSodaType, setSelectedSodaType] = useState<string>("Coca-Cola");
   const [totalPrice, setTotalPrice] = useState(0);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [orderForm, setOrderForm] = useState({
     name: localStorage.getItem("customerName") || "",
     address: localStorage.getItem("customerAddress") || "",
@@ -217,7 +219,9 @@ const MenuPage = () => {
       openingHours: "Opening Hours",
       chooseSodaType: "Which soda would you like?",
       selectSoda: "Select a soda",
-      confirm: "Confirm"
+      confirm: "Confirm",
+      selectExtras: "Select Extras (Optional)",
+      addItemToCart: "Add Item to Cart"
     },
     fr: {
       home: "Accueil",
@@ -265,7 +269,9 @@ const MenuPage = () => {
       openingHours: "Horaires d'Ouverture",
       chooseSodaType: "Quelle boisson voulez-vous?",
       selectSoda: "Sélectionnez une boisson",
-      confirm: "Confirmer"
+      confirm: "Confirmer",
+      selectExtras: "Sélectionner Suppléments (Optionnel)",
+      addItemToCart: "Ajouter Article au Panier"
     }
   };
 
@@ -298,7 +304,7 @@ const MenuPage = () => {
     return cart.reduce((total, item) => total + (item.totalPrice || item.price * item.quantity), 0).toFixed(3);
   };
 
-  // Add item to cart
+  // Add item to cart with extras selection
   const addToCart = (item: any) => {
     if (item.category === "drinks" && item.id === "drink1") {
       setSelectedItem({
@@ -308,9 +314,11 @@ const MenuPage = () => {
         quantity: 1,
         category: item.category
       });
+      setIsAddingToCart(true);
       setShowSodaModal(true);
       return;
     }
+    
     setSelectedItem({
       id: item.id,
       name: currentLanguage === 'en' ? item.name : item.frenchName,
@@ -320,7 +328,8 @@ const MenuPage = () => {
     });
     setSelectedExtras([]);
     setTotalPrice(item.price);
-    setShowOrderModal(true);
+    setIsAddingToCart(true);
+    setShowExtrasModal(true);
   };
 
   // Buy now function
@@ -333,6 +342,7 @@ const MenuPage = () => {
         quantity: 1,
         category: item.category
       });
+      setIsAddingToCart(false);
       setShowSodaModal(true);
       return;
     }
@@ -345,7 +355,8 @@ const MenuPage = () => {
     });
     setSelectedExtras([]);
     setTotalPrice(item.price);
-    setShowOrderModal(true);
+    setIsAddingToCart(false);
+    setShowExtrasModal(true);
   };
 
   // Handle extra option selection
@@ -371,9 +382,79 @@ const MenuPage = () => {
     };
     setSelectedItem(sodaItem);
     setShowSodaModal(false);
-    setSelectedExtras([]);
-    setTotalPrice(sodaItem.price);
-    setShowOrderModal(true);
+    
+    if (isAddingToCart) {
+      // Add directly to cart for soda
+      const updatedCart = [...cart];
+      const existingItemIndex = updatedCart.findIndex(
+        cartItem => cartItem.id === sodaItem.id && cartItem.sodaType === selectedSodaType
+      );
+      
+      if (existingItemIndex > -1) {
+        updatedCart[existingItemIndex].quantity += 1;
+      } else {
+        updatedCart.push({
+          ...sodaItem,
+          totalPrice: sodaItem.price
+        });
+      }
+      
+      setCart(updatedCart);
+      toast({
+        title: "Added to Cart",
+        description: `${sodaItem.name} has been added to your cart.`
+      });
+      setIsAddingToCart(false);
+    } else {
+      // For buy now, proceed to order
+      setSelectedExtras([]);
+      setTotalPrice(sodaItem.price);
+      setShowOrderModal(true);
+    }
+  };
+
+  // Handle extras confirmation and add to cart
+  const handleExtrasConfirm = () => {
+    if (!selectedItem) return;
+    
+    const selectedExtrasData = selectedExtras.map(id => {
+      const option = extraOptions.find(opt => opt.id === id);
+      return {
+        id: option!.id,
+        name: currentLanguage === 'en' ? option!.name : option!.frenchName,
+        price: option!.price
+      };
+    });
+    
+    if (isAddingToCart) {
+      // Add to cart
+      const updatedCart = [...cart];
+      const cartItemId = `${selectedItem.id}_${selectedExtras.join('_')}`;
+      const existingItemIndex = updatedCart.findIndex(cartItem => cartItem.id === cartItemId);
+      
+      if (existingItemIndex > -1) {
+        updatedCart[existingItemIndex].quantity += 1;
+      } else {
+        updatedCart.push({
+          ...selectedItem,
+          id: cartItemId,
+          extras: selectedExtrasData,
+          totalPrice: totalPrice
+        });
+      }
+      
+      setCart(updatedCart);
+      toast({
+        title: "Added to Cart",
+        description: `${selectedItem.name} has been added to your cart.`
+      });
+      setShowExtrasModal(false);
+      setIsAddingToCart(false);
+    } else {
+      // For buy now, proceed to order
+      setShowExtrasModal(false);
+      setShowOrderModal(true);
+    }
   };
 
   // Decrease quantity
@@ -643,6 +724,11 @@ const MenuPage = () => {
                   <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
+                      {item.extras && item.extras.length > 0 && (
+                        <p className="cart-item-extras">
+                          + {item.extras.map(extra => extra.name).join(', ')}
+                        </p>
+                      )}
                       <span>{item.totalPrice?.toFixed(3) || (item.price * item.quantity).toFixed(3)} {t('TND')}</span>
                     </div>
                     <div className="cart-item-quantity">
@@ -714,6 +800,55 @@ const MenuPage = () => {
             
             <button className="btn-primary btn-block mt-4" onClick={handleSodaConfirm}>
               {t('confirm')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Extras Selection Modal */}
+      {showExtrasModal && (
+        <div className="modal" onClick={e => {
+          if ((e.target as HTMLElement).classList.contains('modal')) {
+            setShowExtrasModal(false);
+          }
+        }}>
+          <div className="modal-content">
+            <span className="close-modal" onClick={() => setShowExtrasModal(false)}>×</span>
+            <h2>{t('selectExtras')}</h2>
+            
+            {selectedItem && (
+              <div className="selected-item-info">
+                <h3>{selectedItem.name}</h3>
+                <p>{t('basePrice')} {selectedItem.price.toFixed(3)} {t('TND')}</p>
+              </div>
+            )}
+            
+            <div className="extras-list">
+              {extraOptions.map(option => (
+                <div key={option.id} className="extra-option-item">
+                  <div className="option-checkbox">
+                    <input 
+                      type="checkbox" 
+                      id={`option-${option.id}`} 
+                      checked={selectedExtras.includes(option.id)} 
+                      onChange={e => handleExtraOptionChange(option.id, e.target.checked)} 
+                      className="checkbox-with-border" 
+                    />
+                    <label htmlFor={`option-${option.id}`}>
+                      {currentLanguage === 'en' ? option.name : option.frenchName}
+                    </label>
+                  </div>
+                  <span className="option-price">{option.price.toFixed(3)} {t('TND')}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="extras-total">
+              <span>{t('total')}: {totalPrice.toFixed(3)} {t('TND')}</span>
+            </div>
+            
+            <button className="btn-primary btn-block mt-4" onClick={handleExtrasConfirm}>
+              {isAddingToCart ? t('addItemToCart') : t('buyNow')}
             </button>
           </div>
         </div>
