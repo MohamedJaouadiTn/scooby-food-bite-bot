@@ -25,7 +25,6 @@ body {
   color: var(--dark-color);
   background-color: var(--light-color);
   margin: 0; /* Explicitly setting margin to 0 */
-  padding: 0;
 }
 
 a {
@@ -52,7 +51,7 @@ button {
   width: 100%;
   max-width: 100%; /* Changed from 1200px to 100% */
   margin: 0 auto;
-  padding: 0 1rem; /* Add padding to match header */
+  padding: 0; /* Removed padding */
 }
 
 /* Header Styles */
@@ -567,7 +566,7 @@ button {
 }
 
 .menu-section {
-  padding: 2rem 1rem;
+  padding: 2rem 0;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -1044,65 +1043,4 @@ button {
 .animate-active {
   opacity: 1;
   transform: translateY(0);
-}
-
-/* Custom styling for extras selection */
-.extras-list {
-  margin: 1.5rem 0;
-}
-
-.extra-option-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.extra-option-item:last-child {
-  border-bottom: none;
-}
-
-.option-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.checkbox-with-border {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-  position: relative;
-}
-
-.checkbox-with-border:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.checkbox-with-border:checked::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 0.8rem;
-}
-
-.option-price {
-  font-weight: 500;
-}
-
-/* Fix cart item extras display */
-.cart-item-extras {
-  font-size: 0.8rem;
-  color: #777;
-  margin-bottom: 0.2rem;
 }
