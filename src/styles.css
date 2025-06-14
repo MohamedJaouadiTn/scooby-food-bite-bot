@@ -773,11 +773,13 @@ button:disabled {
 .footer-contact p, .footer-hours p {
   color: #bbb;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .social-icons {
   display: flex;
   gap: 15px;
+  justify-content: center;
 }
 
 .social-icon {
