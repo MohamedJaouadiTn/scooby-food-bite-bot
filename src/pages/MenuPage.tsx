@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 type FoodOption = {
   id: string;
@@ -733,7 +733,6 @@ const MenuPage = () => {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>{t('extras')}</DialogTitle>
-              <DialogDescription>Select any extras you'd like to add</DialogDescription>
             </DialogHeader>
             <div className="extras-list py-4">
               {extraOptions.map(option => (
