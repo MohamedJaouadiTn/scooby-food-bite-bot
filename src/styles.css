@@ -776,6 +776,14 @@ button:disabled {
   text-align: center;
 }
 
+.footer-contact {
+  text-align: center;
+}
+
+.footer-hours {
+  text-align: center;
+}
+
 .social-icons {
   display: flex;
   gap: 15px;
