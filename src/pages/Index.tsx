@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 const Index = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [cart, setCart] = useState<Array<{id: string, name: string, price: number, quantity: number}>>([]);
+  const [showCart, setShowCart] = useState(false);
+  const [showOrderForm, setShowOrderForm] = useState(false);
 
   // Translation data
   const translations = {
@@ -82,6 +85,42 @@ const Index = () => {
   // Get translation function
   const t = (key: string) => {
     return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
+  };
+
+  // Cart functions
+  const addToCart = (id: string, name: string, price: number) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === id);
+      if (existing) {
+        return prev.map(item => 
+          item.id === id ? {...item, quantity: item.quantity + 1} : item
+        );
+      }
+      return [...prev, {id, name, price, quantity: 1}];
+    });
+  };
+
+  const removeFromCart = (id: string) => {
+    setCart(prev => prev.filter(item => item.id !== id));
+  };
+
+  const updateQuantity = (id: string, quantity: number) => {
+    if (quantity === 0) {
+      removeFromCart(id);
+      return;
+    }
+    setCart(prev => prev.map(item => 
+      item.id === id ? {...item, quantity} : item
+    ));
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  const handleBuyNow = (id: string, name: string, price: number) => {
+    setCart([{id, name, price, quantity: 1}]);
+    setShowOrderForm(true);
   };
 
   useEffect(() => {
@@ -172,7 +211,21 @@ const Index = () => {
             <p className="ingredients-text"><small>{t('chapatyIngredients')}</small></p>
             <div className="featured-price">Starting From
 3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
+            <div className="featured-actions">
+              <button 
+                onClick={() => addToCart('chapaty', 'Chapaty', 3.50)}
+                className="btn-secondary"
+                style={{marginRight: '0.5rem'}}
+              >
+                Add to Cart
+              </button>
+              <button 
+                onClick={() => handleBuyNow('chapaty', 'Chapaty', 3.50)}
+                className="btn-primary"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
           
           <div className="featured-item">
@@ -184,7 +237,21 @@ const Index = () => {
             <p className="ingredients-text"><small>{t('malawiIngredients')}</small></p>
             <div className="featured-price">Starting From
 3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
+            <div className="featured-actions">
+              <button 
+                onClick={() => addToCart('malawi', 'Malawi', 3.50)}
+                className="btn-secondary"
+                style={{marginRight: '0.5rem'}}
+              >
+                Add to Cart
+              </button>
+              <button 
+                onClick={() => handleBuyNow('malawi', 'Malawi', 3.50)}
+                className="btn-primary"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
           
           <div className="featured-item">
@@ -196,7 +263,21 @@ const Index = () => {
             <p className="ingredients-text"><small>{t('sodaIngredients')}</small></p>
             <div className="featured-price">Starting From
 3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
+            <div className="featured-actions">
+              <button 
+                onClick={() => addToCart('sodas', 'Refreshing Sodas', 3.50)}
+                className="btn-secondary"
+                style={{marginRight: '0.5rem'}}
+              >
+                Add to Cart
+              </button>
+              <button 
+                onClick={() => handleBuyNow('sodas', 'Refreshing Sodas', 3.50)}
+                className="btn-primary"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
 
           <div className="featured-item">
@@ -208,7 +289,21 @@ const Index = () => {
             <p className="ingredients-text"><small>{t('tacosIngredients')}</small></p>
             <div className="featured-price">Starting From
 3.50 TND</div>
-            <Link to="/menu" className="btn-secondary">{t('orderNow')}</Link>
+            <div className="featured-actions">
+              <button 
+                onClick={() => addToCart('tacos', 'Tacos', 3.50)}
+                className="btn-secondary"
+                style={{marginRight: '0.5rem'}}
+              >
+                Add to Cart
+              </button>
+              <button 
+                onClick={() => handleBuyNow('tacos', 'Tacos', 3.50)}
+                className="btn-primary"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -310,6 +405,111 @@ const Index = () => {
           <p>&copy; {t('copyright')}</p>
         </div>
       </footer>
+      
+      {/* Cart Modal */}
+      {showCart && (
+        <div className="modal" onClick={() => setShowCart(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <span className="close-modal" onClick={() => setShowCart(false)}>&times;</span>
+            <h2>Your Cart</h2>
+            {cart.length === 0 ? (
+              <div className="empty-cart">Your cart is empty</div>
+            ) : (
+              <>
+                <div className="cart-items">
+                  {cart.map(item => (
+                    <div key={item.id} className="cart-item">
+                      <div className="cart-item-info">
+                        <h4>{item.name}</h4>
+                        <p>{item.price.toFixed(2)} TND</p>
+                      </div>
+                      <div className="cart-item-quantity">
+                        <button 
+                          className="quantity-decrease"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          -
+                        </button>
+                        <span className="quantity-value">{item.quantity}</span>
+                        <button 
+                          className="quantity-increase"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          +
+                        </button>
+                        <button 
+                          className="remove-item"
+                          onClick={() => removeFromCart(item.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="cart-total">
+                  <span>Total: {getTotalPrice().toFixed(2)} TND</span>
+                </div>
+                <div className="cart-actions">
+                  <button 
+                    className="btn-primary"
+                    onClick={() => {
+                      setShowCart(false);
+                      setShowOrderForm(true);
+                    }}
+                  >
+                    Proceed to Order
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Order Form Modal */}
+      {showOrderForm && (
+        <div className="modal" onClick={() => setShowOrderForm(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <span className="close-modal" onClick={() => setShowOrderForm(false)}>&times;</span>
+            <h2>Order Details</h2>
+            <div className="order-summary">
+              <h3>Your Order</h3>
+              {cart.map(item => (
+                <div key={item.id} className="order-item">
+                  <span>{item.name} x{item.quantity}</span>
+                  <span>{(item.price * item.quantity).toFixed(2)} TND</span>
+                </div>
+              ))}
+              <div className="order-total">
+                <span>Total: {getTotalPrice().toFixed(2)} TND</span>
+              </div>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              alert('Order placed successfully!');
+              setShowOrderForm(false);
+              setCart([]);
+            }}>
+              <div className="form-group">
+                <label>Name</label>
+                <input type="text" required />
+              </div>
+              <div className="form-group">
+                <label>Phone</label>
+                <input type="tel" required />
+              </div>
+              <div className="form-group">
+                <label>Address</label>
+                <textarea required></textarea>
+              </div>
+              <button type="submit" className="btn-primary btn-block">
+                Place Order
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>;
 };
 
