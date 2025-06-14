@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 type FoodOption = {
   id: string;
@@ -733,7 +733,6 @@ const MenuPage = () => {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>{t('extras')}</DialogTitle>
-              <DialogDescription>Select any extras you'd like to add</DialogDescription>
             </DialogHeader>
             <div className="extras-list py-4">
               {extraOptions.map(option => (
@@ -745,6 +744,7 @@ const MenuPage = () => {
                       onCheckedChange={(checked) => {
                         handleExtraOptionChange(option.id, checked === true);
                       }}
+                      className="h-4 w-4"
                     />
                     <label htmlFor={`extras-${option.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       {currentLanguage === 'en' ? option.name : option.frenchName}
@@ -900,7 +900,7 @@ const MenuPage = () => {
               </ul>
             </div>
             
-            <div className="footer-contact">
+            <div className="footer-contact text-center">
               <h3>{t('contactUs')}</h3>
               <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
               <p><i className="fa fa-phone"></i> (123) 456-7890</p>
@@ -913,7 +913,7 @@ const MenuPage = () => {
               <p><strong>Saturday - Sunday:</strong> 11:00 AM - 11:00 PM</p>
             </div>
             
-            <div className="footer-social">
+            <div className="footer-social text-center">
               <h3>{t('followUs')}</h3>
               <div className="social-icons">
                 <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>

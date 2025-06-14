@@ -1,67 +1,139 @@
-import { useState, useEffect } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-const Index = () => {
-  const { toast } = useToast();
-  const [currentLanguage, setCurrentLanguage] = useState("en");
-
-  useEffect(() => {
-    document.title = "Scooby Food - Home";
-  }, []);
-
-  // Translation data
-  const translations = {
-    en: {
-      home: "Home",
-      menu: "Menu",
-      about: "About",
-      contact: "Contact",
-      deliciousFood: "Delicious street food for takeaway",
-      heroTitle: "Scooby Food",
-      heroSubtitle: "The best street food in town",
-      orderNow: "Order Now",
-      featuredItems: "Featured Items",
-      featuredItemsMlawi: "Try our delicious Mlawi",
-      featuredItemsChapati: "Taste our fresh Chapati",
-      featuredItemsTacos: "Enjoy our tasty Tacos",
-      startingFrom: "Starting from",
+const translations = {
+  en: {
+    home: "Home",
+    menu: "Menu",
+    about: "About",
+    contact: "Contact",
+    hero: {
+      title: "Delicious Street Food",
+      subtitle: "Enjoy the best quality food with fast delivery",
+      viewMenu: "View Menu",
+      orderNow: "Order Now"
+    },
+    featured: {
+      title: "Featured Items",
+      subtitle: "Our most popular dishes",
+      mlawi: "Mlawi Collection",
+      chapati: "Chapati Specialties",
+      tacos: "Tasty Tacos",
+      sodas: "Refreshing Sodas",
+      startingFrom: "Starting from ",
+      viewAll: "View All"
+    },
+    aboutSection: {
+      title: "About Us",
+      desc: "We are a street food stand offering delicious takeaway food. Our passion is to provide high-quality, flavorful dishes that you can enjoy at home or on the go. With fresh ingredients and authentic recipes, we bring the best of street food to your table."
+    },
+    contactSection: {
+      title: "Contact Us",
+      address: "123 Food Street, Tasty Town",
+      phone: "(123) 456-7890",
+      email: "info@scoobyfood.com",
+      hours: "Opening Hours",
+      weekdays: "Monday - Friday: 10:00 AM - 10:00 PM",
+      weekends: "Saturday - Sunday: 11:00 AM - 11:00 PM"
+    },
+    footer: {
       quickLinks: "Quick Links",
       followUs: "Follow Us",
       contactUs: "Contact Us",
-      copyright: "2025 Scooby Food. All rights reserved.",
-      openingHours: "Opening Hours"
+      copyright: "2024 Scooby Food. All rights reserved."
+    }
+  },
+  fr: {
+    home: "Accueil",
+    menu: "Menu",
+    about: "À Propos",
+    contact: "Contact",
+    hero: {
+      title: "Délicieuse Street Food",
+      subtitle: "Profitez de la meilleure qualité de nourriture avec une livraison rapide",
+      viewMenu: "Voir le Menu",
+      orderNow: "Commander"
     },
-    fr: {
-      home: "Accueil",
-      menu: "Menu",
-      about: "À Propos",
-      contact: "Contact",
-      deliciousFood: "Délicieuse street food à emporter",
-      heroTitle: "Scooby Food",
-      heroSubtitle: "La meilleure street food en ville",
-      orderNow: "Commander",
-      featuredItems: "Articles en Vedette",
-      featuredItemsMlawi: "Essayez notre délicieux Mlawi",
-      featuredItemsChapati: "Goûtez notre Chapati frais",
-      featuredItemsTacos: "Savourez nos savoureux Tacos",
-      startingFrom: "À partir de",
+    featured: {
+      title: "Articles Vedettes",
+      subtitle: "Nos plats les plus populaires",
+      mlawi: "Collection Mlawi",
+      chapati: "Spécialités Chapati",
+      tacos: "Délicieux Tacos",
+      sodas: "Sodas Rafraîchissants",
+      startingFrom: "À partir de ",
+      viewAll: "Voir Tout"
+    },
+    aboutSection: {
+      title: "À Propos de Nous",
+      desc: "Nous sommes un stand de street food proposant de délicieux plats à emporter. Notre passion est de fournir des plats de haute qualité et savoureux que vous pouvez déguster à la maison ou en déplacement. Avec des ingrédients frais et des recettes authentiques, nous apportons le meilleur de la street food à votre table."
+    },
+    contactSection: {
+      title: "Contactez-Nous",
+      address: "123 Rue de la Nourriture, Ville Savoureuse",
+      phone: "(123) 456-7890",
+      email: "info@scoobyfood.com",
+      hours: "Heures d'Ouverture",
+      weekdays: "Lundi - Vendredi: 10:00 - 22:00",
+      weekends: "Samedi - Dimanche: 11:00 - 23:00"
+    },
+    footer: {
       quickLinks: "Liens Rapides",
-      followUs: "Suivez-nous",
-      contactUs: "Contactez-nous",
-      copyright: "2025 Scooby Food. Tous droits réservés.",
-      openingHours: "Horaires d'Ouverture"
+      followUs: "Suivez-Nous",
+      contactUs: "Contactez-Nous",
+      copyright: "2024 Scooby Food. Tous droits réservés."
+    }
+  }
+};
+
+const Home = () => {
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [showExtrasDialog, setShowExtrasDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [extras, setExtras] = useState<string[]>([]);
+
+  // Function to get translated text
+  const t = (key: string): string => {
+    const keys = key.split(".");
+    let translation: any = translations[currentLanguage as keyof typeof translations];
+    
+    for (const k of keys) {
+      if (translation && typeof translation === 'object' && k in translation) {
+        translation = translation[k];
+      } else {
+        return key; // Return key if translation not found
+      }
+    }
+    
+    return translation as string;
+  };
+
+  const handleOrderClick = (itemName: string) => {
+    setSelectedItem(itemName);
+    setExtras([]);
+    setShowExtrasDialog(true);
+  };
+
+  const handleExtrasConfirm = () => {
+    // Here you would typically handle the order with the selected extras
+    console.log(`Order confirmed for ${selectedItem} with extras:`, extras);
+    setShowExtrasDialog(false);
+  };
+
+  const handleExtraToggle = (extra: string) => {
+    if (extras.includes(extra)) {
+      setExtras(extras.filter(e => e !== extra));
+    } else {
+      setExtras([...extras, extra]);
     }
   };
 
-  // Get translation function
-  const t = (key: string) => {
-    return translations[currentLanguage as keyof typeof translations][key as keyof typeof translations["en"]] || key;
-  };
-
   return (
-    <div className="home-page">
+    <div className="homepage">
       <header className="header">
         <div className="container">
           <div className="header-content">
@@ -70,15 +142,15 @@ const Index = () => {
             </div>
             <nav className="nav">
               <ul>
-                <li><Link to="/" className="active">{t('home')}</Link></li>
-                <li><Link to="/menu">{t('menu')}</Link></li>
-                <li><a href="/#about">{t('about')}</a></li>
-                <li><a href="/#contact">{t('contact')}</a></li>
+                <li><Link to="/">{t("home")}</Link></li>
+                <li><Link to="/menu">{t("menu")}</Link></li>
+                <li><a href="#about">{t("about")}</a></li>
+                <li><a href="#contact">{t("contact")}</a></li>
               </ul>
             </nav>
             
             <div className="right-header-items">
-              {/* Language Switcher moved next to cart icon */}
+              {/* Language Switcher */}
               <div className="language-switcher">
                 <select value={currentLanguage} onChange={e => setCurrentLanguage(e.target.value)} className="language-select">
                   <option value="en">English</option>
@@ -86,16 +158,15 @@ const Index = () => {
                 </select>
               </div>
               
-              <div className="cart-icon">
+              <Link to="/menu" className="cart-icon">
                 <ShoppingCart className="w-6 h-6" />
-                <span className="cart-count">0</span>
-              </div>
+              </Link>
             </div>
             
             <div className="mobile-menu-btn" onClick={() => {
-            const nav = document.querySelector('.nav') as HTMLElement;
-            if (nav) nav.classList.toggle('active');
-          }}>
+              const nav = document.querySelector('.nav') as HTMLElement;
+              if (nav) nav.classList.toggle('active');
+            }}>
               <span></span>
               <span></span>
               <span></span>
@@ -104,92 +175,213 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="container">
-          <div className="hero-content">
-            <h1>{t('heroTitle')}</h1>
-            <p>{t('heroSubtitle')}</p>
-            <Link to="/menu" className="btn">{t('orderNow')}</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Items */}
-      <section className="featured-items">
-        <div className="container">
-          <h2>{t('featuredItems')}</h2>
-          <div className="featured-items-grid">
-            <div className="featured-item">
-              <img src="/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" alt="Mlawi" />
-              <h3>{t('featuredItemsMlawi')}</h3>
-              <p>{t('startingFrom')} 3.50 TND</p>
-              <Link to="/menu" className="btn">{t('orderNow')}</Link>
-            </div>
-            <div className="featured-item">
-              <img src="/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" alt="Chapati" />
-              <h3>{t('featuredItemsChapati')}</h3>
-              <p>{t('startingFrom')} 6.00 TND</p>
-              <Link to="/menu" className="btn">{t('orderNow')}</Link>
-            </div>
-            <div className="featured-item">
-              <img src="/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" alt="Tacos" />
-              <h3>{t('featuredItemsTacos')}</h3>
-              <p>{t('startingFrom')} 3.50 TND</p>
-              <Link to="/menu" className="btn">{t('orderNow')}</Link>
+      <main>
+        <section className="hero">
+          <div className="container">
+            <div className="hero-content">
+              <h1>{t("hero.title")}</h1>
+              <p>{t("hero.subtitle")}</p>
+              <div className="hero-buttons">
+                <Link to="/menu" className="btn-primary">{t("hero.viewMenu")}</Link>
+                <Link to="/menu" className="btn-secondary">{t("hero.orderNow")}</Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
+        <section className="featured-section">
+          <div className="container">
+            <div className="section-title">
+              <h2>{t("featured.title")}</h2>
+              <p>{t("featured.subtitle")}</p>
+            </div>
+            
+            <div className="featured-grid">
+              <div className="featured-card">
+                <img src="/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" alt="Mlawi" />
+                <div className="featured-info">
+                  <h3>{t("featured.mlawi")}</h3>
+                  <p>{t("featured.startingFrom")}3.50 TND</p>
+                  <button onClick={() => handleOrderClick("Mlawi")} className="featured-btn">{t("featured.viewAll")}</button>
+                </div>
+              </div>
+              
+              <div className="featured-card">
+                <img src="/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" alt="Chapati" />
+                <div className="featured-info">
+                  <h3>{t("featured.chapati")}</h3>
+                  <p>{t("featured.startingFrom")}6.00 TND</p>
+                  <button onClick={() => handleOrderClick("Chapati")} className="featured-btn">{t("featured.viewAll")}</button>
+                </div>
+              </div>
+              
+              <div className="featured-card">
+                <img src="/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" alt="Tacos" />
+                <div className="featured-info">
+                  <h3>{t("featured.tacos")}</h3>
+                  <p>{t("featured.startingFrom")}3.50 TND</p>
+                  <button onClick={() => handleOrderClick("Tacos")} className="featured-btn">{t("featured.viewAll")}</button>
+                </div>
+              </div>
+              
+              <div className="featured-card">
+                <img src="/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png" alt="Sodas" />
+                <div className="featured-info">
+                  <h3>{t("featured.sodas")}</h3>
+                  <p>{t("featured.startingFrom")}2.00 TND</p>
+                  <button onClick={() => handleOrderClick("Sodas")} className="featured-btn">{t("featured.viewAll")}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section id="about" className="about-section">
+          <div className="container">
+            <div className="about-content">
+              <div className="about-text">
+                <h2>{t("aboutSection.title")}</h2>
+                <p>{t("aboutSection.desc")}</p>
+              </div>
+              <div className="about-image">
+                <img src="/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" alt="About Us" />
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section id="contact" className="contact-section">
+          <div className="container">
+            <div className="section-title">
+              <h2>{t("contactSection.title")}</h2>
+            </div>
+            
+            <div className="contact-content">
+              <div className="contact-info">
+                <div className="contact-item">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <p>{t("contactSection.address")}</p>
+                </div>
+                <div className="contact-item">
+                  <i className="fas fa-phone"></i>
+                  <p>{t("contactSection.phone")}</p>
+                </div>
+                <div className="contact-item">
+                  <i className="fas fa-envelope"></i>
+                  <p>{t("contactSection.email")}</p>
+                </div>
+              </div>
+              
+              <div className="opening-hours">
+                <h3>{t("contactSection.hours")}</h3>
+                <p>{t("contactSection.weekdays")}</p>
+                <p>{t("contactSection.weekends")}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      
       <footer className="footer">
         <div className="container">
           <div className="footer-content">
             <div className="footer-logo">
               <h2>Scooby<span>Food</span></h2>
-              <p>{t('deliciousFood')}</p>
+              <p>{t("contactSection.address")}</p>
             </div>
             
             <div className="footer-links">
-              <h3>{t('quickLinks')}</h3>
+              <h3>{t("footer.quickLinks")}</h3>
               <ul>
-                <li><Link to="/">{t('home')}</Link></li>
-                <li><Link to="/menu">{t('menu')}</Link></li>
-                <li><a href="/#about">{t('about')}</a></li>
-                <li><a href="/#contact">{t('contact')}</a></li>
+                <li><Link to="/">{t("home")}</Link></li>
+                <li><Link to="/menu">{t("menu")}</Link></li>
+                <li><a href="#about">{t("about")}</a></li>
+                <li><a href="#contact">{t("contact")}</a></li>
               </ul>
             </div>
             
-            <div className="footer-contact">
-              <h3>{t('contactUs')}</h3>
-              <p><i className="fa fa-map-marker"></i> 123 Food Street, Tasty Town</p>
-              <p><i className="fa fa-phone"></i> (123) 456-7890</p>
-              <p><i className="fa fa-envelope"></i> info@scoobyfood.com</p>
+            <div className="footer-contact text-center">
+              <h3>{t("footer.contactUs")}</h3>
+              <p><i className="fas fa-map-marker-alt"></i> {t("contactSection.address")}</p>
+              <p><i className="fas fa-phone"></i> {t("contactSection.phone")}</p>
+              <p><i className="fas fa-envelope"></i> {t("contactSection.email")}</p>
             </div>
             
             <div className="footer-hours">
-              <h3>{t('openingHours')}</h3>
-              <p><strong>Monday - Friday:</strong> 10:00 AM - 10:00 PM</p>
-              <p><strong>Saturday - Sunday:</strong> 11:00 AM - 11:00 PM</p>
+              <h3>{t("contactSection.hours")}</h3>
+              <p>{t("contactSection.weekdays")}</p>
+              <p>{t("contactSection.weekends")}</p>
             </div>
             
-            <div className="footer-social">
-              <h3>{t('followUs')}</h3>
+            <div className="footer-social text-center">
+              <h3>{t("footer.followUs")}</h3>
               <div className="social-icons">
-                <a href="#" className="social-icon"><i className="fa fa-facebook"></i></a>
-                <a href="#" className="social-icon"><i className="fa fa-instagram"></i></a>
-                <a href="#" className="social-icon"><i className="fa fa-twitter"></i></a>
+                <a href="#" className="social-icon"><i className="fab fa-facebook-f"></i></a>
+                <a href="#" className="social-icon"><i className="fab fa-instagram"></i></a>
+                <a href="#" className="social-icon"><i className="fab fa-twitter"></i></a>
               </div>
             </div>
           </div>
           
           <div className="footer-bottom">
-            <p>&copy; {t('copyright')}</p>
+            <p>&copy; {t("footer.copyright")}</p>
           </div>
         </div>
       </footer>
+
+      {/* Extras Dialog */}
+      <Dialog open={showExtrasDialog} onOpenChange={setShowExtrasDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add extras to your order</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <h4 className="font-medium mb-3">Select extras for {selectedItem}</h4>
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="extra-cheese" 
+                  checked={extras.includes('Cheese')}
+                  onChange={() => handleExtraToggle('Cheese')}
+                  className="mr-2"
+                />
+                <label htmlFor="extra-cheese">Extra Cheese (+1.00 TND)</label>
+              </div>
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="extra-sauce" 
+                  checked={extras.includes('Special Sauce')}
+                  onChange={() => handleExtraToggle('Special Sauce')}
+                  className="mr-2"
+                />
+                <label htmlFor="extra-sauce">Special Sauce (+0.50 TND)</label>
+              </div>
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="extra-toppings" 
+                  checked={extras.includes('Extra Toppings')}
+                  onChange={() => handleExtraToggle('Extra Toppings')}
+                  className="mr-2"
+                />
+                <label htmlFor="extra-toppings">Extra Toppings (+1.50 TND)</label>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setShowExtrasDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleExtrasConfirm}>
+              Add to Cart
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default Index;
+export default Home;

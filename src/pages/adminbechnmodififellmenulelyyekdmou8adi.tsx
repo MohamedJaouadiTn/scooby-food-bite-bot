@@ -1,516 +1,431 @@
 
-import { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
 
-type MenuItemType = {
+// Admin password - stored in JS file as requested
+const ADMIN_PASSWORD = "ScoobyAdmin2025!";
+
+type Product = {
   id: string;
   name: string;
   frenchName: string;
   price: number;
   category: string;
   image: string;
-};
-
-type ExtraOptionType = {
-  id: string;
-  name: string;
-  frenchName: string;
-  price: number;
+  ingredients?: string[];
 };
 
 const AdminPanel = () => {
   const { toast } = useToast();
-  const [menuItems, setMenuItems] = useState<MenuItemType[]>([]);
-  const [extraOptions, setExtraOptions] = useState<ExtraOptionType[]>([]);
-  const [editItem, setEditItem] = useState<MenuItemType | null>(null);
-  const [editExtra, setEditExtra] = useState<ExtraOptionType | null>(null);
-  const [activeTab, setActiveTab] = useState('products');
-  
-  // Initial data loading
-  useEffect(() => {
-    // Fetch menu items from localStorage or use hardcoded data
-    const savedItems = localStorage.getItem('scoobyfoodMenuItems');
-    if (savedItems) {
-      setMenuItems(JSON.parse(savedItems));
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [newProduct, setNewProduct] = useState<Product>({
+    id: "",
+    name: "",
+    frenchName: "",
+    price: 0,
+    category: "mlawi",
+    image: "",
+  });
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("products");
+
+  // Load products from storage/API
+  const loadProducts = () => {
+    const storedProducts = localStorage.getItem('scoobyfood_products');
+    if (storedProducts) {
+      setProducts(JSON.parse(storedProducts));
     } else {
-      // Use default menu items from the app
-      const defaultItems = [
-        // Mlawi Category
-        {
-          id: "mlawi1",
-          name: "Mlawi with Tuna",
-          frenchName: "Mlawi au thon",
-          price: 3.5,
-          category: "mlawi",
-          image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png"
-        }, 
-        {
-          id: "mlawi2",
-          name: "Special Mlawi with Tuna",
-          frenchName: "Mlawi spécial thon",
-          price: 4.5,
-          category: "mlawi",
-          image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png"
-        }, 
-        {
-          id: "mlawi3",
-          name: "Mlawi with Salami",
-          frenchName: "Mlawi au salami",
-          price: 3.5,
-          category: "mlawi",
-          image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
-        }, 
-        {
-          id: "mlawi4",
-          name: "Special Mlawi with Salami",
-          frenchName: "Mlawi spécial salami",
-          price: 4.5,
-          category: "mlawi",
-          image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
-        }, 
-        {
-          id: "mlawi5",
-          name: "Mlawi with Ham",
-          frenchName: "Mlawi au jambon",
-          price: 4.0,
-          category: "mlawi",
-          image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
-        },
-        // Chapati Category
-        {
-          id: "chapati1",
-          name: "Chapati with Grilled Chicken",
-          frenchName: "Chapati escalope grillée",
-          price: 6.0,
-          category: "chapati",
-          image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png"
-        }, 
-        {
-          id: "chapati2",
-          name: "Chapati with Tuna",
-          frenchName: "Chapati au thon",
-          price: 7.99,
-          category: "chapati",
-          image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png"
-        }, 
-        {
-          id: "chapati3",
-          name: "Chapati Cordon Bleu",
-          frenchName: "Chapati cordon bleu",
-          price: 6.5,
-          category: "chapati",
-          image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png"
-        },
-        // Tacos Category
-        {
-          id: "tacos1",
-          name: "Tacos with Tuna",
-          frenchName: "Tacos au thon",
-          price: 3.5,
-          category: "tacos",
-          image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png"
-        }, 
-        {
-          id: "tacos2",
-          name: "Tacos with Special Tuna",
-          frenchName: "Tacos spécial thon",
-          price: 4.5,
-          category: "tacos",
-          image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png"
-        },
-        // Drinks
-        {
-          id: "drink1",
-          name: "Soda Can",
-          frenchName: "Canette",
-          price: 2.0,
-          category: "drinks",
-          image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png"
-        }
+      // Default products if none in storage - now including all menu items
+      const defaultProducts = [
+        { id: "mlawi1", name: "Mlawi with Tuna", frenchName: "Mlawi au thon", price: 3.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
+        { id: "mlawi2", name: "Special Mlawi with Tuna", frenchName: "Mlawi spécial thon", price: 4.5, category: "mlawi", image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png" },
+        { id: "mlawi3", name: "Mlawi with Salami", frenchName: "Mlawi au salami", price: 3.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+        { id: "mlawi4", name: "Special Mlawi with Salami", frenchName: "Mlawi spécial salami", price: 4.5, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+        { id: "mlawi5", name: "Mlawi with Ham", frenchName: "Mlawi au jambon", price: 4.0, category: "mlawi", image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png" },
+        { id: "chapati1", name: "Chapati with Grilled Chicken", frenchName: "Chapati escalope grillée", price: 6.0, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
+        { id: "chapati2", name: "Chapati with Tuna", frenchName: "Chapati au thon", price: 7.99, category: "chapati", image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png" },
+        { id: "chapati3", name: "Chapati Cordon Bleu", frenchName: "Chapati cordon bleu", price: 6.5, category: "chapati", image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png" },
+        { id: "tacos1", name: "Tacos with Tuna", frenchName: "Tacos au thon", price: 3.5, category: "tacos", image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png" },
+        { id: "tacos2", name: "Tacos with Special Tuna", frenchName: "Tacos spécial thon", price: 4.5, category: "tacos", image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png" },
+        { id: "drink1", name: "Soda Can", frenchName: "Canette", price: 2.0, category: "drinks", image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png" },
+        { id: "drink2", name: "Water", frenchName: "Eau", price: 1.5, category: "drinks", image: "/lovable-uploads/aecdc132-2508-4edd-b708-436456343d31.png" },
       ];
-      setMenuItems(defaultItems);
-      localStorage.setItem('scoobyfoodMenuItems', JSON.stringify(defaultItems));
+      setProducts(defaultProducts);
+      localStorage.setItem('scoobyfood_products', JSON.stringify(defaultProducts));
     }
-    
-    // Fetch extras from localStorage or use hardcoded data
-    const savedExtras = localStorage.getItem('scoobyfoodExtraOptions');
-    if (savedExtras) {
-      setExtraOptions(JSON.parse(savedExtras));
-    } else {
-      // Use default extras from the app
-      const defaultExtras = [
-        {
-          id: "extra1",
-          name: "Cheddar",
-          frenchName: "Cheddar",
-          price: 2.5
-        }, 
-        {
-          id: "extra2",
-          name: "Mozzarella",
-          frenchName: "Mozzarella",
-          price: 2.5
-        }, 
-        {
-          id: "extra3",
-          name: "French Fries",
-          frenchName: "Frites",
-          price: 2.0
-        }, 
-        {
-          id: "extra4",
-          name: "Water",
-          frenchName: "Eau",
-          price: 1.5
-        }
-      ];
-      setExtraOptions(defaultExtras);
-      localStorage.setItem('scoobyfoodExtraOptions', JSON.stringify(defaultExtras));
+  };
+
+  useEffect(() => {
+    // Check if already logged in via session
+    const adminSession = sessionStorage.getItem('scoobyfood_admin_auth');
+    if (adminSession === 'true') {
+      setIsAuthenticated(true);
+      loadProducts();
     }
   }, []);
 
-  // Handle editing a menu item
-  const handleEditItem = (item: MenuItemType) => {
-    setEditItem({ ...item });
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('scoobyfood_admin_auth', 'true');
+      loadProducts();
+      toast({
+        title: "Login Successful",
+        description: "Welcome to the admin panel",
+      });
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Incorrect password",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Handle editing an extra option
-  const handleEditExtra = (extra: ExtraOptionType) => {
-    setEditExtra({ ...extra });
-  };
-
-  // Update menu item
-  const updateMenuItem = () => {
-    if (!editItem) return;
-    
-    const updatedItems = menuItems.map(item => 
-      item.id === editItem.id ? editItem : item
-    );
-    
-    setMenuItems(updatedItems);
-    localStorage.setItem('scoobyfoodMenuItems', JSON.stringify(updatedItems));
-    setEditItem(null);
-    
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('scoobyfood_admin_auth');
     toast({
-      title: "Success!",
-      description: "Menu item updated successfully",
+      title: "Logged Out",
+      description: "You have been logged out of the admin panel",
     });
   };
 
-  // Update extra option
-  const updateExtraOption = () => {
-    if (!editExtra) return;
+  const handleAddProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProduct.name || !newProduct.frenchName || newProduct.price <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Generate a random ID if not provided
+    if (!newProduct.id) {
+      newProduct.id = newProduct.category + Date.now().toString();
+    }
+
+    const updatedProducts = [...products, newProduct];
+    setProducts(updatedProducts);
+    localStorage.setItem('scoobyfood_products', JSON.stringify(updatedProducts));
     
-    const updatedExtras = extraOptions.map(extra => 
-      extra.id === editExtra.id ? editExtra : extra
-    );
-    
-    setExtraOptions(updatedExtras);
-    localStorage.setItem('scoobyfoodExtraOptions', JSON.stringify(updatedExtras));
-    setEditExtra(null);
-    
-    toast({
-      title: "Success!",
-      description: "Extra option updated successfully",
-    });
-  };
-  
-  // Add new menu item
-  const addNewMenuItem = () => {
-    const newId = `item${Date.now()}`;
-    const newItem: MenuItemType = {
-      id: newId,
-      name: "New Item",
-      frenchName: "Nouvel Article",
+    // Reset form
+    setNewProduct({
+      id: "",
+      name: "",
+      frenchName: "",
       price: 0,
       category: "mlawi",
-      image: "/lovable-uploads/placeholder.svg"
-    };
+      image: "",
+    });
     
-    setMenuItems([...menuItems, newItem]);
-    setEditItem(newItem);
-  };
-  
-  // Add new extra option
-  const addNewExtra = () => {
-    const newId = `extra${Date.now()}`;
-    const newExtra: ExtraOptionType = {
-      id: newId,
-      name: "New Extra",
-      frenchName: "Nouveau Supplément",
-      price: 0
-    };
-    
-    setExtraOptions([...extraOptions, newExtra]);
-    setEditExtra(newExtra);
-  };
-  
-  // Delete menu item
-  const deleteMenuItem = (id: string) => {
-    if (confirm("Are you sure you want to delete this item?")) {
-      const updatedItems = menuItems.filter(item => item.id !== id);
-      setMenuItems(updatedItems);
-      localStorage.setItem('scoobyfoodMenuItems', JSON.stringify(updatedItems));
-      
-      toast({
-        title: "Deleted!",
-        description: "Menu item removed successfully",
-      });
-    }
-  };
-  
-  // Delete extra option
-  const deleteExtraOption = (id: string) => {
-    if (confirm("Are you sure you want to delete this extra option?")) {
-      const updatedExtras = extraOptions.filter(extra => extra.id !== id);
-      setExtraOptions(updatedExtras);
-      localStorage.setItem('scoobyfoodExtraOptions', JSON.stringify(updatedExtras));
-      
-      toast({
-        title: "Deleted!",
-        description: "Extra option removed successfully",
-      });
-    }
+    toast({
+      title: "Product Added",
+      description: `${newProduct.name} has been added to the menu`,
+    });
   };
 
-  // Group menu items by category for display
-  const groupedMenuItems = menuItems.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
+  const handleEditProduct = (product: Product) => {
+    setEditingProductId(product.id);
+    setNewProduct({ ...product });
+    setActiveTab("add-edit");
+  };
+
+  const handleUpdateProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProduct.name || !newProduct.frenchName || newProduct.price <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
     }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, MenuItemType[]>);
+
+    const updatedProducts = products.map(p => 
+      p.id === editingProductId ? newProduct : p
+    );
+    
+    setProducts(updatedProducts);
+    localStorage.setItem('scoobyfood_products', JSON.stringify(updatedProducts));
+    
+    // Reset form and editing state
+    setNewProduct({
+      id: "",
+      name: "",
+      frenchName: "",
+      price: 0,
+      category: "mlawi",
+      image: "",
+    });
+    setEditingProductId(null);
+    setActiveTab("products");
+    
+    toast({
+      title: "Product Updated",
+      description: `${newProduct.name} has been updated`,
+    });
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    setConfirmDelete(id);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (!confirmDelete) return;
+    
+    const updatedProducts = products.filter(p => p.id !== confirmDelete);
+    setProducts(updatedProducts);
+    localStorage.setItem('scoobyfood_products', JSON.stringify(updatedProducts));
+    
+    toast({
+      title: "Product Deleted",
+      description: "The product has been removed from the menu",
+    });
+    
+    setConfirmDelete(null);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="admin-login-container">
+        <h1 className="admin-login-title">Scooby Food Admin</h1>
+        <form onSubmit={handleLogin} className="admin-form">
+          <div className="admin-form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <button type="submit" className="admin-submit">Login</button>
+          <div className="mt-4 text-center">
+            <Link to="/menu" className="text-blue-500 hover:underline">Back to Menu</Link>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <div className="admin-panel max-w-7xl mx-auto p-6">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold mb-2">Scooby Food Admin Panel</h1>
-        <p className="text-gray-500">Manage your menu items and extras here</p>
-        <div className="mt-4">
-          <Link to="/" className="text-blue-600 hover:underline mr-4">Go to Home Page</Link>
-          <Link to="/menu" className="text-blue-600 hover:underline">Go to Menu</Link>
+    <div className="admin-panel">
+      <div className="admin-header">
+        <h1 className="admin-title">Scooby Food Admin Panel</h1>
+        <button className="admin-logout" onClick={handleLogout}>Logout</button>
+      </div>
+      
+      <div className="admin-tabs">
+        <div 
+          className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} 
+          onClick={() => setActiveTab('products')}
+        >
+          Products
         </div>
-      </header>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="products">Menu Items</TabsTrigger>
-          <TabsTrigger value="extras">Extra Options</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="products" className="space-y-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Menu Items</h2>
-            <Button onClick={addNewMenuItem}>Add New Item</Button>
-          </div>
-
-          {editItem && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Edit Menu Item</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Name (English)</label>
-                      <Input 
-                        value={editItem.name} 
-                        onChange={(e) => setEditItem({...editItem, name: e.target.value})} 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Name (French)</label>
-                      <Input 
-                        value={editItem.frenchName} 
-                        onChange={(e) => setEditItem({...editItem, frenchName: e.target.value})} 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Price</label>
-                      <Input 
-                        type="number" 
-                        step="0.001"
-                        value={editItem.price} 
-                        onChange={(e) => setEditItem({...editItem, price: parseFloat(e.target.value)})} 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Category</label>
-                      <Select 
-                        value={editItem.category} 
-                        onValueChange={(value) => setEditItem({...editItem, category: value})}
+        <div 
+          className={`admin-tab ${activeTab === 'add-edit' ? 'active' : ''}`} 
+          onClick={() => {
+            setActiveTab('add-edit');
+            if (editingProductId) {
+              setEditingProductId(null);
+              setNewProduct({
+                id: "",
+                name: "",
+                frenchName: "",
+                price: 0,
+                category: "mlawi",
+                image: "",
+              });
+            }
+          }}
+        >
+          {editingProductId ? 'Edit Product' : 'Add New Product'}
+        </div>
+      </div>
+      
+      {activeTab === 'products' && (
+        <div className="admin-card">
+          <h2>Current Menu Items</h2>
+          <div className="overflow-x-auto">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>French Name</th>
+                  <th>Price</th>
+                  <th>Category</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(product => (
+                  <tr key={product.id}>
+                    <td>{product.name}</td>
+                    <td>{product.frenchName}</td>
+                    <td>{product.price.toFixed(3)} TND</td>
+                    <td className="capitalize">{product.category}</td>
+                    <td>
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="admin-action-btn admin-edit-btn"
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="mlawi">Mlawi</SelectItem>
-                          <SelectItem value="chapati">Chapati</SelectItem>
-                          <SelectItem value="tacos">Tacos</SelectItem>
-                          <SelectItem value="sides">Sides</SelectItem>
-                          <SelectItem value="drinks">Drinks</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Image URL</label>
-                    <Input 
-                      value={editItem.image} 
-                      onChange={(e) => setEditItem({...editItem, image: e.target.value})}
-                    />
-                    {editItem.image && (
-                      <div className="mt-2">
-                        <img 
-                          src={editItem.image} 
-                          alt={editItem.name} 
-                          className="h-24 object-cover rounded border"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button variant="outline" onClick={() => setEditItem(null)}>Cancel</Button>
-                    <Button onClick={updateMenuItem}>Save Changes</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {Object.keys(groupedMenuItems).map(category => (
-            <div key={category} className="mb-8">
-              <h3 className="text-xl font-medium mb-3 capitalize">{category}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {groupedMenuItems[category].map(item => (
-                  <Card key={item.id} className="overflow-hidden">
-                    <div className="h-40 overflow-hidden">
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <CardContent className="p-4">
-                      <h4 className="font-medium">{item.name}</h4>
-                      <p className="text-sm text-gray-500">{item.frenchName}</p>
-                      <p className="text-sm font-semibold mt-2">{item.price.toFixed(3)} TND</p>
-                      <div className="flex justify-between mt-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEditItem(item)}
-                        >
-                          Edit
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => deleteMenuItem(item.id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="admin-action-btn admin-delete-btn"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              </div>
+                {products.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="text-center py-4 text-gray-500">
+                      No products found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      
+      {activeTab === 'add-edit' && (
+        <div className="admin-card">
+          <h2>{editingProductId ? "Edit Product" : "Add New Product"}</h2>
+          <form onSubmit={editingProductId ? handleUpdateProduct : handleAddProduct} className="admin-form">
+            <div className="admin-form-group">
+              <label>Product ID</label>
+              <input
+                type="text"
+                value={newProduct.id}
+                onChange={(e) => setNewProduct({...newProduct, id: e.target.value})}
+                placeholder="Auto-generated if empty"
+              />
             </div>
-          ))}
-        </TabsContent>
-        
-        <TabsContent value="extras" className="space-y-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Extra Options</h2>
-            <Button onClick={addNewExtra}>Add New Extra</Button>
-          </div>
+            
+            <div className="admin-form-group">
+              <label>Name (English)</label>
+              <input
+                type="text"
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div className="admin-form-group">
+              <label>Name (French)</label>
+              <input
+                type="text"
+                value={newProduct.frenchName}
+                onChange={(e) => setNewProduct({...newProduct, frenchName: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div className="admin-form-group">
+              <label>Price (TND)</label>
+              <input
+                type="number"
+                step="0.001"
+                value={newProduct.price}
+                onChange={(e) => setNewProduct({...newProduct, price: Number(e.target.value)})}
+                required
+              />
+            </div>
+            
+            <div className="admin-form-group">
+              <label>Category</label>
+              <select
+                value={newProduct.category}
+                onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+              >
+                <option value="mlawi">Mlawi</option>
+                <option value="chapati">Chapati</option>
+                <option value="tacos">Tacos</option>
+                <option value="drinks">Drinks</option>
+              </select>
+            </div>
+            
+            <div className="admin-form-group">
+              <label>Image URL</label>
+              <input
+                type="text"
+                value={newProduct.image}
+                onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                placeholder="Image path or URL"
+              />
+            </div>
+            
+            <button type="submit" className="admin-submit">
+              {editingProductId ? "Update Product" : "Add Product"}
+            </button>
+            
+            {editingProductId && (
+              <button 
+                type="button" 
+                className="admin-cancel"
+                onClick={() => {
+                  setEditingProductId(null);
+                  setNewProduct({
+                    id: "",
+                    name: "",
+                    frenchName: "",
+                    price: 0,
+                    category: "mlawi",
+                    image: "",
+                  });
+                  setActiveTab("products");
+                }}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </form>
+        </div>
+      )}
 
-          {editExtra && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Edit Extra Option</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Name (English)</label>
-                      <Input 
-                        value={editExtra.name} 
-                        onChange={(e) => setEditExtra({...editExtra, name: e.target.value})} 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Name (French)</label>
-                      <Input 
-                        value={editExtra.frenchName} 
-                        onChange={(e) => setEditExtra({...editExtra, frenchName: e.target.value})} 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Price</label>
-                    <Input 
-                      type="number" 
-                      step="0.001"
-                      value={editExtra.price} 
-                      onChange={(e) => setEditExtra({...editExtra, price: parseFloat(e.target.value)})} 
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button variant="outline" onClick={() => setEditExtra(null)}>Cancel</Button>
-                    <Button onClick={updateExtraOption}>Save Changes</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {extraOptions.map(extra => (
-              <Card key={extra.id}>
-                <CardContent className="p-4">
-                  <h4 className="font-medium">{extra.name}</h4>
-                  <p className="text-sm text-gray-500">{extra.frenchName}</p>
-                  <p className="text-sm font-semibold mt-2">{extra.price.toFixed(3)} TND</p>
-                  <div className="flex justify-between mt-4">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleEditExtra(extra)}
-                    >
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => deleteExtraOption(extra.id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+      {/* Confirmation Dialog */}
+      <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this product? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteProduct}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
