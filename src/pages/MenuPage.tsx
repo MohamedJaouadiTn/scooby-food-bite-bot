@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 type FoodOption = {
   id: string;
@@ -52,10 +53,7 @@ const MenuPage = () => {
     allergies: localStorage.getItem("customerAllergies") || ""
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
-
-  // Telegram Bot Configuration
-  const token = "8170617850:AAFJWVcrDKSCaRknRSs_XTj_6epWef8qnjQ";
-  const chatId = "7809319602";
+  const [telegramConfig, setTelegramConfig] = useState<{ botToken: string; chatId: string } | null>(null);
 
   // Menu items data - now excluding extras
   const menuItems = [
@@ -510,17 +508,48 @@ const MenuPage = () => {
     localStorage.setItem(`customer${name.charAt(0).toUpperCase() + name.slice(1)}`, value);
   };
 
+  // Fetch Telegram configuration from database
+  useEffect(() => {
+    const fetchTelegramConfig = async () => {
+      const { data, error } = await supabase
+        .from('telegram_config')
+        .select('bot_token, chat_id')
+        .single();
+
+      if (error) {
+        console.error('Error fetching Telegram config:', error);
+        toast({
+          title: "Configuration Error",
+          description: "Failed to load Telegram configuration.",
+          variant: "destructive",
+        });
+      } else if (data) {
+        setTelegramConfig({
+          botToken: data.bot_token,
+          chatId: data.chat_id
+        });
+      }
+    };
+
+    fetchTelegramConfig();
+  }, []);
+
   // Send order to Telegram
   const sendToTelegram = (message: string) => {
-    console.log("Sending to Telegram with token:", token, "and chat ID:", chatId);
+    if (!telegramConfig) {
+      console.error("Telegram configuration not loaded");
+      return Promise.reject(new Error("Telegram configuration not loaded"));
+    }
+
+    console.log("Sending to Telegram with token:", telegramConfig.botToken, "and chat ID:", telegramConfig.chatId);
     console.log("Message:", message);
-    return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    return fetch(`https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        chat_id: chatId,
+        chat_id: telegramConfig.chatId,
         text: message
       })
     }).then(response => {
