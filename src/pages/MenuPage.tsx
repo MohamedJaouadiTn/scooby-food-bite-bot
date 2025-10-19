@@ -499,13 +499,37 @@ const MenuPage = () => {
       name,
       value
     } = e.target;
-    setOrderForm({
-      ...orderForm,
-      [name]: value
-    });
-
-    // Store customer info in localStorage
-    localStorage.setItem(`customer${name.charAt(0).toUpperCase() + name.slice(1)}`, value);
+    
+    // Special handling for phone number formatting
+    if (name === 'phone') {
+      // Remove all non-digit characters
+      const digits = value.replace(/\D/g, '');
+      
+      // Format as XX XXX XXX
+      let formatted = '';
+      if (digits.length > 0) {
+        formatted = digits.substring(0, 2);
+        if (digits.length > 2) {
+          formatted += ' ' + digits.substring(2, 5);
+        }
+        if (digits.length > 5) {
+          formatted += ' ' + digits.substring(5, 8);
+        }
+      }
+      
+      setOrderForm({
+        ...orderForm,
+        [name]: formatted
+      });
+      localStorage.setItem(`customer${name.charAt(0).toUpperCase() + name.slice(1)}`, formatted);
+    } else {
+      setOrderForm({
+        ...orderForm,
+        [name]: value
+      });
+      // Store customer info in localStorage
+      localStorage.setItem(`customer${name.charAt(0).toUpperCase() + name.slice(1)}`, value);
+    }
   };
 
   // Fetch Telegram configuration from database
@@ -897,17 +921,17 @@ const MenuPage = () => {
             <form id="orderForm" onSubmit={handleSubmitOrder}>
               <div className="form-group">
                 <label htmlFor="name">{t('name')} *</label>
-                <input type="text" id="name" name="name" value={orderForm.name} onChange={handleInputChange} required />
+                <input type="text" id="name" name="name" value={orderForm.name} onChange={handleInputChange} placeholder="Ex : foulen falteny" required />
               </div>
               
               <div className="form-group">
                 <label htmlFor="address">{t('deliveryAddress')} *</label>
-                <textarea id="address" name="address" value={orderForm.address} onChange={handleInputChange} required></textarea>
+                <textarea id="address" name="address" value={orderForm.address} onChange={handleInputChange} placeholder=" Ex : kairouan al aghaliba 3100 appartement n24 etage 6" required></textarea>
               </div>
               
               <div className="form-group">
                 <label htmlFor="phone">{t('phoneNumber')} *</label>
-                <input type="tel" id="phone" name="phone" value={orderForm.phone} onChange={handleInputChange} required />
+                <input type="tel" id="phone" name="phone" value={orderForm.phone} onChange={handleInputChange} placeholder=" Ex : 99 586 375" required />
               </div>
               {/* Allergies field */}
               <div className="form-group allergies-group">
@@ -918,7 +942,7 @@ const MenuPage = () => {
                     <span className="tooltip-text">{t('allergiesInfo')}</span>
                   </div>
                 </div>
-                <textarea id="allergies" name="allergies" value={orderForm.allergies} onChange={handleInputChange}></textarea>
+                <textarea id="allergies" name="allergies" value={orderForm.allergies} onChange={handleInputChange} placeholder="onion / ketchup / Mayonnaise / harissa ..."></textarea>
               </div>
               
               <div className="order-summary">
