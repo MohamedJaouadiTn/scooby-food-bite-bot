@@ -909,31 +909,6 @@ const MenuPage = () => {
                 <label htmlFor="phone">{t('phoneNumber')} *</label>
                 <input type="tel" id="phone" name="phone" value={orderForm.phone} onChange={handleInputChange} required />
               </div>
-              
-              {/* Extras section with better checkbox styling */}
-              <div className="form-group">
-                <h3>{t('extras')}</h3>
-                <div className="extras-list">
-                  {extraOptions.map(option => (
-                    <div key={option.id} className="extra-option-item">
-                      <div className="option-checkbox">
-                        <input 
-                          type="checkbox" 
-                          id={`option-${option.id}`} 
-                          checked={selectedExtras.includes(option.id)} 
-                          onChange={e => handleExtraOptionChange(option.id, e.target.checked)} 
-                          className="checkbox-with-border" 
-                        />
-                        <label htmlFor={`option-${option.id}`}>
-                          {currentLanguage === 'en' ? option.name : option.frenchName}
-                        </label>
-                      </div>
-                      <span className="option-price">{option.price.toFixed(3)} {t('TND')}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
               {/* Allergies field */}
               <div className="form-group allergies-group">
                 <div className="allergies-label-container">
