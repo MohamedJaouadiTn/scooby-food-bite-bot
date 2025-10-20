@@ -54,94 +54,53 @@ const MenuPage = () => {
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
   const [telegramConfig, setTelegramConfig] = useState<{ botToken: string; chatId: string } | null>(null);
+  const [menuItems, setMenuItems] = useState<FoodOptionType[]>([]);
 
-  // Menu items data - now excluding extras
-  const menuItems = [
-  // Mlawi Category
-  {
-    id: "mlawi1",
-    name: "Mlawi with Tuna",
-    frenchName: "Mlawi au thon",
-    price: 3.5,
-    category: "mlawi",
-    image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png"
-  }, {
-    id: "mlawi2",
-    name: "Special Mlawi with Tuna",
-    frenchName: "Mlawi spécial thon",
-    price: 4.5,
-    category: "mlawi",
-    image: "/lovable-uploads/e036f500-7659-4481-8dbb-7fd189e0342a.png"
-  }, {
-    id: "mlawi3",
-    name: "Mlawi with Salami",
-    frenchName: "Mlawi au salami",
-    price: 3.5,
-    category: "mlawi",
-    image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
-  }, {
-    id: "mlawi4",
-    name: "Special Mlawi with Salami",
-    frenchName: "Mlawi spécial salami",
-    price: 4.5,
-    category: "mlawi",
-    image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
-  }, {
-    id: "mlawi5",
-    name: "Mlawi with Ham",
-    frenchName: "Mlawi au jambon",
-    price: 4.0,
-    category: "mlawi",
-    image: "/lovable-uploads/60a0a66d-96f1-4e6a-8a98-b4eaae85a200.png"
-  },
-  // Chapati Category
-  {
-    id: "chapati1",
-    name: "Chapati with Grilled Chicken",
-    frenchName: "Chapati escalope grillée",
-    price: 6.0,
-    category: "chapati",
-    image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png"
-  }, {
-    id: "chapati2",
-    name: "Chapati with Tuna",
-    frenchName: "Chapati au thon",
-    price: 7.99,
-    category: "chapati",
-    image: "/lovable-uploads/a9a310a0-a2f6-4a19-ad28-62cc5f6a0bca.png"
-  }, {
-    id: "chapati3",
-    name: "Chapati Cordon Bleu",
-    frenchName: "Chapati cordon bleu",
-    price: 6.5,
-    category: "chapati",
-    image: "/lovable-uploads/c92d067b-44d8-4570-bd8e-2bd4927e7fb7.png"
-  },
-  // Tacos Category
-  {
-    id: "tacos1",
-    name: "Tacos with Tuna",
-    frenchName: "Tacos au thon",
-    price: 3.5,
-    category: "tacos",
-    image: "/lovable-uploads/7f6ef961-d8a3-4cc3-8a10-943b8487da0b.png"
-  }, {
-    id: "tacos2",
-    name: "Tacos with Special Tuna",
-    frenchName: "Tacos spécial thon",
-    price: 4.5,
-    category: "tacos",
-    image: "/lovable-uploads/85aba854-be50-4f4f-b700-711a5ba92d9d.png"
-  },
-  // Drinks (only soda now)
-  {
-    id: "drink1",
-    name: "Soda Can",
-    frenchName: "Canette",
-    price: 2.0,
-    category: "drinks",
-    image: "/lovable-uploads/d0cd08a4-4b41-456e-9348-166d9b4e3420.png"
-  }];
+
+  // Fetch products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching products:', error);
+        return;
+      }
+
+      if (data) {
+        // Transform database products to match existing FoodOptionType structure
+        const transformed = data.map(p => ({
+          id: p.product_id,
+          name: p.name,
+          frenchName: p.french_name,
+          price: p.price,
+          category: p.category,
+          image: p.image_url || ''
+        }));
+        setMenuItems(transformed);
+      }
+    };
+    
+    fetchProducts();
+    
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('products-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'products' },
+        () => fetchProducts()
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
 
   // Extras options - now separate from menu
   const extraOptions = [{
@@ -585,7 +544,7 @@ const MenuPage = () => {
   };
 
   // Handle order submission
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate required fields
@@ -606,14 +565,24 @@ const MenuPage = () => {
       return;
     }
 
-    // Create message for Telegram
-    let message = `New Order!\n\n`;
-    message += `Order = ${selectedItem.name}\n`;
-    message += `Quantity = ${selectedItem.quantity}\n`;
-    message += `Price = ${selectedItem.price.toFixed(3)} TND\n`;
+    try {
+      // Save customer to database (upsert by phone)
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .upsert({
+          name: orderForm.name,
+          phone: orderForm.phone,
+          address: orderForm.address
+        }, { onConflict: 'phone' })
+        .select()
+        .single();
 
-    // Add extras if selected
-    if (selectedExtras.length > 0) {
+      if (customerError) {
+        console.error('Error saving customer:', customerError);
+      }
+
+      // Calculate total price
+      let totalWithExtras = selectedItem.price;
       const selectedOptions = selectedExtras.map(id => {
         const option = extraOptions.find(opt => opt.id === id);
         return {
@@ -621,53 +590,105 @@ const MenuPage = () => {
           price: option?.price || 0
         };
       });
-      const extraNames = selectedOptions.map(opt => opt.name).join(' + ');
-      message += `Extras = ${extraNames}\n\n`;
-
-      // Calculate total price with extras
-      let totalWithExtras = selectedItem.price;
       selectedOptions.forEach(opt => {
         totalWithExtras += opt.price;
       });
-      message += `Total = ${selectedItem.price.toFixed(3)} TND`;
 
-      // Add each extra price
-      selectedOptions.forEach(opt => {
-        message += ` + ${opt.price.toFixed(3)} TND`;
-      });
-      message += ` = ${totalWithExtras.toFixed(3)} TND\n\n`;
-    } else {
-      message += `\nTotal = ${selectedItem.price.toFixed(3)} TND\n\n`;
-    }
-    message += `Customer Information:\n`;
-    message += `Name = ${orderForm.name}\n`;
-    message += `Address = ${orderForm.address}\n`;
-    message += `Phone = ${orderForm.phone}\n`;
+      // Save order to database
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_id: customer?.id,
+          customer_name: orderForm.name,
+          customer_phone: orderForm.phone,
+          customer_address: orderForm.address,
+          allergies: orderForm.allergies || null,
+          items: [{
+            ...selectedItem,
+            extras: selectedExtras.map(id => {
+              const option = extraOptions.find(opt => opt.id === id);
+              return {
+                id,
+                name: option?.name,
+                price: option?.price
+              };
+            })
+          }],
+          total_price: totalWithExtras,
+          telegram_sent: false
+        })
+        .select()
+        .single();
 
-    // Add allergies information if provided
-    if (orderForm.allergies.trim()) {
-      message += `Allergies/Preferences = ${orderForm.allergies}\n`;
-    } else {
-      message += `Allergies/Preferences = (none)\n`;
-    }
+      if (orderError) {
+        throw orderError;
+      }
 
-    // Send to Telegram
-    sendToTelegram(message).then(() => {
-      toast({
-        title: "Order Sent",
-        description: "Your order has been sent successfully!"
-      });
-      setShowOrderModal(false);
-      setShowConfirmationModal(true);
-      setCart([]);
-    }).catch(error => {
-      console.error("Error sending to Telegram:", error);
+      // Create message for Telegram
+      let message = `New Order!\n\n`;
+      message += `Order = ${selectedItem.name}\n`;
+      message += `Quantity = ${selectedItem.quantity}\n`;
+      message += `Price = ${selectedItem.price.toFixed(3)} TND\n`;
+
+      // Add extras if selected
+      if (selectedExtras.length > 0) {
+        const extraNames = selectedOptions.map(opt => opt.name).join(' + ');
+        message += `Extras = ${extraNames}\n\n`;
+        message += `Total = ${selectedItem.price.toFixed(3)} TND`;
+        selectedOptions.forEach(opt => {
+          message += ` + ${opt.price.toFixed(3)} TND`;
+        });
+        message += ` = ${totalWithExtras.toFixed(3)} TND\n\n`;
+      } else {
+        message += `\nTotal = ${selectedItem.price.toFixed(3)} TND\n\n`;
+      }
+      message += `Customer Information:\n`;
+      message += `Name = ${orderForm.name}\n`;
+      message += `Address = ${orderForm.address}\n`;
+      message += `Phone = ${orderForm.phone}\n`;
+
+      // Add allergies information if provided
+      if (orderForm.allergies.trim()) {
+        message += `Allergies/Preferences = ${orderForm.allergies}\n`;
+      } else {
+        message += `Allergies/Preferences = (none)\n`;
+      }
+
+      // Send to Telegram
+      try {
+        await sendToTelegram(message);
+        
+        // Update order as telegram_sent
+        if (order) {
+          await supabase
+            .from('orders')
+            .update({ telegram_sent: true, status: 'confirmed' })
+            .eq('id', order.id);
+        }
+
+        toast({
+          title: "Order Sent",
+          description: "Your order has been sent successfully!"
+        });
+        setShowOrderModal(false);
+        setShowConfirmationModal(true);
+        setCart([]);
+      } catch (telegramError) {
+        console.error("Error sending to Telegram:", telegramError);
+        toast({
+          title: "Order Saved",
+          description: "Order saved but failed to send notification. Admin will be notified.",
+          variant: "destructive"
+        });
+      }
+    } catch (error: any) {
+      console.error("Error processing order:", error);
       toast({
         title: "Error",
-        description: "Error sending order. Please try again.",
+        description: error.message || "Error processing order. Please try again.",
         variant: "destructive"
       });
-    });
+    }
   };
 
   return (
