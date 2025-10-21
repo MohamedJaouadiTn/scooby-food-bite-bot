@@ -1,9 +1,19 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+// Input validation schema
+const requestSchema = z.object({
+  message: z.string()
+    .min(1, 'Message cannot be empty')
+    .max(4000, 'Message too long'),
+  orderId: z.string()
+    .uuid('Invalid order ID format')
+})
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -12,7 +22,19 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { message, orderId } = await req.json()
+    const requestBody = await req.json()
+    
+    // Validate input
+    const validation = requestSchema.safeParse(requestBody)
+    if (!validation.success) {
+      console.error('Validation error:', validation.error.issues)
+      return new Response(
+        JSON.stringify({ error: validation.error.issues[0].message }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    
+    const { message, orderId } = validation.data
     
     console.log('Sending Telegram notification for order:', orderId)
 
