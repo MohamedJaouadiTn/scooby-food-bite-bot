@@ -538,6 +538,7 @@ const MenuPage = () => {
 
     try {
       // Save customer to database (upsert by phone)
+      console.log('Saving customer:', { name: orderForm.name, phone: orderForm.phone, address: orderForm.address });
       const { data: customer, error: customerError } = await supabase
         .from('customers')
         .upsert({
@@ -550,7 +551,15 @@ const MenuPage = () => {
 
       if (customerError) {
         console.error('Error saving customer:', customerError);
+        toast({
+          title: "Error",
+          description: "Failed to save customer information. Please try again.",
+          variant: "destructive"
+        });
+        return;
       }
+
+      console.log('Customer saved successfully:', customer);
 
       // Calculate total price
       let totalWithExtras = selectedItem.price;
@@ -592,8 +601,16 @@ const MenuPage = () => {
         .single();
 
       if (orderError) {
-        throw orderError;
+        console.error('Error processing order:', orderError);
+        toast({
+          title: "Error",
+          description: `Failed to process order: ${orderError.message}`,
+          variant: "destructive"
+        });
+        return;
       }
+
+      console.log('Order saved successfully:', order);
 
       // Create message for Telegram
       let message = `New Order!\n\n`;

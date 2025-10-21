@@ -1,6 +1,6 @@
 project_id = "dayyzbgyslmwaalcliqo"
 
 [functions.send-telegram-notification]
-# Require JWT verification for authenticated access
-# This ensures only authenticated users can trigger Telegram notifications
-verify_jwt = true
+# Allow anonymous users to send order notifications
+# This is safe because the Telegram config is only accessible via service role key
+verify_jwt = false
