@@ -5,6 +5,7 @@ import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { orderSchema } from "@/lib/validations";
 
 type FoodOption = {
   id: string;
@@ -547,15 +548,24 @@ const MenuPage = () => {
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!orderForm.name || !orderForm.address || !orderForm.phone) {
+    // Validate order form using Zod schema
+    try {
+      orderSchema.parse({
+        name: orderForm.name,
+        phone: orderForm.phone,
+        address: orderForm.address,
+        allergies: orderForm.allergies
+      });
+    } catch (validationError: any) {
+      const errorMessage = validationError.errors?.[0]?.message || "Please check your information and try again.";
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Validation Error",
+        description: errorMessage,
         variant: "destructive"
       });
       return;
     }
+
     if (!selectedItem) {
       toast({
         title: "Error",
