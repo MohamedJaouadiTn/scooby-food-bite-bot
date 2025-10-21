@@ -54,7 +54,6 @@ const MenuPage = () => {
     allergies: localStorage.getItem("customerAllergies") || ""
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
-  const [telegramConfig, setTelegramConfig] = useState<{ botToken: string; chatId: string } | null>(null);
   const [menuItems, setMenuItems] = useState<FoodOptionType[]>([]);
 
 
@@ -492,56 +491,18 @@ const MenuPage = () => {
     }
   };
 
-  // Fetch Telegram configuration from database
-  useEffect(() => {
-    const fetchTelegramConfig = async () => {
-      const { data, error } = await supabase
-        .from('telegram_config')
-        .select('bot_token, chat_id')
-        .single();
+  // Send order to Telegram via secure Edge Function
+  const sendToTelegram = async (message: string, orderId: string) => {
+    const { data, error } = await supabase.functions.invoke('send-telegram-notification', {
+      body: { message, orderId }
+    });
 
-      if (error) {
-        console.error('Error fetching Telegram config:', error);
-        toast({
-          title: "Configuration Error",
-          description: "Failed to load Telegram configuration.",
-          variant: "destructive",
-        });
-      } else if (data) {
-        setTelegramConfig({
-          botToken: data.bot_token,
-          chatId: data.chat_id
-        });
-      }
-    };
-
-    fetchTelegramConfig();
-  }, []);
-
-  // Send order to Telegram
-  const sendToTelegram = (message: string) => {
-    if (!telegramConfig) {
-      console.error("Telegram configuration not loaded");
-      return Promise.reject(new Error("Telegram configuration not loaded"));
+    if (error) {
+      console.error("Failed to send Telegram notification:", error);
+      throw new Error("Failed to send notification");
     }
 
-    console.log("Sending to Telegram with token:", telegramConfig.botToken, "and chat ID:", telegramConfig.chatId);
-    console.log("Message:", message);
-    return fetch(`https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        chat_id: telegramConfig.chatId,
-        text: message
-      })
-    }).then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    });
+    return data;
   };
 
   // Handle order submission
@@ -664,17 +625,11 @@ const MenuPage = () => {
         message += `Allergies/Preferences = (none)\n`;
       }
 
-      // Send to Telegram
+      // Send to Telegram via secure Edge Function
       try {
-        await sendToTelegram(message);
+        await sendToTelegram(message, order.id);
         
-        // Update order as telegram_sent
-        if (order) {
-          await supabase
-            .from('orders')
-            .update({ telegram_sent: true, status: 'confirmed' })
-            .eq('id', order.id);
-        }
+        // Order status is updated by the Edge Function
 
         toast({
           title: "Order Sent",
