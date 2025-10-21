@@ -1,1 +1,6 @@
 project_id = "dayyzbgyslmwaalcliqo"
+
+[functions.send-telegram-notification]
+# Require JWT verification for authenticated access
+# This ensures only authenticated users can trigger Telegram notifications
+verify_jwt = true
