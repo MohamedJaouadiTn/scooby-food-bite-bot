@@ -171,14 +171,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_dashboard_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      get_dashboard_stats: { Args: never; Returns: Json }
+      is_admin: { Args: { user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
