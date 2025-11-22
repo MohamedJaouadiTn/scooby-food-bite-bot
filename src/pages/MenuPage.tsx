@@ -491,13 +491,13 @@ const MenuPage = () => {
   };
 
   // Send order to Telegram via edge function
-  const sendToTelegram = async (message: string) => {
+  const sendToTelegram = async (orderData: any) => {
     const { data, error } = await supabase.functions.invoke('send-telegram', {
-      body: { message }
+      body: { orderData }
     });
 
     if (error) {
-      console.error("Error sending to Telegram:", error);
+      console.error("Error sending order:", error);
       throw error;
     }
 
@@ -527,26 +527,12 @@ const MenuPage = () => {
     }
 
     try {
-      // Save customer to database (upsert by phone)
-      const { data: customer, error: customerError } = await supabase
-        .from('customers')
-        .upsert({
-          name: orderForm.name,
-          phone: orderForm.phone,
-          address: orderForm.address
-        }, { onConflict: 'phone' })
-        .select()
-        .single();
-
-      if (customerError) {
-        console.error('Error saving customer:', customerError);
-      }
-
       // Calculate total price
       let totalWithExtras = selectedItem.price;
       const selectedOptions = selectedExtras.map(id => {
         const option = extraOptions.find(opt => opt.id === id);
         return {
+          id,
           name: currentLanguage === 'en' ? option?.name : option?.frenchName,
           price: option?.price || 0
         };
@@ -555,78 +541,25 @@ const MenuPage = () => {
         totalWithExtras += opt.price;
       });
 
-      // Save order to database
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          customer_id: customer?.id,
-          customer_name: orderForm.name,
-          customer_phone: orderForm.phone,
-          customer_address: orderForm.address,
-          allergies: orderForm.allergies || null,
-          items: [{
-            ...selectedItem,
-            extras: selectedExtras.map(id => {
-              const option = extraOptions.find(opt => opt.id === id);
-              return {
-                id,
-                name: option?.name,
-                price: option?.price
-              };
-            })
-          }],
-          total_price: totalWithExtras,
-          telegram_sent: false
-        })
-        .select()
-        .single();
+      // Prepare order data for edge function
+      const orderData = {
+        customer: {
+          name: orderForm.name,
+          phone: orderForm.phone,
+          address: orderForm.address,
+          allergies: orderForm.allergies || null
+        },
+        items: [{
+          ...selectedItem,
+          extras: selectedOptions
+        }],
+        totalPrice: totalWithExtras
+      };
 
-      if (orderError) {
-        throw orderError;
-      }
+      // Send order via edge function (handles DB save + Telegram)
+      const result = await sendToTelegram(orderData);
 
-      // Create message for Telegram
-      let message = `New Order!\n\n`;
-      message += `Order = ${selectedItem.name}\n`;
-      message += `Quantity = ${selectedItem.quantity}\n`;
-      message += `Price = ${selectedItem.price.toFixed(3)} TND\n`;
-
-      // Add extras if selected
-      if (selectedExtras.length > 0) {
-        const extraNames = selectedOptions.map(opt => opt.name).join(' + ');
-        message += `Extras = ${extraNames}\n\n`;
-        message += `Total = ${selectedItem.price.toFixed(3)} TND`;
-        selectedOptions.forEach(opt => {
-          message += ` + ${opt.price.toFixed(3)} TND`;
-        });
-        message += ` = ${totalWithExtras.toFixed(3)} TND\n\n`;
-      } else {
-        message += `\nTotal = ${selectedItem.price.toFixed(3)} TND\n\n`;
-      }
-      message += `Customer Information:\n`;
-      message += `Name = ${orderForm.name}\n`;
-      message += `Address = ${orderForm.address}\n`;
-      message += `Phone = ${orderForm.phone}\n`;
-
-      // Add allergies information if provided
-      if (orderForm.allergies.trim()) {
-        message += `Allergies/Preferences = ${orderForm.allergies}\n`;
-      } else {
-        message += `Allergies/Preferences = (none)\n`;
-      }
-
-      // Send to Telegram
-      try {
-        await sendToTelegram(message);
-        
-        // Update order as telegram_sent
-        if (order) {
-          await supabase
-            .from('orders')
-            .update({ telegram_sent: true, status: 'confirmed' })
-            .eq('id', order.id);
-        }
-
+      if (result.success) {
         toast({
           title: "Order Sent",
           description: "Your order has been sent successfully!"
@@ -634,13 +567,8 @@ const MenuPage = () => {
         setShowOrderModal(false);
         setShowConfirmationModal(true);
         setCart([]);
-      } catch (telegramError) {
-        console.error("Error sending to Telegram:", telegramError);
-        toast({
-          title: "Order Saved",
-          description: "Order saved but failed to send notification. Admin will be notified.",
-          variant: "destructive"
-        });
+      } else {
+        throw new Error(result.telegramError || 'Failed to process order');
       }
     } catch (error: any) {
       console.error("Error processing order:", error);
