@@ -1,6 +1,1 @@
 project_id = "dayyzbgyslmwaalcliqo"
-
-[functions.send-telegram-notification]
-# Allow anonymous users to send order notifications
-# This is safe because the Telegram config is only accessible via service role key
-verify_jwt = false

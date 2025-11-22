@@ -5,7 +5,6 @@ import { ShoppingCart, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { orderSchema } from "@/lib/validations";
 
 type FoodOption = {
   id: string;
@@ -54,6 +53,7 @@ const MenuPage = () => {
     allergies: localStorage.getItem("customerAllergies") || ""
   });
   const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [telegramConfig, setTelegramConfig] = useState<{ botToken: string; chatId: string } | null>(null);
   const [menuItems, setMenuItems] = useState<FoodOptionType[]>([]);
 
 
@@ -491,42 +491,71 @@ const MenuPage = () => {
     }
   };
 
-  // Send order to Telegram via secure Edge Function
-  const sendToTelegram = async (message: string, orderId: string) => {
-    const { data, error } = await supabase.functions.invoke('send-telegram-notification', {
-      body: { message, orderId }
-    });
+  // Fetch Telegram configuration from database
+  useEffect(() => {
+    const fetchTelegramConfig = async () => {
+      const { data, error } = await supabase
+        .from('telegram_config')
+        .select('bot_token, chat_id')
+        .single();
 
-    if (error) {
-      console.error("Failed to send Telegram notification:", error);
-      throw new Error("Failed to send notification");
+      if (error) {
+        console.error('Error fetching Telegram config:', error);
+        toast({
+          title: "Configuration Error",
+          description: "Failed to load Telegram configuration.",
+          variant: "destructive",
+        });
+      } else if (data) {
+        setTelegramConfig({
+          botToken: data.bot_token,
+          chatId: data.chat_id
+        });
+      }
+    };
+
+    fetchTelegramConfig();
+  }, []);
+
+  // Send order to Telegram
+  const sendToTelegram = (message: string) => {
+    if (!telegramConfig) {
+      console.error("Telegram configuration not loaded");
+      return Promise.reject(new Error("Telegram configuration not loaded"));
     }
 
-    return data;
+    console.log("Sending to Telegram with token:", telegramConfig.botToken, "and chat ID:", telegramConfig.chatId);
+    console.log("Message:", message);
+    return fetch(`https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: telegramConfig.chatId,
+        text: message
+      })
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    });
   };
 
   // Handle order submission
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate order form using Zod schema
-    try {
-      orderSchema.parse({
-        name: orderForm.name,
-        phone: orderForm.phone,
-        address: orderForm.address,
-        allergies: orderForm.allergies
-      });
-    } catch (validationError: any) {
-      const errorMessage = validationError.errors?.[0]?.message || "Please check your information and try again.";
+    // Validate required fields
+    if (!orderForm.name || !orderForm.address || !orderForm.phone) {
       toast({
-        title: "Validation Error",
-        description: errorMessage,
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
     }
-
     if (!selectedItem) {
       toast({
         title: "Error",
@@ -538,7 +567,6 @@ const MenuPage = () => {
 
     try {
       // Save customer to database (upsert by phone)
-      console.log('Saving customer:', { name: orderForm.name, phone: orderForm.phone, address: orderForm.address });
       const { data: customer, error: customerError } = await supabase
         .from('customers')
         .upsert({
@@ -551,15 +579,7 @@ const MenuPage = () => {
 
       if (customerError) {
         console.error('Error saving customer:', customerError);
-        toast({
-          title: "Error",
-          description: "Failed to save customer information. Please try again.",
-          variant: "destructive"
-        });
-        return;
       }
-
-      console.log('Customer saved successfully:', customer);
 
       // Calculate total price
       let totalWithExtras = selectedItem.price;
@@ -601,16 +621,8 @@ const MenuPage = () => {
         .single();
 
       if (orderError) {
-        console.error('Error processing order:', orderError);
-        toast({
-          title: "Error",
-          description: `Failed to process order: ${orderError.message}`,
-          variant: "destructive"
-        });
-        return;
+        throw orderError;
       }
-
-      console.log('Order saved successfully:', order);
 
       // Create message for Telegram
       let message = `New Order!\n\n`;
@@ -642,11 +654,17 @@ const MenuPage = () => {
         message += `Allergies/Preferences = (none)\n`;
       }
 
-      // Send to Telegram via secure Edge Function
+      // Send to Telegram
       try {
-        await sendToTelegram(message, order.id);
+        await sendToTelegram(message);
         
-        // Order status is updated by the Edge Function
+        // Update order as telegram_sent
+        if (order) {
+          await supabase
+            .from('orders')
+            .update({ telegram_sent: true, status: 'confirmed' })
+            .eq('id', order.id);
+        }
 
         toast({
           title: "Order Sent",
