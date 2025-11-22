@@ -1,18 +1,7 @@
-# Welcome to your Lovable project
 
-## Project info
+**Welcome to my Project Samsari **
 
-**URL**: https://lovable.dev/projects/d8f720ab-29fb-4726-93a7-b7ff5d42a21a
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/d8f720ab-29fb-4726-93a7-b7ff5d42a21a) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+Samsari simply allows travelers to find the perfect vacation house /rental house to rent that matches there taste
 
 **Use your preferred IDE**
 
@@ -60,14 +49,9 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/d8f720ab-29fb-4726-93a7-b7ff5d42a21a) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Website Is not totally done 
+Code will be optimized when all functions implemented 
+Thanks for Understandsing 
+Yours Mohammed
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
