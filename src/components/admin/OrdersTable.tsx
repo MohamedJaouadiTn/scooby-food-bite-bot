@@ -45,6 +45,11 @@ const statusOptions = [
 export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const filteredOrders = statusFilter === 'all' 
+    ? orders 
+    : orders.filter(order => order.status === statusFilter);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     setUpdatingStatus(orderId);
@@ -95,7 +100,32 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
   };
 
   return (
-    <>
+    <div className="space-y-4">
+      {/* Status Filter Tabs */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={statusFilter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter('all')}
+        >
+          All ({orders.length})
+        </Button>
+        {statusOptions.map((status) => {
+          const count = orders.filter(o => o.status === status.value).length;
+          return (
+            <Button
+              key={status.value}
+              variant={statusFilter === status.value ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setStatusFilter(status.value)}
+              className={statusFilter === status.value ? status.color : ''}
+            >
+              {status.label} ({count})
+            </Button>
+          );
+        })}
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -109,14 +139,14 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.length === 0 ? (
+          {filteredOrders.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                No orders found
+                {statusFilter === 'all' ? 'No orders found' : `No ${statusFilter} orders`}
               </TableCell>
             </TableRow>
           ) : (
-            orders.map((order) => (
+            filteredOrders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-mono text-xs">{order.id.substring(0, 8)}</TableCell>
                 <TableCell className="font-medium">{order.customer_name}</TableCell>
@@ -258,6 +288,6 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
