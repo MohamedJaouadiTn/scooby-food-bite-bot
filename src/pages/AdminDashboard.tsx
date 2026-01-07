@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { ProductFormData } from '@/lib/validations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { OrdersTable } from '@/components/admin/OrdersTable';
+import { useOrderNotification } from '@/hooks/useOrderNotification';
 
 interface DashboardStats {
   total_products: number;
@@ -51,6 +52,8 @@ interface Customer {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { notifyNewOrder } = useOrderNotification();
+  const initialLoadRef = useRef(true);
   const [stats, setStats] = useState<DashboardStats>({
     total_products: 0,
     total_customers: 0,
@@ -65,7 +68,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     loadDashboardData();
-    subscribeToChanges();
+    const cleanup = subscribeToChanges();
+    return cleanup;
   }, []);
 
   const subscribeToChanges = () => {
@@ -78,10 +82,19 @@ export default function AdminDashboard() {
       })
       .subscribe();
 
-    // Subscribe to orders changes
+    // Subscribe to orders changes - specifically listen for INSERTs to trigger notification
     const ordersChannel = supabase
       .channel('orders-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        // Only notify after initial load
+        if (!initialLoadRef.current) {
+          const newOrder = payload.new as Order;
+          notifyNewOrder(newOrder.customer_name);
+        }
+        loadOrders();
+        loadStats();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => {
         loadOrders();
         loadStats();
       })
@@ -102,6 +115,8 @@ export default function AdminDashboard() {
       loadCustomers()
     ]);
     setIsLoading(false);
+    // Mark initial load as complete after data is loaded
+    initialLoadRef.current = false;
   };
 
   const loadStats = async () => {
