@@ -1,10 +1,26 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
+
+const SOUND_ENABLED_KEY = 'admin_sound_notifications';
 
 export function useOrderNotification() {
   const audioContextRef = useRef<AudioContext | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    const stored = localStorage.getItem(SOUND_ENABLED_KEY);
+    return stored !== null ? stored === 'true' : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(SOUND_ENABLED_KEY, String(soundEnabled));
+  }, [soundEnabled]);
+
+  const toggleSound = useCallback(() => {
+    setSoundEnabled(prev => !prev);
+  }, []);
 
   const playNotificationSound = useCallback(() => {
+    if (!soundEnabled) return;
+    
     try {
       // Create or resume AudioContext
       if (!audioContextRef.current) {
@@ -50,7 +66,7 @@ export function useOrderNotification() {
     } catch (error) {
       console.error('Error playing notification sound:', error);
     }
-  }, []);
+  }, [soundEnabled]);
 
   const notifyNewOrder = useCallback((customerName: string) => {
     playNotificationSound();
@@ -72,5 +88,5 @@ export function useOrderNotification() {
     }
   }, [playNotificationSound]);
 
-  return { notifyNewOrder, playNotificationSound };
+  return { notifyNewOrder, playNotificationSound, soundEnabled, toggleSound };
 }
