@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { ProductFormData } from '@/lib/validations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { OrdersTable } from '@/components/admin/OrdersTable';
 
 interface DashboardStats {
   total_products: number;
@@ -345,37 +345,10 @@ export default function AdminDashboard() {
           <TabsContent value="orders">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
+                <CardTitle>Manage Orders</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-mono text-xs">{order.id.substring(0, 8)}</TableCell>
-                        <TableCell>{order.customer_name}</TableCell>
-                        <TableCell>{order.customer_phone}</TableCell>
-                        <TableCell>{order.total_price.toFixed(3)} TND</TableCell>
-                        <TableCell>
-                          <Badge variant={order.status === 'pending' ? 'secondary' : 'default'}>
-                            {order.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <OrdersTable orders={orders} onStatusChange={loadOrders} />
               </CardContent>
             </Card>
           </TabsContent>
