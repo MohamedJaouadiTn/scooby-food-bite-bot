@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatCard } from '@/components/admin/StatCard';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductTable } from '@/components/admin/ProductTable';
-import { Package, Users, ShoppingCart, DollarSign, LogOut, Loader2 } from 'lucide-react';
+import { Package, Users, ShoppingCart, DollarSign, LogOut, Loader2, Volume2, VolumeX } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ProductFormData } from '@/lib/validations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,7 +52,7 @@ interface Customer {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { notifyNewOrder } = useOrderNotification();
+  const { notifyNewOrder, soundEnabled, toggleSound } = useOrderNotification();
   const initialLoadRef = useRef(true);
   const [stats, setStats] = useState<DashboardStats>({
     total_products: 0,
@@ -280,10 +280,24 @@ export default function AdminDashboard() {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Scooby Food Admin</h1>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSound}
+              title={soundEnabled ? "Disable sound notifications" : "Enable sound notifications"}
+            >
+              {soundEnabled ? (
+                <Volume2 className="h-5 w-5 text-green-600" />
+              ) : (
+                <VolumeX className="h-5 w-5 text-muted-foreground" />
+              )}
+            </Button>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
